@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Triad-X1 GraphLock Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        textarea, button { width: 100%; margin: 10px 0; }
+        .container { display: flex; gap: 20px; }
+        .box { flex: 1; border: 1px solid #ccc; padding: 15px; border-radius: 5px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+    </style>
+</head>
+<body>
+    <h1>Triad-X1 GraphLock Encryption Demo</h1>
+    
+    <div class="container">
+        <div class="box">
+            <h2>Original Text</h2>
+            <textarea id="plaintext" rows="5" placeholder="Enter English text to encrypt"></textarea>
+            <button onclick="encrypt()">Encrypt</button>
+        </div>
+        
+        <div class="box">
+            <h2>Encrypted Data</h2>
+            <textarea id="ciphertext" rows="5" readonly></textarea>
+            <button onclick="decrypt()">Decrypt</button>
+        </div>
+    </div>
+
+    <div class="box">
+        <h2>Zero-Knowledge Proof Verification</h2>
+        <div id="zkp-status">❌ Not verified</div>
+        <button onclick="verifyProof()">Verify Proof</button>
+    </div>
+
+    <script>
+        // Simplified Hypergraph parameters
+        const GRAPH_SIZE = 16; // Reduced from 256 for demo
+        const DEGREE = 8;      // Reduced from 192
+        
+        // Generate a random hypergraph adjacency matrix
+        function generateHypergraph() {
+            let graph = Array(GRAPH_SIZE).fill().map(() => 
+                Array(GRAPH_SIZE).fill(0));
+            
+            for (let i = 0; i < GRAPH_SIZE; i++) {
+                let edges = 0;
+                while (edges < DEGREE) {
+                    const j = Math.floor(Math.random() * GRAPH_SIZE);
+                    if (graph[i][j] === 0 && i !== j) {
+                        graph[i][j] = 1;
+                        edges++;
+                    }
+                }
+            }
+            return graph;
+        }
+        
+        // Create isomorphic graph + proof
+        function createIsomorphicGraph(originalGraph) {
+            // Random permutation
+            const permutation = [...Array(GRAPH_SIZE).keys()];
+            for (let i = GRAPH_SIZE - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [permutation[i], permutation[j]] = [permutation[j], permutation[i]];
+            }
+            
+            // Apply permutation
+            let newGraph = Array(GRAPH_SIZE).fill().map(() => 
+                Array(GRAPH_SIZE).fill(0));
+                
+            for (let i = 0; i < GRAPH_SIZE; i++) {
+                for (let j = 0; j < GRAPH_SIZE; j++) {
+                    newGraph[permutation[i]][permutation[j]] = originalGraph[i][j];
+                }
+            }
+            
+            // Simplified "proof" for demo
+            const proof = {
+                perm: permutation,
+                hash: CryptoJS.SHA256(JSON.stringify(permutation)).toString()
+            };
+            
+            return { graph: newGraph, proof };
+        }
+        
+        // Encrypt function
+        function encrypt() {
+            const plaintext = document.getElementById('plaintext').value;
+            if (!plaintext) return;
+            
+            // 1. Generate base graph (secret)
+            const baseGraph = generateHypergraph();
+            
+            // 2. Create isomorphic graph + proof
+            const { graph: encryptedGraph, proof } = createIsomorphicGraph(baseGraph);
+            
+            // 3. Encode text in graph (simplified)
+            const textBytes = new TextEncoder().encode(plaintext);
+            let encodedText = '';
+            for (let i = 0; i < textBytes.length; i++) {
+                const row = i % GRAPH_SIZE;
+                const col = (i + 3) % GRAPH_SIZE;
+                encryptedGraph[row][col] = (encryptedGraph[row][col] + textBytes[i]) % 256;
+                encodedText += String.fromCharCode(textBytes[i] ^ encryptedGraph[row][col]);
+            }
+            
+            // Store for decryption
+            window.encryptedData = {
+                baseGraph,
+                encryptedGraph,
+                proof,
+                encodedText
+            };
+            
+            // Display ciphertext (simplified for demo)
+            document.getElementById('ciphertext').value = 
+                `GRAPH-LOCK ENCRYPTED DATA:\n` +
+                `Graph Hash: ${CryptoJS.SHA256(JSON.stringify(encryptedGraph)).toString().substring(0, 32)}\n` +
+                `ZKP Proof: ${proof.hash.substring(0, 24)}...\n` +
+                `Payload: ${btoa(encodedText).substring(0, 64)}...`;
+        }
+        
+        // Decrypt function
+        function decrypt() {
+            if (!window.encryptedData) return;
+            
+            const { baseGraph, encryptedGraph, encodedText } = window.encryptedData;
+            let decryptedBytes = [];
+            
+            // Recover text from graph
+            for (let i = 0; i < encodedText.length; i++) {
+                const row = i % GRAPH_SIZE;
+                const col = (i + 3) % GRAPH_SIZE;
+                const originalVal = baseGraph[row][col];
+                const encryptedVal = encryptedGraph[row][col];
+                decryptedBytes.push(encodedText.charCodeAt(i) ^ encryptedVal);
+            }
+            
+            const plaintext = new TextDecoder().decode(new Uint8Array(decryptedBytes));
+            document.getElementById('plaintext').value = plaintext;
+        }
+        
+        // Verify ZKP proof
+        function verifyProof() {
+            if (!window.encryptedData) return;
+            
+            const { proof, encryptedGraph, baseGraph } = window.encryptedData;
+            
+            // Reconstruct permutation proof
+            let isValid = true;
+            for (let i = 0; i < GRAPH_SIZE && isValid; i++) {
+                for (let j = 0; j < GRAPH_SIZE; j++) {
+                    if (encryptedGraph[proof.perm[i]][proof.perm[j]] !== baseGraph[i][j]) {
+                        isValid = false;
+                        break;
+                    }
+                }
+            }
+            
+            // Verify hash
+            const recomputedHash = CryptoJS.SHA256(JSON.stringify(proof.perm)).toString();
+            isValid = isValid && (recomputedHash === proof.hash);
+            
+            document.getElementById('zkp-status').innerHTML = 
+                isValid ? "✅ Proof valid" : "❌ Proof invalid";
+            document.getElementById('zkp-status').style.color = isValid ? "green" : "red";
+        }
+    </script>
+    
+    <!-- Using CryptoJS for SHA-256 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</body>
+</html>
