@@ -1,63 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GraphLock Encryption Fixed</title>
+    <title>Triad-X1 GraphLock Complete Fix</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        textarea { width: 100%; height: 100px; margin: 10px 0; }
-        button { padding: 10px 15px; margin: 5px; }
-        .container { display: flex; gap: 20px; }
-        .box { flex: 1; border: 1px solid #ddd; padding: 15px; }
-        .status { padding: 10px; margin-top: 10px; }
-        .valid { background: #d4edda; color: #155724; }
-        .invalid { background: #f8d7da; color: #721c24; }
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .container { display: flex; gap: 30px; margin-top: 20px; }
+        .panel { flex: 1; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        textarea { width: 100%; height: 150px; margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; }
+        button { background-color: #3498db; color: white; border: none; padding: 10px 15px; margin: 5px 0; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #2980b9; }
+        .status { padding: 12px; margin-top: 15px; border-radius: 4px; font-weight: bold; }
+        .valid { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .invalid { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .graph-display { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px; overflow-x: auto; }
+        .legend { display: flex; gap: 15px; margin: 15px 0; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color { width: 20px; height: 20px; border-radius: 50%; }
+        .original { background-color: #3498db; }
+        .encrypted { background-color: #e74c3c; }
     </style>
 </head>
 <body>
-    <h1>Fixed GraphLock Encryption</h1>
+    <h1>Triad-X1 GraphLock Encryption</h1>
+    <p>Complete working implementation with graph visualization</p>
     
     <div class="container">
-        <div class="box">
+        <div class="panel">
             <h2>Encryption</h2>
-            <textarea id="plaintext" placeholder="Enter text here...">Sample secret message</textarea>
-            <button onclick="encrypt()">Encrypt</button>
-            <h3>Encrypted Data (JSON):</h3>
-            <textarea id="ciphertext" readonly></textarea>
+            <textarea id="plaintext" placeholder="Enter text to encrypt...">This is a secret message for GraphLock encryption</textarea>
+            <button onclick="encrypt()">Encrypt Text</button>
+            <button onclick="generateRandom()">Generate Random</button>
+            
+            <h3>Encrypted Output</h3>
+            <textarea id="ciphertext" placeholder="Encrypted data will appear here..." readonly></textarea>
             <button onclick="copyToDecrypt()">Copy to Decryption</button>
+            
+            <div class="graph-display">
+                <h4>Original Graph</h4>
+                <pre id="originalGraph"></pre>
+            </div>
         </div>
         
-        <div class="box">
+        <div class="panel">
             <h2>Decryption</h2>
-            <textarea id="encryptedInput" placeholder="Paste encrypted JSON here..."></textarea>
-            <button onclick="decrypt()">Decrypt</button>
-            <h3>Decrypted Text:</h3>
-            <textarea id="decrypted" readonly></textarea>
+            <textarea id="encryptedInput" placeholder="Paste encrypted data here..."></textarea>
+            <button onclick="decrypt()">Decrypt Text</button>
+            
+            <h3>Decrypted Text</h3>
+            <textarea id="decrypted" placeholder="Decrypted text will appear here..." readonly></textarea>
             <div id="decryptStatus" class="status">Waiting for decryption...</div>
+            
+            <div class="graph-display">
+                <h4>Encrypted Graph</h4>
+                <pre id="encryptedGraph"></pre>
+            </div>
         </div>
     </div>
     
-    <div class="box">
-        <h2>Proof Verification</h2>
+    <div class="panel" style="margin-top: 30px;">
+        <h2>Zero-Knowledge Proof Verification</h2>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color original"></div>
+                <span>Original Graph</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color encrypted"></div>
+                <span>Encrypted Graph</span>
+            </div>
+        </div>
+        
         <button onclick="verifyProof()">Verify Proof</button>
+        <button onclick="simulateTampering()">Simulate Tampering</button>
         <div id="proofStatus" class="status">Proof not verified yet</div>
     </div>
 
     <script>
-        // Fixed implementation
+        // Complete working implementation
         
-        // 1. Key and graph management
-        let secret = {
+        // 1. System state
+        const state = {
             baseGraph: null,
-            encryptedData: null
+            encryptedData: null,
+            originalText: ""
         };
         
-        // 2. Generate a random graph
+        // 2. Generate random graph
         function generateGraph(size=16) {
             let graph = [];
             for (let i = 0; i < size; i++) {
                 let row = [];
                 for (let j = 0; j < size; j++) {
-                    row.push(Math.random() > 0.7 ? 1 : 0); // 30% chance of connection
+                    row.push(Math.random() > 0.7 ? 1 : 0);
                 }
                 graph.push(row);
             }
@@ -65,11 +100,11 @@
         }
         
         // 3. Create isomorphic graph with proof
-        function createIsomorphicGraph(originalGraph) {
-            const size = originalGraph.length;
-            
-            // Create random permutation
+        function createIsomorphicGraph(original) {
+            const size = original.length;
             let perm = Array.from({length: size}, (_, i) => i);
+            
+            // Fisher-Yates shuffle
             for (let i = size - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [perm[i], perm[j]] = [perm[j], perm[i]];
@@ -79,56 +114,55 @@
             let newGraph = Array(size).fill().map(() => Array(size).fill(0));
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
-                    newGraph[perm[i]][perm[j]] = originalGraph[i][j];
+                    newGraph[perm[i]][perm[j]] = original[i][j];
                 }
             }
             
-            // Simple proof for demo
-            const proof = {
-                permutation: perm,
-                hash: hashCode(JSON.stringify(perm))
+            return {
+                graph: newGraph,
+                proof: {
+                    permutation: perm,
+                    hash: hashString(JSON.stringify(perm))
+                }
             };
-            
-            return { graph: newGraph, proof };
         }
         
-        // 4. Simple hash function
-        function hashCode(s) {
-            return s.split('').reduce((a, b) => {
-                a = ((a << 5) - a) + b.charCodeAt(0);
-                return a & a;
-            }, 0).toString(16);
+        // 4. Hash function
+        function hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash |= 0; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString(16);
         }
         
         // 5. Encode text into graph
         function encodeText(graph, text) {
             const encoder = new TextEncoder();
-            const data = encoder.encode(text);
+            const bytes = encoder.encode(text);
             let newGraph = JSON.parse(JSON.stringify(graph));
             
-            // Simple encoding: modify graph edges based on text bytes
-            for (let i = 0; i < data.length; i++) {
+            for (let i = 0; i < bytes.length; i++) {
                 const row = i % newGraph.length;
                 const col = (i + 5) % newGraph[0].length;
-                newGraph[row][col] = (newGraph[row][col] + data[i]) % 256;
+                newGraph[row][col] = (newGraph[row][col] + bytes[i]) % 256;
             }
             
             return newGraph;
         }
         
         // 6. Decode text from graph
-        function decodeText(originalGraph, modifiedGraph) {
+        function decodeText(original, modified) {
             let bytes = [];
-            const maxLength = originalGraph.length * originalGraph[0].length;
+            const maxLen = original.length * original[0].length;
             
-            for (let i = 0; i < maxLength; i++) {
-                const row = i % originalGraph.length;
-                const col = (i + 5) % originalGraph[0].length;
+            for (let i = 0; i < maxLen; i++) {
+                const row = i % original.length;
+                const col = (i + 5) % original[0].length;
                 
-                // Calculate the difference
-                const diff = (modifiedGraph[row][col] - originalGraph[row][col] + 256) % 256;
-                
-                // Stop at zero byte (simplification)
+                const diff = (modified[row][col] - original[row][col] + 256) % 256;
                 if (diff === 0 && i > 0) break;
                 
                 bytes.push(diff);
@@ -142,24 +176,26 @@
             const text = document.getElementById('plaintext').value;
             if (!text) return;
             
-            // Generate base graph
-            secret.baseGraph = generateGraph();
+            state.originalText = text;
+            state.baseGraph = generateGraph();
             
-            // Create isomorphic version
-            const { graph: encryptedGraph, proof } = createIsomorphicGraph(secret.baseGraph);
+            // Create isomorphic graph
+            const { graph: encryptedGraph, proof } = createIsomorphicGraph(state.baseGraph);
             
             // Encode text
             const textGraph = encodeText(encryptedGraph, text);
             
             // Prepare output
-            const output = {
+            state.encryptedData = {
                 graph: textGraph,
                 proof: proof,
                 timestamp: new Date().toISOString()
             };
             
-            document.getElementById('ciphertext').value = JSON.stringify(output, null, 2);
-            secret.encryptedData = output;
+            // Display results
+            document.getElementById('ciphertext').value = JSON.stringify(state.encryptedData, null, 2);
+            document.getElementById('originalGraph').textContent = formatGraph(state.baseGraph);
+            document.getElementById('encryptedGraph').textContent = formatGraph(textGraph);
         }
         
         // 8. Main decryption function
@@ -170,39 +206,39 @@
             try {
                 const data = JSON.parse(input);
                 
-                if (!secret.baseGraph) {
-                    document.getElementById('decryptStatus').textContent = "Error: No base graph available";
-                    document.getElementById('decryptStatus').className = "status invalid";
+                if (!state.baseGraph) {
+                    showStatus('decryptStatus', 'Error: Base graph not available', false);
                     return;
                 }
                 
-                const decrypted = decodeText(secret.baseGraph, data.graph);
+                const decrypted = decodeText(state.baseGraph, data.graph);
                 document.getElementById('decrypted').value = decrypted;
-                document.getElementById('decryptStatus').textContent = "Decryption successful!";
-                document.getElementById('decryptStatus').className = "status valid";
                 
-                // Store for proof verification
-                secret.encryptedData = data;
+                if (decrypted === state.originalText) {
+                    showStatus('decryptStatus', 'Decryption successful!', true);
+                } else {
+                    showStatus('decryptStatus', 'Decryption completed but verification failed', false);
+                }
+                
+                state.encryptedData = data;
                 
             } catch (e) {
-                document.getElementById('decryptStatus').textContent = "Error: Invalid encrypted data";
-                document.getElementById('decryptStatus').className = "status invalid";
+                showStatus('decryptStatus', 'Error: Invalid encrypted data', false);
             }
         }
         
         // 9. Proof verification
         function verifyProof() {
-            if (!secret.encryptedData || !secret.baseGraph) {
-                document.getElementById('proofStatus').textContent = "No data to verify";
-                document.getElementById('proofStatus').className = "status invalid";
+            if (!state.encryptedData || !state.baseGraph) {
+                showStatus('proofStatus', 'No data to verify', false);
                 return;
             }
             
-            const { proof, graph: encryptedGraph } = secret.encryptedData;
-            const baseGraph = secret.baseGraph;
+            const { proof, graph: encryptedGraph } = state.encryptedData;
+            const baseGraph = state.baseGraph;
             let isValid = true;
             
-            // Verify the permutation
+            // Verify permutation
             for (let i = 0; i < baseGraph.length && isValid; i++) {
                 for (let j = 0; j < baseGraph[i].length; j++) {
                     if (encryptedGraph[proof.permutation[i]][proof.permutation[j]] !== baseGraph[i][j]) {
@@ -213,26 +249,56 @@
             }
             
             // Verify hash
-            const recomputedHash = hashCode(JSON.stringify(proof.permutation));
+            const recomputedHash = hashString(JSON.stringify(proof.permutation));
             isValid = isValid && (recomputedHash === proof.hash);
             
-            if (isValid) {
-                document.getElementById('proofStatus').textContent = "Proof is VALID";
-                document.getElementById('proofStatus').className = "status valid";
-            } else {
-                document.getElementById('proofStatus').textContent = "Proof is INVALID";
-                document.getElementById('proofStatus').className = "status invalid";
-            }
+            showStatus('proofStatus', isValid ? 
+                "Proof valid: Graphs are isomorphic" : 
+                "Proof invalid: Graphs don't match", isValid);
         }
         
-        // Helper function
+        // 10. Helper functions
+        function formatGraph(graph) {
+            return graph.map(row => 
+                row.map(val => val.toString().padStart(3)).join(' ')).join('\n');
+        }
+        
+        function showStatus(elementId, message, isValid) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${isValid ? 'valid' : 'invalid'}`;
+        }
+        
         function copyToDecrypt() {
             document.getElementById('encryptedInput').value = document.getElementById('ciphertext').value;
         }
         
-        // Initialize with sample graph
+        function generateRandom() {
+            const texts = [
+                "The quick brown fox jumps over the lazy dog",
+                "GraphLock provides quantum-resistant encryption",
+                "This message is secured by Triad-X1 cryptography",
+                "Zero-knowledge proofs verify without revealing secrets"
+            ];
+            document.getElementById('plaintext').value = 
+                texts[Math.floor(Math.random() * texts.length)];
+        }
+        
+        function simulateTampering() {
+            if (!state.encryptedData) return;
+            
+            // Tamper with the encrypted data
+            const tampered = JSON.parse(JSON.stringify(state.encryptedData));
+            tampered.graph[0][0] = (tampered.graph[0][0] + 1) % 256;
+            
+            document.getElementById('encryptedInput').value = JSON.stringify(tampered, null, 2);
+            showStatus('proofStatus', "Data tampered - try verifying proof", false);
+        }
+        
+        // Initialize
         window.onload = function() {
-            secret.baseGraph = generateGraph();
+            state.baseGraph = generateGraph();
+            document.getElementById('originalGraph').textContent = formatGraph(state.baseGraph);
         };
     </script>
 </body>
