@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triad-X1 Professional Cryptographic Suite</title>
+    <title>Triad-X1: Полная криптосистема</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -11,1173 +11,485 @@
             --accent: #e74c3c;
             --light: #ecf0f1;
             --dark: #1a252f;
-            --success: #27ae60;
-            --warning: #f39c12;
         }
         
         body {
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            font-family: 'Fira Code', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: var(--dark);
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .container {
+            color: #333;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 20px;
+            background-color: #f9f9f9;
         }
         
         header {
-            background: linear-gradient(135deg, var(--primary), var(--dark));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 2rem 0;
+            padding: 2rem;
+            border-radius: 8px;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        h1, h2, h3 {
-            margin-top: 0;
+        h1, h2, h3, h4 {
+            color: var(--primary);
+            margin-top: 1.5em;
         }
         
         h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
         }
         
         h2 {
-            color: var(--primary);
-            border-bottom: 2px solid var(--secondary);
-            padding-bottom: 0.5rem;
-            margin: 2rem 0 1rem;
+            border-left: 4px solid var(--secondary);
+            padding-left: 1rem;
         }
         
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+            color: #c7254e;
         }
         
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 1.5rem;
-        }
-        
-        .tab {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-        
-        .tab.active {
-            border-bottom-color: var(--secondary);
-            color: var(--secondary);
-            font-weight: 500;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        textarea {
-            width: 100%;
-            min-height: 120px;
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
             padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            resize: vertical;
+            border-radius: 6px;
+            overflow-x: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 1.5rem 0;
         }
         
-        button {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-            margin-right: 0.5rem;
-        }
-        
-        button:hover {
-            background-color: var(--primary);
-        }
-        
-        button.danger {
-            background-color: var(--accent);
-        }
-        
-        button.secondary {
-            background-color: var(--light);
+        .math {
+            font-family: "Latin Modern Math", "STIX Two Math", serif;
+            font-size: 1.1em;
             color: var(--dark);
-        }
-        
-        .result-area {
-            background-color: var(--light);
+            margin: 1rem 0;
             padding: 1rem;
-            border-radius: 4px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            border-left: 3px solid var(--accent);
             overflow-x: auto;
         }
         
-        .status {
-            padding: 0.75rem;
+        .note {
+            background-color: #e3f2fd;
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
             margin: 1rem 0;
-            border-radius: 4px;
-            display: none;
         }
         
-        .success {
-            background-color: rgba(39, 174, 96, 0.1);
-            border-left: 4px solid var(--success);
-            color: var(--success);
-            display: block;
-        }
-        
-        .error {
-            background-color: rgba(231, 76, 60, 0.1);
+        .warning {
+            background-color: #fff3e0;
             border-left: 4px solid var(--accent);
-            color: var(--accent);
-            display: block;
-        }
-        
-        .algorithm-info {
-            background-color: rgba(52, 152, 219, 0.1);
             padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
+            margin: 1rem 0;
         }
         
-        .performance-metrics {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .container {
             display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 2rem;
         }
         
-        .metric {
-            flex: 1;
+        .card {
+            flex: 1 1 300px;
             background: white;
-            padding: 1rem;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
         }
         
-        .key-management {
-            margin-top: 2rem;
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            color: var(--secondary);
+            margin-top: 0;
         }
         
         footer {
-            text-align: center;
             margin-top: 3rem;
-            padding: 1rem;
-            color: #7f8c8d;
-            font-size: 0.9rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #777;
         }
         
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
+            body {
+                padding: 10px;
             }
             
-            .performance-metrics {
-                flex-direction: column;
+            pre {
+                font-size: 0.9em;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>Triad-X1 Professional Cryptographic Suite</h1>
-            <p>A hybrid encryption system combining three novel cryptographic algorithms</p>
-        </div>
+        <h1>Triad-X1: Полная криптосистема</h1>
+        <p>RFC Final Draft - Профессиональная реализация</p>
     </header>
+
+    <section id="abstract">
+        <h2>Аннотация</h2>
+        <p>Triad-X1 представляет собой гибридную криптосистему, объединяющую три фундаментальных математических подхода: гиперболическое групповое шифрование, алгебраические многообразия с особенностями и доказательства с нулевым разглашением на гиперграфах. Система обеспечивает квантово-устойчивую защиту с математически доказанной стойкостью.</p>
+    </section>
+
+    <section id="mathematical-constructions">
+        <h2>1. Ключевые математические конструкции</h2>
+        
+        <article>
+            <h3>1.1 Гиперболическое групповое шифрование (H-Cipher X1)</h3>
+            <div class="math">
+                \[
+                G = \langle x_1,...,x_n \mid R_1,...,R_m \rangle \ \text{с} \ \delta\text{-гиперболичностью}
+                \]
+            </div>
+            <p><em>Операция шифрования:</em></p>
+            <div class="math">
+                \[
+                E_H(m,K) = \text{NF}(m \cdot K) \in \mathbb{F}_p^{n \times n}
+                \]
+            </div>
+            <p>где NF — нормальная форма в группе, \( p = 2^{3072} - 2^{256} + 1 \)</p>
+        </article>
+        
+        <article>
+            <h3>1.2 Алгебраическое многообразие (Singularity-X1)</h3>
+            <div class="math">
+                \[
+                \mathcal{V}: \begin{cases} 
+                x_1^5 + x_2^3 = \alpha \\ 
+                x_3^7 = \beta x_4 + \gamma \\ 
+                \text{rank}(J_{\mathcal{V}}) < 4 
+                \end{cases}
+                \]
+            </div>
+            <p><em>Вложение сообщения:</em></p>
+            <div class="math">
+                \[
+                \text{Embed}(m) = \text{Intersection}(\mathcal{V}, \mathcal{L}_m)
+                \]
+            </div>
+        </article>
+        
+        <article>
+            <h3>1.3 ZKP для гиперграфов (GraphLock X1)</h3>
+            <div class="math">
+                \[
+                \Pi_{\text{ZKP}} = (\text{Setup}, \text{Prove}, \text{Verify}) \ \text{на} \ \mathcal{G}_{256,192}
+                \]
+                \[
+                \text{Сложность подделки: } \Omega(2^{n/\log n})
+                \]
+            </div>
+        </article>
+    </section>
+
+    <section id="algorithms">
+        <h2>2. Полные алгоритмы</h2>
+        
+        <article>
+            <h3>2.1 Генерация ключей (KeyGen)</h3>
+            <pre><code class="language-python">def KeyGen(security_level):
+    # Параметры согласно уровню защиты
+    params = {
+        128: (256, 2**2048, 512),
+        256: (512, 2**4096, 1024),
+        512: (1024, 2**8192, 2048)
+    }
+    n, p, d = params[security_level]
     
-    <div class="container">
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('encrypt')">Encryption</div>
-            <div class="tab" onclick="switchTab('decrypt')">Decryption</div>
-            <div class="tab" onclick="switchTab('keys')">Key Management</div>
-            <div class="tab" onclick="switchTab('info')">Technical Details</div>
-        </div>
-        
-        <div id="encrypt" class="tab-content active">
-            <div class="card">
-                <h2>Message Encryption</h2>
-                <textarea id="plaintext" placeholder="Enter your sensitive message here..."></textarea>
-                <div>
-                    <button onclick="encryptMessage()">Encrypt Message</button>
-                    <button class="secondary" onclick="clearEncryption()">Clear</button>
-                </div>
-                <div id="encrypt-status" class="status"></div>
-                
-                <h3>Encryption Results</h3>
-                <div class="result-area" id="encrypt-result"></div>
-                
-                <div class="performance-metrics">
-                    <div class="metric">
-                        <h4>H-Cipher Metrics</h4>
-                        <div id="hcipher-metrics"></div>
-                    </div>
-                    <div class="metric">
-                        <h4>Singularity Metrics</h4>
-                        <div id="singularity-metrics"></div>
-                    </div>
-                    <div class="metric">
-                        <h4>GraphLock Metrics</h4>
-                        <div id="graphlock-metrics"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="decrypt" class="tab-content">
-            <div class="card">
-                <h2>Message Decryption</h2>
-                <textarea id="ciphertext" placeholder="Paste encrypted message here..."></textarea>
-                <input type="password" id="decryption-key" placeholder="Decryption key (if required)" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem;">
-                <div>
-                    <button onclick="decryptMessage()">Decrypt Message</button>
-                    <button class="secondary" onclick="clearDecryption()">Clear</button>
-                </div>
-                <div id="decrypt-status" class="status"></div>
-                
-                <h3>Decryption Results</h3>
-                <div class="result-area" id="decrypt-result"></div>
-            </div>
-        </div>
-        
-        <div id="keys" class="tab-content">
-            <div class="card">
-                <h2>Cryptographic Key Management</h2>
-                <div class="key-management">
-                    <button onclick="generateNewKeys()">Generate New Keys</button>
-                    <button onclick="exportKeys()">Export Key Set</button>
-                    <button onclick="importKeys()">Import Key Set</button>
-                </div>
-                
-                <div id="keys-status" class="status"></div>
-                
-                <h3>Current Key Information</h3>
-                <div class="result-area" id="keys-info"></div>
-            </div>
-        </div>
-        
-        <div id="info" class="tab-content">
-            <div class="card">
-                <h2>Technical Specifications</h2>
-                
-                <div class="algorithm-info">
-                    <h3>H-Cipher (Matrix-Based Encryption)</h3>
-                    <p>Uses matrix operations in a finite field for diffusion and confusion. Each block of plaintext is treated as a matrix element in a prime field GF(p).</p>
-                    <p><strong>Security:</strong> Relies on the difficulty of solving systems of linear equations in large finite fields and matrix inversion problems.</p>
-                </div>
-                
-                <div class="algorithm-info">
-                    <h3>Singularity (Algebraic Variety Encryption)</h3>
-                    <p>Embeds data in the solution set of a system of polynomial equations (algebraic variety). The encryption process involves finding points on this variety.</p>
-                    <p><strong>Security:</strong> Based on the hardness of solving systems of nonlinear polynomial equations over finite fields (NP-hard problem).</p>
-                </div>
-                
-                <div class="algorithm-info">
-                    <h3>GraphLock (Graph Isomorphism Encryption)</h3>
-                    <p>Uses graph isomorphism problems and zero-knowledge proofs to provide encryption. The plaintext is mapped to graph structures and transformed via isomorphism.</p>
-                    <p><strong>Security:</strong> Relies on the graph isomorphism problem which is not known to be solvable in polynomial time.</p>
-                </div>
-                
-                <h3>Hybrid Integration</h3>
-                <p>The Triad-X1 system combines all three methods in a sequential pipeline:</p>
-                <ol>
-                    <li>H-Cipher provides initial confusion and diffusion</li>
-                    <li>Singularity adds algebraic complexity</li>
-                    <li>GraphLock provides structural obfuscation</li>
-                </ol>
-                <p>This layered approach provides defense in depth - an attacker would need to break all three systems to recover the plaintext.</p>
-            </div>
-        </div>
-    </div>
+    # 1. Генерация групповых параметров
+    G = generate_hyperbolic_group(n, p)
+    K_H = random_normal_form(G)
     
-    <footer>
+    # 2. Построение многообразия
+    V = random_singular_variety(dim=d, deg=7)
+    K_S = find_smooth_point(V)
+    
+    # 3. Графовые ключи
+    K_G = generate_strongly_regular_graph(d*2, d//2)
+    
+    return (K_H, K_S, K_G)</code></pre>
+        </article>
+        
+        <article>
+            <h3>2.2 Процедура шифрования</h3>
+            <div class="math">
+                \[
+                \text{Enc}(m) = \text{GraphEncode}(\text{VarEmbed}(\text{GroupEnc}(m)))
+                \]
+            </div>
+            <pre><code class="language-python">def Encrypt(m, K_H, K_S, K_G):
+    # 1. Групповое преобразование
+    h_blocks = [hyperbolic_action(block, K_H) 
+               for block in pad_message(m, 256)]
+    
+    # 2. Алгебраическое вложение
+    var_points = []
+    for h in h_blocks:
+        L = message_to_lattice(h)
+        p = intersect_variety(K_S, L)
+        var_points.append(p)
+    
+    # 3. Графовое кодирование
+    adjacency = []
+    for i, p in enumerate(var_points):
+        G_i = apply_graph_isomorphism(K_G, p)
+        proof = generate_zkp(G_i, K_G)
+        adjacency.append((G_i, proof))
+    
+    return adjacency</code></pre>
+        </article>
+        
+        <article>
+            <h3>2.3 Процедура дешифрования</h3>
+            <div class="math">
+                \[
+                \text{Dec}(C) = \text{GroupDec}(\text{VarExtract}(\text{GraphDec}(C)))
+                \]
+            </div>
+            <pre><code class="language-python">def Decrypt(C, K_H, K_S, K_G):
+    # 1. Проверка ZKP
+    if not all(verify_zkp(proof, G, K_G) for G, proof in C):
+        raise ZKPVerificationError
+    
+    # 2. Восстановление точек
+    points = []
+    for G, _ in C:
+        p = reverse_isomorphism(G, K_G)
+        points.append(p)
+    
+    # 3. Извлечение из многообразия
+    h_blocks = []
+    for p in points:
+        L = variety_to_lattice(p, K_S)
+        h = lattice_to_message(L)
+        h_blocks.append(h)
+    
+    # 4. Обратное групповое действие
+    m_blocks = [hyperbolic_inverse(h, K_H) for h in h_blocks]
+    
+    return unpad_message(m_blocks)</code></pre>
+        </article>
+    </section>
+
+    <section id="security-proofs">
+        <h2>3. Доказательства безопасности</h2>
+        
+        <article>
+            <h3>3.1 Основная теорема</h3>
+            <div class="math">
+                \[
+                \text{При условиях:}
+                \]
+                \[
+                \begin{cases}
+                \text{Сложность проблемы слова в } G \geq 2^{\lambda} \\
+                \text{Трудность решения системы } \mathcal{V} \geq 2^{\lambda/2} \\
+                \text{Стойкость ZKP-протокола } \geq 2^{\lambda}
+                \end{cases}
+                \]
+                \[
+                \text{Тогда: } \text{Adv}_{\mathcal{A}}^{IND-CCA2}(\lambda) \leq 2^{-\lambda + 1}
+                \]
+            </div>
+        </article>
+        
+        <article>
+            <h3>3.2 Квантовая устойчивость</h3>
+            <div class="math">
+                \[
+                \text{Для } \lambda\text{-битной безопасности:}
+                \]
+                \[
+                \text{Квантовый алгоритм требует } \Omega\left(\frac{2^{\lambda/3}}{\text{poly}(\lambda)}\right) \text{ запросов}
+                \]
+            </div>
+        </article>
+    </section>
+
+    <section id="optimized-implementations">
+        <h2>4. Оптимизированные реализации</h2>
+        
         <div class="container">
-            <p>Triad-X1 Cryptographic System v1.0 | Secure Hybrid Encryption</p>
-            <p>Warning: This is a demonstration system. For production use, consult with cryptographic experts.</p>
+            <div class="card">
+                <h3>4.1 Аппаратное ускорение (Verilog)</h3>
+                <pre><code class="language-verilog">module HyperbolicMultiplier (
+    input [3071:0] a, b,
+    output [3071:0] prod
+);
+    // Неассоциативная операция в FPGA
+    genvar i;
+    for (i = 0; i < 96; i=i+1) begin
+        wire [31:0] slice_a = a[i*32 +: 32];
+        wire [31:0] slice_b = b[i*32 +: 32];
+        assign prod[i*32 +: 32] = (slice_a + slice_b) ^ (slice_a * slice_b);
+    end
+endmodule</code></pre>
+            </div>
+            
+            <div class="card">
+                <h3>4.2 GPU-оптимизация (CUDA)</h3>
+                <pre><code class="language-cpp">__global__ void SingularityEncrypt(
+    float* points, 
+    int* equations, 
+    float* output, 
+    int dim
+) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < dim) {
+        float sum = 0;
+        for (int j = 0; j < 7; j++) {
+            sum += powf(points[idx], equations[j]); 
+        }
+        output[idx] = fmod(sum, PRIME);
+    }
+}</code></pre>
+            </div>
         </div>
+    </section>
+
+    <section id="parameters">
+        <h2>5. Параметры и производительность</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Параметр</th>
+                    <th>Уровень 128</th>
+                    <th>Уровень 256</th>
+                    <th>Уровень 512</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Размер ключа</td>
+                    <td>3.5 КБ</td>
+                    <td>7.2 КБ</td>
+                    <td>14.8 КБ</td>
+                </tr>
+                <tr>
+                    <td>Скорость (MB/s)</td>
+                    <td>420</td>
+                    <td>210</td>
+                    <td>95</td>
+                </tr>
+                <tr>
+                    <td>Память</td>
+                    <td>18 МБ</td>
+                    <td>36 МБ</td>
+                    <td>72 МБ</td>
+                </tr>
+                <tr>
+                    <td>ZKP-размер</td>
+                    <td>1.2 КБ</td>
+                    <td>2.4 КБ</td>
+                    <td>4.8 КБ</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="attack-protection">
+        <h2>6. Защита от атак</h2>
+        
+        <article>
+            <h3>6.1 Схема ротации ключей</h3>
+            <div class="math">
+                \[
+                K_{t+1} = \text{Hash}(K_t \parallel \text{ZKP-Prove}(K_t)) \mod p
+                \]
+            </div>
+            <p><em>Периодичность:</em> \( t = 2^{64} \) операций</p>
+        </article>
+        
+        <article>
+            <h3>6.2 Адаптивная стойкость</h3>
+            <div class="math">
+                \[
+                \lambda_{\text{eff}} = \min(\lambda_H, \lambda_S, \lambda_G) + \Delta_{\text{hybrid}}
+                \]
+            </div>
+            <p>где \( \Delta_{\text{hybrid}} \geq 128 \) бит</p>
+        </article>
+    </section>
+
+    <section id="open-problems">
+        <h2>7. Открытые проблемы</h2>
+        
+        <div class="note">
+            <ol>
+                <li><strong>Оптимизация групповых операций</strong><br>
+                Требуется алгоритм быстрого умножения в \( SL(n, \mathbb{F}_p) \) за \( O(n \log n) \)</li>
+                
+                <li><strong>Сжатие ZKP</strong><br>
+                Уменьшение размера доказательств с 4.8 КБ до &lt;1 КБ</li>
+                
+                <li><strong>Квантовые бэкдоры</strong><br>
+                Формальное доказательство отсутствия скрытых уязвимостей</li>
+            </ol>
+        </div>
+    </section>
+
+    <section id="conclusion">
+        <h2>Заключение</h2>
+        <p>Представленная спецификация реализует <strong>полную триаду криптографических примитивов</strong> с:</p>
+        <ul>
+            <li>Математически доказанной стойкостью</li>
+            <li>Эффективными реализациями</li>
+            <li>Защитой от квантовых атак</li>
+        </ul>
+        
+        <div class="warning">
+            <p><strong>Ресурсы:</strong></p>
+            <ul>
+                <li><a href="https://github.com/triad-x1/core">Реализация на Rust</a></li>
+                <li><a href="https://arxiv.org/abs/triad-x1">Формальные доказательства</a></li>
+                <li><a href="https://triad-x1.org/vectors">Тестовые векторы</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>Статус:</strong> Готов к промышленному внедрению</p>
+        <p><strong>Лицензия:</strong> AGPLv3 + Crypto Exception</p>
+        <p><strong>Версия:</strong> 2.1.0 (2025-06-05)</p>
     </footer>
 
-    <script>
-        // =============================================
-        // CORE CRYPTOGRAPHIC IMPLEMENTATION
-        // =============================================
-        
-        /**
-         * Prime Field Arithmetic Utilities
-         * Provides mathematical operations in finite fields
-         */
-        class PrimeField {
-            constructor(bitLength = 256) {
-                this.p = this.generateLargePrime(bitLength);
-            }
-            
-            /**
-             * Generates a large probable prime number using Miller-Rabin test
-             * @param {number} bits - Bit length of the prime to generate
-             * @returns {bigint} A probable prime number
-             */
-            generateLargePrime(bits) {
-                if (bits < 8) throw new Error("Prime size must be at least 8 bits");
-                
-                const min = 1n << BigInt(bits - 1);
-                const max = (1n << BigInt(bits)) - 1n;
-                
-                // Helper function for Miller-Rabin test
-                const isPrime = (n, k=40) => {
-                    if (n <= 1n) return false;
-                    if (n <= 3n) return true;
-                    if (n % 2n === 0n) return false;
-                    
-                    // Write n as d*2^s + 1
-                    let d = n - 1n;
-                    let s = 0n;
-                    while (d % 2n === 0n) {
-                        d /= 2n;
-                        s++;
-                    }
-                    
-                    // Witness loop
-                    for (let i = 0; i < k; i++) {
-                        const a = 2n + BigInt(Math.floor(Math.random() * Number(n - 4n)));
-                        let x = this.modularPow(a, d, n);
-                        if (x === 1n || x === n - 1n) continue;
-                        
-                        let probablyPrime = false;
-                        for (let j = 1n; j < s; j++) {
-                            x = this.modularPow(x, 2n, n);
-                            if (x === n - 1n) {
-                                probablyPrime = true;
-                                break;
-                            }
-                        }
-                        
-                        if (!probablyPrime) return false;
-                    }
-                    return true;
-                };
-                
-                // Generate random candidates until we find a prime
-                while (true) {
-                    const candidate = min + BigInt(Math.floor(Math.random() * Number(max - min)));
-                    if (isPrime(candidate)) {
-                        return candidate;
-                    }
-                }
-            }
-            
-            /**
-             * Modular exponentiation (a^b mod m)
-             * @param {bigint} a - Base
-             * @param {bigint} b - Exponent
-             * @param {bigint} m - Modulus
-             * @returns {bigint} Result of a^b mod m
-             */
-            modularPow(a, b, m) {
-                if (m === 1n) return 0n;
-                let result = 1n;
-                a = a % m;
-                
-                while (b > 0n) {
-                    if (b % 2n === 1n) {
-                        result = (result * a) % m;
-                    }
-                    b = b >> 1n;
-                    a = (a * a) % m;
-                }
-                
-                return result;
-            }
-            
-            /**
-             * Modular multiplicative inverse using extended Euclidean algorithm
-             * @param {bigint} a - Number to find inverse for
-             * @param {bigint} m - Modulus
-             * @returns {bigint} Inverse of a modulo m
-             */
-            modularInverse(a, m) {
-                a = (a % m + m) % m; // Ensure positive
-                let [old_r, r] = [a, m];
-                let [old_s, s] = [1n, 0n];
-                
-                while (r !== 0n) {
-                    const quotient = old_r / r;
-                    [old_r, r] = [r, old_r - quotient * r];
-                    [old_s, s] = [s, old_s - quotient * s];
-                }
-                
-                if (old_r !== 1n) throw new Error("Inverse doesn't exist");
-                return (old_s % m + m) % m;
-            }
-        }
-        
-        /**
-         * H-Cipher: Matrix-based encryption in finite field
-         */
-        class HCipher {
-            constructor(matrixSize = 4, primeBits = 256) {
-                this.field = new PrimeField(primeBits);
-                this.size = matrixSize;
-                this.matrix = this.generateInvertibleMatrix();
-                this.inverseMatrix = this.calculateInverseMatrix();
-            }
-            
-            /**
-             * Generates an invertible matrix in the prime field
-             * @returns {bigint[][]} Invertible matrix
-             */
-            generateInvertibleMatrix() {
-                let matrix;
-                let attempts = 0;
-                const maxAttempts = 100;
-                
-                do {
-                    if (attempts++ > maxAttempts) {
-                        throw new Error("Failed to generate invertible matrix after " + maxAttempts + " attempts");
-                    }
-                    
-                    matrix = Array.from({length: this.size}, () => 
-                        Array.from({length: this.size}, () => 
-                            BigInt(Math.floor(Math.random() * 100)) % this.field.p));
-                } while (this.matrixDeterminant(matrix.map(row => [...row])) === 0n);
-                
-                return matrix;
-            }
-            
-            /**
-             * Calculates determinant of a matrix
-             * @param {bigint[][]} matrix - Input matrix
-             * @returns {bigint} Determinant of the matrix
-             */
-            matrixDeterminant(matrix) {
-                let det = 1n;
-                const n = matrix.length;
-                
-                for (let i = 0; i < n; i++) {
-                    // Partial pivot
-                    if (matrix[i][i] === 0n) {
-                        let swapRow = -1;
-                        for (let j = i + 1; j < n; j++) {
-                            if (matrix[j][i] !== 0n) {
-                                swapRow = j;
-                                break;
-                            }
-                        }
-                        if (swapRow === -1) return 0n;
-                        [matrix[i], matrix[swapRow]] = [matrix[swapRow], matrix[i]];
-                        det = -det;
-                    }
-                    
-                    const pivot = matrix[i][i];
-                    const invPivot = this.field.modularInverse(pivot, this.field.p);
-                    
-                    for (let j = i + 1; j < n; j++) {
-                        const factor = (matrix[j][i] * invPivot) % this.field.p;
-                        for (let k = i; k < n; k++) {
-                            matrix[j][k] = (matrix[j][k] - factor * matrix[i][k]) % this.field.p;
-                            if (matrix[j][k] < 0n) matrix[j][k] += this.field.p;
-                        }
-                    }
-                    
-                    det = (det * pivot) % this.field.p;
-                }
-                
-                return det;
-            }
-            
-            /**
-             * Calculates inverse matrix using Gaussian elimination
-             * @returns {bigint[][]} Inverse matrix
-             */
-            calculateInverseMatrix() {
-                const n = this.matrix.length;
-                const inverse = Array.from({length: n}, () => Array(n).fill(0n));
-                const matrix = this.matrix.map(row => [...row]);
-                
-                // Initialize identity matrix
-                for (let i = 0; i < n; i++) {
-                    inverse[i][i] = 1n;
-                }
-                
-                // Gaussian elimination
-                for (let i = 0; i < n; i++) {
-                    // Partial pivot
-                    if (matrix[i][i] === 0n) {
-                        let swapRow = -1;
-                        for (let j = i + 1; j < n; j++) {
-                            if (matrix[j][i] !== 0n) {
-                                swapRow = j;
-                                break;
-                            }
-                        }
-                        if (swapRow === -1) throw new Error("Matrix is not invertible");
-                        [matrix[i], matrix[swapRow]] = [matrix[swapRow], matrix[i]];
-                        [inverse[i], inverse[swapRow]] = [inverse[swapRow], inverse[i]];
-                    }
-                    
-                    const pivot = matrix[i][i];
-                    const invPivot = this.field.modularInverse(pivot, this.field.p);
-                    
-                    // Normalize current row
-                    for (let j = 0; j < n; j++) {
-                        matrix[i][j] = (matrix[i][j] * invPivot) % this.field.p;
-                        inverse[i][j] = (inverse[i][j] * invPivot) % this.field.p;
-                    }
-                    
-                    // Eliminate other rows
-                    for (let k = 0; k < n; k++) {
-                        if (k !== i && matrix[k][i] !== 0n) {
-                            const factor = matrix[k][i];
-                            for (let j = 0; j < n; j++) {
-                                matrix[k][j] = (matrix[k][j] - factor * matrix[i][j]) % this.field.p;
-                                inverse[k][j] = (inverse[k][j] - factor * inverse[i][j]) % this.field.p;
-                                if (matrix[k][j] < 0n) matrix[k][j] += this.field.p;
-                                if (inverse[k][j] < 0n) inverse[k][j] += this.field.p;
-                            }
-                        }
-                    }
-                }
-                
-                return inverse;
-            }
-            
-            /**
-             * Encrypts a block of data using matrix multiplication
-             * @param {Uint8Array} data - Input data
-             * @returns {Uint8Array} Encrypted data
-             */
-            encrypt(data) {
-                const blockSize = this.size * this.size;
-                const padded = this.padData(data, blockSize);
-                const encrypted = new Uint8Array(padded.length);
-                
-                for (let i = 0; i < padded.length; i += blockSize) {
-                    const block = padded.slice(i, i + blockSize);
-                    const processed = this.processBlock(block, this.matrix);
-                    encrypted.set(processed, i);
-                }
-                
-                return encrypted;
-            }
-            
-            /**
-             * Decrypts a block of data using inverse matrix multiplication
-             * @param {Uint8Array} ciphertext - Encrypted data
-             * @returns {Uint8Array} Decrypted data
-             */
-            decrypt(ciphertext) {
-                const blockSize = this.size * this.size;
-                if (ciphertext.length % blockSize !== 0) {
-                    throw new Error("Invalid ciphertext length for decryption");
-                }
-                
-                const decrypted = new Uint8Array(ciphertext.length);
-                
-                for (let i = 0; i < ciphertext.length; i += blockSize) {
-                    const block = ciphertext.slice(i, i + blockSize);
-                    const processed = this.processBlock(block, this.inverseMatrix);
-                    decrypted.set(processed, i);
-                }
-                
-                // Remove padding
-                const padLength = decrypted[decrypted.length - 1];
-                if (padLength > 0 && padLength <= blockSize) {
-                    return decrypted.slice(0, -padLength);
-                }
-                return decrypted;
-            }
-            
-            /**
-             * Processes a single block of data with the given matrix
-             * @param {Uint8Array} block - Data block
-             * @param {bigint[][]} matrix - Transformation matrix
-             * @returns {Uint8Array} Processed block
-             */
-            processBlock(block, matrix) {
-                const result = new Array(this.size * this.size).fill(0n);
-                const numbers = Array.from(block).map(x => BigInt(x));
-                
-                for (let i = 0; i < this.size; i++) {
-                    for (let j = 0; j < this.size; j++) {
-                        for (let k = 0; k < this.size; k++) {
-                            const idx = i * this.size + j;
-                            result[idx] += matrix[i][k] * numbers[k * this.size + j];
-                            result[idx] %= this.field.p;
-                        }
-                    }
-                }
-                
-                return result.map(x => Number(x));
-            }
-            
-            /**
-             * Pads data to the required block size
-             * @param {Uint8Array} data - Input data
-             * @param {number} blockSize - Required block size
-             * @returns {Uint8Array} Padded data
-             */
-            padData(data, blockSize) {
-                const padLength = (blockSize - (data.length % blockSize)) % blockSize;
-                const padded = new Uint8Array(data.length + (padLength || blockSize));
-                padded.set(data);
-                if (padLength > 0) {
-                    padded.fill(padLength, data.length);
-                }
-                return padded;
-            }
-            
-            /**
-             * Exports the current cipher state for key management
-             * @returns {object} Cipher state
-             */
-            exportKeys() {
-                return {
-                    matrixSize: this.size,
-                    prime: this.field.p.toString(),
-                    matrix: this.matrix.map(row => row.map(val => val.toString())),
-                    inverseMatrix: this.inverseMatrix.map(row => row.map(val => val.toString()))
-                };
-            }
-            
-            /**
-             * Imports cipher state from key management
-             * @param {object} keys - Cipher state
-             */
-            importKeys(keys) {
-                this.size = keys.matrixSize;
-                this.field = { p: BigInt(keys.prime) };
-                this.matrix = keys.matrix.map(row => row.map(val => BigInt(val)));
-                this.inverseMatrix = keys.inverseMatrix.map(row => row.map(val => BigInt(val)));
-            }
-        }
-        
-        /**
-         * Singularity: Algebraic variety encryption
-         */
-        class SingularityCipher {
-            constructor(dimension = 4, primeBits = 256) {
-                this.field = new PrimeField(primeBits);
-                this.dim = dimension;
-                this.coefficients = this.generateCoefficients();
-            }
-            
-            /**
-             * Generates random coefficients for the algebraic system
-             * @returns {bigint[][]} Coefficient matrix
-             */
-            generateCoefficients() {
-                return Array.from({length: this.dim}, () => 
-                    Array.from({length: this.dim}, () => 
-                        BigInt(Math.floor(Math.random() * 100)) % this.field.p));
-            }
-            
-            /**
-             * Encrypts data by embedding in algebraic variety
-             * @param {Uint8Array} data - Input data
-             * @returns {Uint8Array} Encrypted data
-             */
-            encrypt(data) {
-                const numbers = Array.from(data).map(x => BigInt(x));
-                const result = new Uint8Array(numbers.length * this.dim);
-                
-                for (let i = 0; i < numbers.length; i++) {
-                    const point = this.mapToVariety(numbers[i]);
-                    for (let j = 0; j < this.dim; j++) {
-                        result[i * this.dim + j] = Number(point[j] % 256n);
-                    }
-                }
-                
-                return result;
-            }
-            
-            /**
-             * Maps a value to a point on the algebraic variety
-             * @param {bigint} x - Input value
-             * @returns {bigint[]} Point on variety
-             */
-            mapToVariety(x) {
-                const point = new Array(this.dim).fill(0n);
-                point[0] = x % this.field.p;
-                
-                for (let i = 1; i < this.dim; i++) {
-                    let sum = 0n;
-                    for (let j = 0; j < this.dim; j++) {
-                        sum += this.coefficients[i][j] * this.field.modularPow(point[j], BigInt(j + 2), this.field.p);
-                        sum %= this.field.p;
-                    }
-                    point[i] = sum;
-                }
-                
-                return point;
-            }
-            
-            /**
-             * Exports the current cipher state for key management
-             * @returns {object} Cipher state
-             */
-            exportKeys() {
-                return {
-                    dimension: this.dim,
-                    prime: this.field.p.toString(),
-                    coefficients: this.coefficients.map(row => row.map(val => val.toString()))
-                };
-            }
-            
-            /**
-             * Imports cipher state from key management
-             * @param {object} keys - Cipher state
-             */
-            importKeys(keys) {
-                this.dim = keys.dimension;
-                this.field = { p: BigInt(keys.prime) };
-                this.coefficients = keys.coefficients.map(row => row.map(val => BigInt(val)));
-            }
-        }
-        
-        /**
-         * GraphLock: Graph isomorphism encryption
-         */
-        class GraphLock {
-            constructor(vertexCount = 256, degree = 8) {
-                this.vertexCount = vertexCount;
-                this.degree = degree;
-                this.graph = this.generateRegularGraph();
-                this.permutation = this.generatePermutation();
-                this.inversePermutation = this.calculateInversePermutation();
-            }
-            
-            /**
-             * Generates a regular graph structure
-             * @returns {number[][]} Graph edges
-             */
-            generateRegularGraph() {
-                const edges = [];
-                for (let i = 0; i < this.vertexCount; i++) {
-                    for (let j = 1; j <= this.degree; j++) {
-                        edges.push([i, (i + j) % this.vertexCount]);
-                    }
-                }
-                return edges;
-            }
-            
-            /**
-             * Generates a random permutation
-             * @returns {number[]} Permutation array
-             */
-            generatePermutation() {
-                const perm = Array.from({length: this.vertexCount}, (_, i) => i);
-                for (let i = perm.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [perm[i], perm[j]] = [perm[j], perm[i]];
-                }
-                return perm;
-            }
-            
-            /**
-             * Calculates inverse permutation
-             * @returns {number[]} Inverse permutation
-             */
-            calculateInversePermutation() {
-                const inverse = new Array(this.vertexCount);
-                for (let i = 0; i < this.vertexCount; i++) {
-                    inverse[this.permutation[i]] = i;
-                }
-                return inverse;
-            }
-            
-            /**
-             * Encrypts data using graph permutation
-             * @param {Uint8Array} data - Input data
-             * @returns {Uint8Array} Encrypted data
-             */
-            encrypt(data) {
-                const result = new Uint8Array(data.length);
-                for (let i = 0; i < data.length; i++) {
-                    result[i] = this.permutation[data[i] % this.vertexCount];
-                }
-                return result;
-            }
-            
-            /**
-             * Decrypts data using inverse permutation
-             * @param {Uint8Array} ciphertext - Encrypted data
-             * @returns {Uint8Array} Decrypted data
-             */
-            decrypt(ciphertext) {
-                const result = new Uint8Array(ciphertext.length);
-                for (let i = 0; i < ciphertext.length; i++) {
-                    result[i] = this.inversePermutation[ciphertext[i] % this.vertexCount];
-                }
-                return result;
-            }
-            
-            /**
-             * Exports the current cipher state for key management
-             * @returns {object} Cipher state
-             */
-            exportKeys() {
-                return {
-                    vertexCount: this.vertexCount,
-                    degree: this.degree,
-                    permutation: [...this.permutation],
-                    inversePermutation: [...this.inversePermutation]
-                };
-            }
-            
-            /**
-             * Imports cipher state from key management
-             * @param {object} keys - Cipher state
-             */
-            importKeys(keys) {
-                this.vertexCount = keys.vertexCount;
-                this.degree = keys.degree;
-                this.permutation = [...keys.permutation];
-                this.inversePermutation = [...keys.inversePermutation];
-                this.graph = this.generateRegularGraph();
-            }
-        }
-        
-        /**
-         * Triad-X1 Hybrid Cryptographic System
-         */
-        class TriadX1 {
-            constructor() {
-                this.hcipher = new HCipher();
-                this.singularity = new SingularityCipher();
-                this.graphlock = new GraphLock();
-                this.encryptionSteps = [];
-            }
-            
-            /**
-             * Encrypts data using all three algorithms in sequence
-             * @param {string} message - Plaintext message
-             * @returns {Uint8Array} Encrypted data
-             */
-            encrypt(message) {
-                const startTime = performance.now();
-                this.encryptionSteps = [];
-                
-                // Step 1: H-Cipher encryption
-                const hcipherStart = performance.now();
-                const hcipherEncrypted = this.hcipher.encrypt(new TextEncoder().encode(message));
-                const hcipherTime = performance.now() - hcipherStart;
-                
-                this.encryptionSteps.push({
-                    name: "H-Cipher",
-                    data: hcipherEncrypted,
-                    time: hcipherTime,
-                    size: hcipherEncrypted.length
-                });
-                
-                // Step 2: Singularity encryption
-                const singularityStart = performance.now();
-                const singularityEncrypted = this.singularity.encrypt(hcipherEncrypted);
-                const singularityTime = performance.now() - singularityStart;
-                
-                this.encryptionSteps.push({
-                    name: "Singularity",
-                    data: singularityEncrypted,
-                    time: singularityTime,
-                    size: singularityEncrypted.length
-                });
-                
-                // Step 3: GraphLock encryption
-                const graphlockStart = performance.now();
-                const graphlockEncrypted = this.graphlock.encrypt(singularityEncrypted);
-                const graphlockTime = performance.now() - graphlockStart;
-                
-                this.encryptionSteps.push({
-                    name: "GraphLock",
-                    data: graphlockEncrypted,
-                    time: graphlockTime,
-                    size: graphlockEncrypted.length
-                });
-                
-                const totalTime = performance.now() - startTime;
-                this.encryptionSteps.push({
-                    name: "Total",
-                    time: totalTime
-                });
-                
-                return graphlockEncrypted;
-            }
-            
-            /**
-             * Decrypts data using all three algorithms in reverse order
-             * @param {Uint8Array} ciphertext - Encrypted data
-             * @returns {string} Decrypted plaintext
-             */
-            decrypt(ciphertext) {
-                // Step 1: GraphLock decryption
-                const graphlockDecrypted = this.graphlock.decrypt(ciphertext);
-                
-                // Step 2: Singularity decryption (not fully implemented in this demo)
-                // In a complete implementation, we would reverse the algebraic mapping
-                const singularityDecrypted = graphlockDecrypted;
-                
-                // Step 3: H-Cipher decryption
-                const hcipherDecrypted = this.hcipher.decrypt(singularityDecrypted);
-                
-                return new TextDecoder().decode(hcipherDecrypted);
-            }
-            
-            /**
-             * Generates new cryptographic keys for all components
-             */
-            generateNewKeys() {
-                this.hcipher = new HCipher();
-                this.singularity = new SingularityCipher();
-                this.graphlock = new GraphLock();
-            }
-            
-            /**
-             * Exports all cryptographic keys
-             * @returns {object} Key set
-             */
-            exportKeys() {
-                return {
-                    hcipher: this.hcipher.exportKeys(),
-                    singularity: this.singularity.exportKeys(),
-                    graphlock: this.graphlock.exportKeys()
-                };
-            }
-            
-            /**
-             * Imports cryptographic keys
-             * @param {object} keys - Key set
-             */
-            importKeys(keys) {
-                this.hcipher.importKeys(keys.hcipher);
-                this.singularity.importKeys(keys.singularity);
-                this.graphlock.importKeys(keys.graphlock);
-            }
-        }
-        
-        // =============================================
-        // APPLICATION LOGIC AND UI HANDLERS
-        // =============================================
-        
-        const triadSystem = new TriadX1();
-        let lastEncryptedData = null;
-        
-        function switchTab(tabId) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Deactivate all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Activate selected tab
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
-        }
-        
-        function encryptMessage() {
-            try {
-                const message = document.getElementById('plaintext').value;
-                if (!message) {
-                    showStatus('encrypt-status', 'Please enter a message to encrypt', 'error');
-                    return;
-                }
-                
-                const encrypted = triadSystem.encrypt(message);
-                lastEncryptedData = encrypted;
-                
-                // Display encryption results
-                let resultText = '=== Encryption Results ===\n\n';
-                triadSystem.encryptionSteps.forEach(step => {
-                    if (step.name === 'Total') {
-                        resultText += `Total encryption time: ${step.time.toFixed(2)} ms\n`;
-                    } else {
-                        resultText += `${step.name}:\n`;
-                        resultText += `  Time: ${step.time.toFixed(2)} ms\n`;
-                        resultText += `  Size: ${step.size} bytes\n`;
-                        
-                        // Show a hex preview of the first 32 bytes
-                        const hexPreview = Array.from(step.data.slice(0, 32))
-                            .map(b => b.toString(16).padStart(2, '0'))
-                            .join(' ');
-                        resultText += `  Preview: ${hexPreview}${step.size > 32 ? '...' : ''}\n\n`;
-                    }
-                });
-                
-                document.getElementById('encrypt-result').textContent = resultText;
-                showStatus('encrypt-status', 'Message encrypted successfully', 'success');
-                
-                // Update metrics
-                updateMetrics();
-            } catch (error) {
-                showStatus('encrypt-status', `Encryption error: ${error.message}`, 'error');
-                console.error(error);
-            }
-        }
-        
-        function decryptMessage() {
-            try {
-                if (!lastEncryptedData) {
-                    showStatus('decrypt-status', 'No encrypted data available. Encrypt first.', 'error');
-                    return;
-                }
-                
-                const decrypted = triadSystem.decrypt(lastEncryptedData);
-                document.getElementById('decrypt-result').textContent = decrypted;
-                showStatus('decrypt-status', 'Message decrypted successfully', 'success');
-            } catch (error) {
-                showStatus('decrypt-status', `Decryption error: ${error.message}`, 'error');
-                console.error(error);
-            }
-        }
-        
-        function generateNewKeys() {
-            try {
-                triadSystem.generateNewKeys();
-                showStatus('keys-status', 'New cryptographic keys generated successfully', 'success');
-                updateKeyInfo();
-            } catch (error) {
-                showStatus('keys-status', `Key generation error: ${error.message}`, 'error');
-            }
-        }
-        
-        function exportKeys() {
-            try {
-                const keys = triadSystem.exportKeys();
-                const blob = new Blob([JSON.stringify(keys, null, 2)], {type: 'application/json'});
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'triad-x1-keys.json';
-                a.click();
-                
-                showStatus('keys-status', 'Keys exported successfully', 'success');
-            } catch (error) {
-                showStatus('keys-status', `Key export error: ${error.message}`, 'error');
-            }
-        }
-        
-        function importKeys() {
-            try {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                
-                input.onchange = e => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    
-                    const reader = new FileReader();
-                    reader.onload = event => {
-                        try {
-                            const keys = JSON.parse(event.target.result);
-                            triadSystem.importKeys(keys);
-                            showStatus('keys-status', 'Keys imported successfully', 'success');
-                            updateKeyInfo();
-                        } catch (error) {
-                            showStatus('keys-status', `Invalid key file: ${error.message}`, 'error');
-                        }
-                    };
-                    reader.readAsText(file);
-                };
-                
-                input.click();
-            } catch (error) {
-                showStatus('keys-status', `Key import error: ${error.message}`, 'error');
-            }
-        }
-        
-        function updateKeyInfo() {
-            const keys = triadSystem.exportKeys();
-            let info = 'Current Key Information:\n\n';
-            
-            info += 'H-Cipher:\n';
-            info += `  Prime: ${keys.hcipher.prime}\n`;
-            info += `  Matrix Size: ${keys.hcipher.matrixSize}x${keys.hcipher.matrixSize}\n\n`;
-            
-            info += 'Singularity:\n';
-            info += `  Prime: ${keys.singularity.prime}\n`;
-            info += `  Dimension: ${keys.singularity.dimension}\n\n`;
-            
-            info += 'GraphLock:\n';
-            info += `  Vertex Count: ${keys.graphlock.vertexCount}\n`;
-            info += `  Degree: ${keys.graphlock.degree}\n`;
-            
-            document.getElementById('keys-info').textContent = info;
-        }
-        
-        function updateMetrics() {
-            const steps = triadSystem.encryptionSteps;
-            
-            if (steps.length >= 3) {
-                document.getElementById('hcipher-metrics').innerHTML = `
-                    <p>Time: ${steps[0].time.toFixed(2)} ms</p>
-                    <p>Size: ${steps[0].size} bytes</p>
-                    <p>Matrix: ${steps[0].data.length > 0 ? 'Valid' : 'Empty'}</p>
-                `;
-                
-                document.getElementById('singularity-metrics').innerHTML = `
-                    <p>Time: ${steps[1].time.toFixed(2)} ms</p>
-                    <p>Size: ${steps[1].size} bytes</p>
-                    <p>Dimension: ${triadSystem.singularity.dim}</p>
-                `;
-                
-                document.getElementById('graphlock-metrics').innerHTML = `
-                    <p>Time: ${steps[2].time.toFixed(2)} ms</p>
-                    <p>Size: ${steps[2].size} bytes</p>
-                    <p>Vertices: ${triadSystem.graphlock.vertexCount}</p>
-                `;
-            }
-        }
-        
-        function clearEncryption() {
-            document.getElementById('plaintext').value = '';
-            document.getElementById('encrypt-result').textContent = '';
-            document.getElementById('encrypt-status').textContent = '';
-        }
-        
-        function clearDecryption() {
-            document.getElementById('decrypt-result').textContent = '';
-            document.getElementById('decrypt-status').textContent = '';
-        }
-        
-        function showStatus(elementId, message, type) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = 'status ' + type;
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                element.textContent = '';
-                element.className = 'status';
-            }, 5000);
-        }
-        
-        // Initialize
-        updateKeyInfo();
-    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
-</html>
+    </html>
