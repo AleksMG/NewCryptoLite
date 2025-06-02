@@ -1,495 +1,439 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triad-X1: Полная криптосистема</title>
+    <title>Triad-X1: Complete Cryptographic Specification</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #1a252f;
-        }
-        
         body {
-            font-family: 'Fira Code', monospace, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f9f9f9;
+            counter-reset: section;
         }
-        
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
         h1, h2, h3, h4 {
-            color: var(--primary);
-            margin-top: 1.5em;
+            color: #2c3e50;
+            margin-top: 24px;
         }
-        
         h1 {
-            border-bottom: 2px solid var(--secondary);
-            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            counter-reset: subsection;
         }
-        
         h2 {
-            border-left: 4px solid var(--secondary);
-            padding-left: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            counter-reset: subsubsection;
         }
-        
-        code {
-            font-family: 'Fira Code', monospace;
-            background-color: #f0f0f0;
-            padding: 2px 4px;
-            border-radius: 4px;
-            color: #c7254e;
+        h2:before {
+            counter-increment: section;
+            content: counter(section) ". ";
         }
-        
-        pre {
-            background-color: #282c34;
-            color: #abb2bf;
-            padding: 1rem;
-            border-radius: 6px;
-            overflow-x: auto;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 1.5rem 0;
+        h3:before {
+            counter-increment: subsection;
+            content: counter(section) "." counter(subsection) " ";
         }
-        
-        .math {
-            font-family: "Latin Modern Math", "STIX Two Math", serif;
-            font-size: 1.1em;
-            color: var(--dark);
-            margin: 1rem 0;
-            padding: 1rem;
+        h4:before {
+            counter-increment: subsubsection;
+            content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .method {
             background-color: #f8f9fa;
-            border-left: 3px solid var(--accent);
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 0 5px 5px 0;
+        }
+        .math {
+            font-family: "Cambria Math", serif;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
             overflow-x: auto;
+            margin: 10px 0;
         }
-        
-        .note {
-            background-color: #e3f2fd;
-            border-left: 4px solid var(--secondary);
-            padding: 1rem;
-            margin: 1rem 0;
-        }
-        
-        .warning {
-            background-color: #fff3e0;
-            border-left: 4px solid var(--accent);
-            padding: 1rem;
-            margin: 1rem 0;
-        }
-        
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1.5rem 0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
         }
-        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
         th, td {
-            padding: 12px 15px;
+            padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
-        
         th {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-        
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
+        .algorithm {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
         }
-        
-        .card {
-            flex: 1 1 300px;
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+        .algorithm-title {
+            font-weight: bold;
+            margin-bottom: 10px;
         }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card h3 {
-            color: var(--secondary);
-            margin-top: 0;
-        }
-        
-        footer {
-            margin-top: 3rem;
-            padding-top: 1rem;
-            border-top: 1px solid #eee;
-            text-align: center;
-            color: #777;
-        }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            pre {
-                font-size: 0.9em;
-            }
+        .security-condition {
+            background-color: #fff8e1;
+            padding: 10px;
+            border-left: 3px solid #ffc107;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Triad-X1: Полная криптосистема</h1>
-        <p>RFC Final Draft - Профессиональная реализация</p>
-    </header>
+    <div class="header">
+        <h1>Triad-X1: Complete Cryptographic Specification</h1>
+        <p><strong>Formal Definitions of All Three Methods with Full Cryptographic Operations</strong></p>
+    </div>
 
-    <section id="abstract">
-        <h2>Аннотация</h2>
-        <p>Triad-X1 представляет собой гибридную криптосистему, объединяющую три фундаментальных математических подхода: гиперболическое групповое шифрование, алгебраические многообразия с особенностями и доказательства с нулевым разглашением на гиперграфах. Система обеспечивает квантово-устойчивую защиту с математически доказанной стойкостью.</p>
-    </section>
-
-    <section id="mathematical-constructions">
-        <h2>1. Ключевые математические конструкции</h2>
+    <div class="method">
+        <h2>Hyperbolic Group Encryption (H-Cipher)</h2>
         
-        <article>
-            <h3>1.1 Гиперболическое групповое шифрование (H-Cipher X1)</h3>
-            <div class="math">
-                \[
-                G = \langle x_1,...,x_n \mid R_1,...,R_m \rangle \ \text{с} \ \delta\text{-гиперболичностью}
-                \]
-            </div>
-            <p><em>Операция шифрования:</em></p>
-            <div class="math">
-                \[
-                E_H(m,K) = \text{NF}(m \cdot K) \in \mathbb{F}_p^{n \times n}
-                \]
-            </div>
-            <p>где NF — нормальная форма в группе, \( p = 2^{3072} - 2^{256} + 1 \)</p>
-        </article>
-        
-        <article>
-            <h3>1.2 Алгебраическое многообразие (Singularity-X1)</h3>
-            <div class="math">
-                \[
-                \mathcal{V}: \begin{cases} 
-                x_1^5 + x_2^3 = \alpha \\ 
-                x_3^7 = \beta x_4 + \gamma \\ 
-                \text{rank}(J_{\mathcal{V}}) < 4 
-                \end{cases}
-                \]
-            </div>
-            <p><em>Вложение сообщения:</em></p>
-            <div class="math">
-                \[
-                \text{Embed}(m) = \text{Intersection}(\mathcal{V}, \mathcal{L}_m)
-                \]
-            </div>
-        </article>
-        
-        <article>
-            <h3>1.3 ZKP для гиперграфов (GraphLock X1)</h3>
-            <div class="math">
-                \[
-                \Pi_{\text{ZKP}} = (\text{Setup}, \text{Prove}, \text{Verify}) \ \text{на} \ \mathcal{G}_{256,192}
-                \]
-                \[
-                \text{Сложность подделки: } \Omega(2^{n/\log n})
-                \]
-            </div>
-        </article>
-    </section>
-
-    <section id="algorithms">
-        <h2>2. Полные алгоритмы</h2>
-        
-        <article>
-            <h3>2.1 Генерация ключей (KeyGen)</h3>
-            <pre><code class="language-python">def KeyGen(security_level):
-    # Параметры согласно уровню защиты
-    params = {
-        128: (256, 2**2048, 512),
-        256: (512, 2**4096, 1024),
-        512: (1024, 2**8192, 2048)
-    }
-    n, p, d = params[security_level]
-    
-    # 1. Генерация групповых параметров
-    G = generate_hyperbolic_group(n, p)
-    K_H = random_normal_form(G)
-    
-    # 2. Построение многообразия
-    V = random_singular_variety(dim=d, deg=7)
-    K_S = find_smooth_point(V)
-    
-    # 3. Графовые ключи
-    K_G = generate_strongly_regular_graph(d*2, d//2)
-    
-    return (K_H, K_S, K_G)</code></pre>
-        </article>
-        
-        <article>
-            <h3>2.2 Процедура шифрования</h3>
-            <div class="math">
-                \[
-                \text{Enc}(m) = \text{GraphEncode}(\text{VarEmbed}(\text{GroupEnc}(m)))
-                \]
-            </div>
-            <pre><code class="language-python">def Encrypt(m, K_H, K_S, K_G):
-    # 1. Групповое преобразование
-    h_blocks = [hyperbolic_action(block, K_H) 
-               for block in pad_message(m, 256)]
-    
-    # 2. Алгебраическое вложение
-    var_points = []
-    for h in h_blocks:
-        L = message_to_lattice(h)
-        p = intersect_variety(K_S, L)
-        var_points.append(p)
-    
-    # 3. Графовое кодирование
-    adjacency = []
-    for i, p in enumerate(var_points):
-        G_i = apply_graph_isomorphism(K_G, p)
-        proof = generate_zkp(G_i, K_G)
-        adjacency.append((G_i, proof))
-    
-    return adjacency</code></pre>
-        </article>
-        
-        <article>
-            <h3>2.3 Процедура дешифрования</h3>
-            <div class="math">
-                \[
-                \text{Dec}(C) = \text{GroupDec}(\text{VarExtract}(\text{GraphDec}(C)))
-                \]
-            </div>
-            <pre><code class="language-python">def Decrypt(C, K_H, K_S, K_G):
-    # 1. Проверка ZKP
-    if not all(verify_zkp(proof, G, K_G) for G, proof in C):
-        raise ZKPVerificationError
-    
-    # 2. Восстановление точек
-    points = []
-    for G, _ in C:
-        p = reverse_isomorphism(G, K_G)
-        points.append(p)
-    
-    # 3. Извлечение из многообразия
-    h_blocks = []
-    for p in points:
-        L = variety_to_lattice(p, K_S)
-        h = lattice_to_message(L)
-        h_blocks.append(h)
-    
-    # 4. Обратное групповое действие
-    m_blocks = [hyperbolic_inverse(h, K_H) for h in h_blocks]
-    
-    return unpad_message(m_blocks)</code></pre>
-        </article>
-    </section>
-
-    <section id="security-proofs">
-        <h2>3. Доказательства безопасности</h2>
-        
-        <article>
-            <h3>3.1 Основная теорема</h3>
-            <div class="math">
-                \[
-                \text{При условиях:}
-                \]
-                \[
-                \begin{cases}
-                \text{Сложность проблемы слова в } G \geq 2^{\lambda} \\
-                \text{Трудность решения системы } \mathcal{V} \geq 2^{\lambda/2} \\
-                \text{Стойкость ZKP-протокола } \geq 2^{\lambda}
-                \end{cases}
-                \]
-                \[
-                \text{Тогда: } \text{Adv}_{\mathcal{A}}^{IND-CCA2}(\lambda) \leq 2^{-\lambda + 1}
-                \]
-            </div>
-        </article>
-        
-        <article>
-            <h3>3.2 Квантовая устойчивость</h3>
-            <div class="math">
-                \[
-                \text{Для } \lambda\text{-битной безопасности:}
-                \]
-                \[
-                \text{Квантовый алгоритм требует } \Omega\left(\frac{2^{\lambda/3}}{\text{poly}(\lambda)}\right) \text{ запросов}
-                \]
-            </div>
-        </article>
-    </section>
-
-    <section id="optimized-implementations">
-        <h2>4. Оптимизированные реализации</h2>
-        
-        <div class="container">
-            <div class="card">
-                <h3>4.1 Аппаратное ускорение (Verilog)</h3>
-                <pre><code class="language-verilog">module HyperbolicMultiplier (
-    input [3071:0] a, b,
-    output [3071:0] prod
-);
-    // Неассоциативная операция в FPGA
-    genvar i;
-    for (i = 0; i < 96; i=i+1) begin
-        wire [31:0] slice_a = a[i*32 +: 32];
-        wire [31:0] slice_b = b[i*32 +: 32];
-        assign prod[i*32 +: 32] = (slice_a + slice_b) ^ (slice_a * slice_b);
-    end
-endmodule</code></pre>
-            </div>
-            
-            <div class="card">
-                <h3>4.2 GPU-оптимизация (CUDA)</h3>
-                <pre><code class="language-cpp">__global__ void SingularityEncrypt(
-    float* points, 
-    int* equations, 
-    float* output, 
-    int dim
-) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < dim) {
-        float sum = 0;
-        for (int j = 0; j < 7; j++) {
-            sum += powf(points[idx], equations[j]); 
-        }
-        output[idx] = fmod(sum, PRIME);
-    }
-}</code></pre>
-            </div>
+        <h3>Mathematical Foundation</h3>
+        <div class="math">
+            Let G = ⟨x₁, ..., xₙ | R₁, ..., Rₘ⟩ be a δ-hyperbolic group with:<br>
+            • Dehn function D(n) = O(n²)<br>
+            • Geodesic stability constant K(δ)<br>
+            • Asymptotic cone property: ∀ε>0 ∃N ∀n≥N, diam(γ) ≤ (1+ε)d(γ(0),γ(n))
         </div>
-    </section>
-
-    <section id="parameters">
-        <h2>5. Параметры и производительность</h2>
         
-        <table>
-            <thead>
-                <tr>
-                    <th>Параметр</th>
-                    <th>Уровень 128</th>
-                    <th>Уровень 256</th>
-                    <th>Уровень 512</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Размер ключа</td>
-                    <td>3.5 КБ</td>
-                    <td>7.2 КБ</td>
-                    <td>14.8 КБ</td>
-                </tr>
-                <tr>
-                    <td>Скорость (MB/s)</td>
-                    <td>420</td>
-                    <td>210</td>
-                    <td>95</td>
-                </tr>
-                <tr>
-                    <td>Память</td>
-                    <td>18 МБ</td>
-                    <td>36 МБ</td>
-                    <td>72 МБ</td>
-                </tr>
-                <tr>
-                    <td>ZKP-размер</td>
-                    <td>1.2 КБ</td>
-                    <td>2.4 КБ</td>
-                    <td>4.8 КБ</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <section id="attack-protection">
-        <h2>6. Защита от атак</h2>
-        
-        <article>
-            <h3>6.1 Схема ротации ключей</h3>
-            <div class="math">
-                \[
-                K_{t+1} = \text{Hash}(K_t \parallel \text{ZKP-Prove}(K_t)) \mod p
-                \]
-            </div>
-            <p><em>Периодичность:</em> \( t = 2^{64} \) операций</p>
-        </article>
-        
-        <article>
-            <h3>6.2 Адаптивная стойкость</h3>
-            <div class="math">
-                \[
-                \lambda_{\text{eff}} = \min(\lambda_H, \lambda_S, \lambda_G) + \Delta_{\text{hybrid}}
-                \]
-            </div>
-            <p>где \( \Delta_{\text{hybrid}} \geq 128 \) бит</p>
-        </article>
-    </section>
-
-    <section id="open-problems">
-        <h2>7. Открытые проблемы</h2>
-        
-        <div class="note">
+        <h3>Key Generation</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 1.1: KeyGen(λ) → (K<sub>H</sub>, K'<sub>H</sub>)</div>
             <ol>
-                <li><strong>Оптимизация групповых операций</strong><br>
-                Требуется алгоритм быстрого умножения в \( SL(n, \mathbb{F}_p) \) за \( O(n \log n) \)</li>
-                
-                <li><strong>Сжатие ZKP</strong><br>
-                Уменьшение размера доказательств с 4.8 КБ до &lt;1 КБ</li>
-                
-                <li><strong>Квантовые бэкдоры</strong><br>
-                Формальное доказательство отсутствия скрытых уязвимостей</li>
+                <li>Select random reduced word w ∈ G of length ℓ(w) = λ² + Random(λ)</li>
+                <li>Compute normal form NF(w) using Dehn's algorithm:
+                    <div class="math">
+                        While ∃ subword u ⊂ w with |u| > D(δ) and u = v in G:<br>
+                        w ← w[u→v] where |v| < |u|
+                    </div>
+                </li>
+                <li>Verify ord(w) > 2<sup>2λ</sup> using:
+                    <div class="math">
+                        Test w^p ≠ 1 for all prime p < 2<sup>λ</sup> (AKS primality test variant)
+                    </div>
+                </li>
+                <li>Derive K'<sub>H</sub> = Derive(NF(w), "KeyDerivation") where:
+                    <div class="math">
+                        Derive(k, ctx) = NF(∏_{i=0}^{512} w^{SHA3-512(k∥ctx∥i)})
+                    </div>
+                </li>
+                <li>Output (K<sub>H</sub> = NF(w), K'<sub>H</sub>)
             </ol>
         </div>
-    </section>
-
-    <section id="conclusion">
-        <h2>Заключение</h2>
-        <p>Представленная спецификация реализует <strong>полную триаду криптографических примитивов</strong> с:</p>
-        <ul>
-            <li>Математически доказанной стойкостью</li>
-            <li>Эффективными реализациями</li>
-            <li>Защитой от квантовых атак</li>
-        </ul>
         
-        <div class="warning">
-            <p><strong>Ресурсы:</strong></p>
-            <ul>
-                <li><a href="https://github.com/triad-x1/core">Реализация на Rust</a></li>
-                <li><a href="https://arxiv.org/abs/triad-x1">Формальные доказательства</a></li>
-                <li><a href="https://triad-x1.org/vectors">Тестовые векторы</a></li>
-            </ul>
+        <h3>Encryption Scheme</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 1.2: Encrypt(m, K<sub>H</sub>) → C</div>
+            <ol>
+                <li>Encode message m as group element:
+                    <div class="math">
+                        m<sub>G</sub> = NF(∏_{i=0}^{⌈|m|/λ⌉} x_{m[iλ:(i+1)λ] mod n})
+                    </div>
+                </li>
+                <li>Compute ciphertext:
+                    <div class="math">
+                        C = NF(m<sub>G</sub> · K<sub>H</sub><sup>-1</sup>) · K'<sub>H</sub> mod p
+                    </div>
+                    where p = 2<sup>3072</sup> - 2<sup>256</sup> + 1
+                </li>
+                <li>Apply length normalization:
+                    <div class="math">
+                        C ← ShortLexReduce(C, max_len = 2λ³)
+                    </div>
+                </li>
+            </ol>
         </div>
-    </section>
+        
+        <h3>Decryption Scheme</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 1.3: Decrypt(C, K<sub>H</sub>, K'<sub>H</sub>) → m</div>
+            <ol>
+                <li>Recover group element:
+                    <div class="math">
+                        m<sub>G</sub> = NF(NF(C · K'<sub>H</sub><sup>-1</sup>) · K<sub>H</sub>)
+                    </div>
+                </li>
+                <li>Decode to binary:
+                    <div class="math">
+                        m = Decode(m<sub>G</sub>) where:<br>
+                        Decode(g) = Concat(ExtractBits(ExponentSum(xᵢ in NF(g)) for i=1..n)
+                    </div>
+                </li>
+            </ol>
+        </div>
+        
+        <h3>Security Conditions</h3>
+        <div class="security-condition">
+            <strong>Theorem 1.1 (Semantic Security):</strong><br>
+            If the Word Problem in G is (t,ε)-hard and Derive is a PRF, then for all PPT adversaries 𝒜:
+            <div class="math">
+                Adv<sub>SS</sub>(𝒜) = |Pr[𝒜(Enc(m₀)) = 1] - Pr[𝒜(Enc(m₁)) = 1]| ≤ ε + negl(λ)
+            </div>
+        </div>
+    </div>
 
-    <footer>
-        <p><strong>Статус:</strong> Готов к промышленному внедрению</p>
-        <p><strong>Лицензия:</strong> AGPLv3 + Crypto Exception</p>
-        <p><strong>Версия:</strong> 2.1.0 (2025-06-05)</p>
-    </footer>
+    <div class="method">
+        <h2>Algebraic Variety Encryption (Singularity-X1)</h2>
+        
+        <h3>Variety Definition</h3>
+        <div class="math">
+            𝒱 ⊂ ℙ⁵(𝔽<sub>q</sub>) defined by:<br>
+            ⎧ f₁(x₀,...,x₅) = ∑_{|α|=5} a₅x^α + ∑_{|α|=3} a₃x^α = 0<br>
+            ⎨ f₂(x₀,...,x₅) = ∑_{|β|=5} b₅x^β + ∑_{|β|=2} b₂x^β = 0<br>
+            ⎩ rank(J<sub>𝒱</sub>(P)) ≤ 3 ∀P ∈ 𝒱<br>
+            where q = 2<sup>512</sup> - 569, aᵢ,bⱼ ∈ 𝔽<sub>q</sub>
+        </div>
+        
+        <h3>Key Generation</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 2.1: KeyGen(λ) → (K<sub>S</sub>, K<sub>V</sub>)</div>
+            <ol>
+                <li>Generate random coefficients for f₁, f₂ with:
+                    <div class="math">
+                        ∀aᵢ,bⱼ ← 𝔽<sub>q</sub> s.t. ∃P∈𝒱 with dim(T<sub>P</sub>𝒱) = 3
+                    </div>
+                </li>
+                <li>Compute secret projection map:
+                    <div class="math">
+                        K<sub>V</sub> = [M|b] where M ∈ GL₃(𝔽<sub>q</sub>), b ∈ 𝔽<sub>q</sub>³
+                    </div>
+                </li>
+                <li>Select secret point P<sub>K</sub> ∈ 𝒱 with:
+                    <div class="math">
+                        P<sub>K</sub> = (SHA3-512(K<sub>S</sub>∥0), ..., SHA3-512(K<sub>S</sub>∥5)) mod q
+                    </div>
+                </li>
+                <li>Output (K<sub>S</sub> = (f₁,f₂), K<sub>V</sub>)
+            </ol>
+        </div>
+        
+        <h3>Encryption Scheme</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 2.2: Encrypt(m, K<sub>S</sub>, K<sub>V</sub>) → C</div>
+            <ol>
+                <li>Encode message as partial point:
+                    <div class="math">
+                        P<sub>m</sub> = (SHA3-512(m∥0), SHA3-512(m∥1), SHA3-512(m∥2), ?, ?, ?)
+                    </div>
+                </li>
+                <li>Solve for x₃,x₄,x₅:
+                    <div class="math">
+                        ⎧ f₁(P<sub>m</sub>) = 0<br>
+                        ⎨ f₂(P<sub>m</sub>) = 0<br>
+                        ⎩ x₃² + x₄² + x₅² = SHA3-512(m∥"norm")
+                    </div>
+                    using Gröbner basis with F₄ algorithm
+                </li>
+                <li>Apply projection:
+                    <div class="math">
+                        C = K<sub>V</sub> · P<sub>m</sub> + RandomNoise(λ)
+                    </div>
+                </li>
+            </ol>
+        </div>
+        
+        <h3>Decryption Scheme</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 2.3: Decrypt(C, K<sub>S</sub>, K<sub>V</sub>) → m</div>
+            <ol>
+                <li>Invert projection:
+                    <div class="math">
+                        P̃ = K<sub>V</sub><sup>-1</sup> · (C - b)
+                    </div>
+                </li>
+                <li>Recover original point:
+                    <div class="math">
+                        P<sub>m</sub> = argmin<sub>P∈𝒱</sub> ||P - P̃||<sub>2</sub>
+                    </div>
+                </li>
+                <li>Extract message:
+                    <div class="math">
+                        m = FindPreimage(P<sub>m</sub>[0:2], SHA3-512)
+                    </div>
+                </li>
+            </ol>
+        </div>
+        
+        <h3>Security Conditions</h3>
+        <div class="security-condition">
+            <strong>Theorem 2.1 (Algebraic Security):</strong><br>
+            Under the hardness of:<br>
+            1) MQ problem (solving quadratic systems over 𝔽<sub>q</sub>)<br>
+            2) IP1S (Isomorphism of Polynomials with 1 Secret)<br>
+            For all PPT adversaries 𝒜:
+            <div class="math">
+                Adv<sub>IND-CPA</sub>(𝒜) ≤ (q<sup>-3</sup> + ε<sub>MQ</sub> + ε<sub>IP1S</sub>)·poly(λ)
+            </div>
+        </div>
+    </div>
 
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <div class="method">
+        <h2>Hypergraph Isomorphism (GraphLock-X1)</h2>
+        
+        <h3>Graph Construction</h3>
+        <div class="math">
+            Γ = (V,E) where:<br>
+            • |V| = 3λ<br>
+            • |E| = 2λ²<br>
+            • Degree distribution: Pr[deg(v) = d] = Poisson(λ, d) for d ∈ [λ-5, λ+5]<br>
+            • Girth g(Γ) ≥ log₄(3λ)
+        </div>
+        
+        <h3>Key Generation</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 3.1: KeyGen(λ) → (Γ<sub>0</sub>, σ)</div>
+            <ol>
+                <li>Construct base graph Γ<sub>0</sub>:
+                    <div class="math">
+                        Γ<sub>0</sub> = RandomRegularHypergraph(3λ, 2λ², λ±5)
+                    </div>
+                </li>
+                <li>Generate secret isomorphism:
+                    <div class="math">
+                        σ ∈ S<sub>3λ</sub> with σ = ∏_{i=1}^λ (aᵢ bᵢ) (product of λ transpositions)
+                    </div>
+                </li>
+                <li>Compute verification tokens:
+                    <div class="math">
+                        ∀v∈V: token(v) = BLAKE3(Γ<sub>0</sub>(v) ∥ σ(v) ∥ v)
+                    </div>
+                </li>
+            </ol>
+        </div>
+        
+        <h3>Zero-Knowledge Protocol</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 3.2: ZKP-Prove(Γ<sub>0</sub>, Γ<sub>1</sub>, σ) → π</div>
+            <ol>
+                <li><strong>Commitment Phase</strong>:
+                    <div class="math">
+                        For i=1 to λ:<br>
+                        • Select random ρᵢ ∈ S<sub>3λ</sub><br>
+                        • Compute Γ̃ᵢ = ρᵢ(Γ<sub>0</sub>)<br>
+                        • Send hᵢ = BLAKE3(Γ̃ᵢ ∥ ρᵢ)
+                    </div>
+                </li>
+                <li><strong>Challenge Phase</strong>:
+                    <div class="math">
+                        Receive c ← {0,1}^λ
+                    </div>
+                </li>
+                <li><strong>Response Phase</strong>:
+                    <div class="math">
+                        For each bit cⱼ:<br>
+                        If cⱼ=0: reveal ρⱼ<br>
+                        If cⱼ=1: reveal τⱼ = ρⱼ ∘ σ<sup>-1</sup>
+                    </div>
+                </li>
+                <li>Output π = {(hᵢ, responses)}
+            </ol>
+        </div>
+        
+        <h3>Encryption Scheme</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 3.3: Encrypt(m, Γ<sub>K</sub>) → C</div>
+            <ol>
+                <li>Encode message as subgraph:
+                    <div class="math">
+                        G<sub>m</sub> = ConstructSubgraph(m, Γ<sub>K</sub>) where:<br>
+                        • Select 30% vertices V<sub>m</sub> ⊂ V via m-derived indices<br>
+                        • Include all edges E∩(V<sub>m</sub>×V<sub>m</sub>)
+                    </div>
+                </li>
+                <li>Generate proof:
+                    <div class="math">
+                        π = ZKP-Prove(Γ<sub>0</sub>, G<sub>m</sub>, σ)
+                    </div>
+                </li>
+                <li>Output C = (G<sub>m</sub>, π)
+            </ol>
+        </div>
+        
+        <h3>Decryption Scheme</h3>
+        <div class="algorithm">
+            <div class="algorithm-title">Algorithm 3.4: Decrypt(C, σ) → m</div>
+            <ol>
+                <li>Verify proof:
+                    <div class="math">
+                        Check ZKP-Verify(π, Γ<sub>0</sub>, G<sub>m</sub>)
+                    </div>
+                </li>
+                <li>Recover message:
+                    <div class="math">
+                        m = Decode(σ<sup>-1</sup>(G<sub>m</sub>)) by:<br>
+                        • Applying inverse permutation<br>
+                        • Extracting vertex indices<br>
+                        • Converting to binary via Gray code
+                    </div>
+                </li>
+            </ol>
+        </div>
+        
+        <h3>Security Conditions</h3>
+        <div class="security-condition">
+            <strong>Theorem 3.1 (Graph Security):</strong><br>
+            Under the hardness of:<br>
+            1) Hypergraph Isomorphism Problem<br>
+            2) Minimum Distortion Problem for S<sub>n</sub><br>
+            The scheme satisfies:
+            <div class="math">
+                ∀PPT 𝒜: Adv<sub>MIM</sub>(𝒜) ≤ λ·2<sup>-λ</sup> + ε<sub>HI</sub> + ε<sub>MD</sub>
+            </div>
+        </div>
+    </div>
+
+    <div class="method">
+        <h2>Hybrid Composition Theorem</h2>
+        
+        <h3>Combined Security</h3>
+        <div class="security-condition">
+            <strong>Theorem 4.1 (Triad Security):</strong><br>
+            When composed as H-Cipher ∘ Singularity-X1 ∘ GraphLock-X1 with independent keys,<br>
+            the system achieves:
+            <div class="math">
+                Adv<sub>Triad</sub>(𝒜) ≤ min⎧Adv<sub>H-Cipher</sub><br>
+                                      ⎨Adv<sub>Singularity</sub><br>
+                                      ⎩Adv<sub>GraphLock</sub>
+            </div>
+            with failure probability δ ≤ 2<sup>-2λ</sup>.
+        </div>
+        
+        <h3>Performance Parameters</h3>
+        <table>
+            <tr>
+                <th>Operation</th>
+                <th>Time Complexity</th>
+                <th>Space Complexity</th>
+            </tr>
+            <tr>
+                <td>H-Cipher Encrypt</td>
+                <td>O(λ³ log p)</td>
+                <td>O(λ²)</td>
+            </tr>
+            <tr>
+                <td>Singularity Encrypt</td>
+                <td>O(λ⁶) [F₄ complexity]</td>
+                <td>O(λ⁴)</td>
+            </tr>
+            <tr>
+                <td>GraphLock Prove</td>
+                <td>O(λ³)</td>
+                <td>O(λ²)</td>
+            </tr>
+        </table>
+    </div>
 </body>
-    </html>
+</html>
