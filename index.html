@@ -2,438 +2,259 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triad-X1: Complete Cryptographic Specification</title>
+    <title>Triad-X1 Cryptosystem</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            counter-reset: section;
-        }
-        h1, h2, h3, h4 {
-            color: #2c3e50;
-            margin-top: 24px;
-        }
-        h1 {
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            counter-reset: subsection;
-        }
-        h2 {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-            counter-reset: subsubsection;
-        }
-        h2:before {
-            counter-increment: section;
-            content: counter(section) ". ";
-        }
-        h3:before {
-            counter-increment: subsection;
-            content: counter(section) "." counter(subsection) " ";
-        }
-        h4:before {
-            counter-increment: subsubsection;
-            content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .method {
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin-bottom: 30px;
-            border-radius: 0 5px 5px 0;
-        }
-        .math {
-            font-family: "Cambria Math", serif;
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-            margin: 10px 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .algorithm {
-            background-color: #e8f4f8;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-        .algorithm-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .security-condition {
-            background-color: #fff8e1;
-            padding: 10px;
-            border-left: 3px solid #ffc107;
-            margin: 10px 0;
-        }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .method { background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        textarea { width: 100%; height: 100px; }
+        button { background: #4CAF50; color: white; border: none; padding: 8px 15px; cursor: pointer; }
+        .output { margin-top: 10px; padding: 10px; background: #eee; border-radius: 3px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Triad-X1: Complete Cryptographic Specification</h1>
-        <p><strong>Formal Definitions of All Three Methods with Full Cryptographic Operations</strong></p>
+    <h1>Triad-X1 Cryptographic System</h1>
+
+    <!-- 1. Hyperbolic Group Encryption -->
+    <div class="method">
+        <h2>1. H-Cipher (Group Encryption)</h2>
+        <textarea id="h-input" placeholder="Enter message here..."></textarea><br>
+        <button onclick="hEncrypt()">Encrypt</button>
+        <button onclick="hDecrypt()">Decrypt</button>
+        <div class="output" id="h-output"></div>
+
+        <script>
+            // Group parameters
+            const p = 2n**3072n - 2n**256n + 1n;
+            const generators = ['x', 'y', 'z'];
+            
+            function hEncrypt() {
+                const message = document.getElementById('h-input').value;
+                const { encrypted, key } = encryptH(message);
+                document.getElementById('h-output').innerHTML = `
+                    <strong>Encrypted:</strong> ${encrypted}<br>
+                    <strong>Key:</strong> ${key}`;
+            }
+
+            function hDecrypt() {
+                const ciphertext = document.getElementById('h-input').value;
+                const key = prompt("Enter decryption key:");
+                const decrypted = decryptH(ciphertext, key);
+                document.getElementById('h-output').innerHTML = `
+                    <strong>Decrypted:</strong> ${decrypted}`;
+            }
+
+            // Core algorithms
+            function encryptH(message) {
+                const key = generateGroupElement();
+                const mGroup = messageToGroup(message);
+                const K_prime = deriveKey(key, hashMessage(message));
+                const cipher = groupMultiply(groupMultiply(mGroup, groupInverse(key)), K_prime);
+                return { 
+                    encrypted: groupToString(cipher),
+                    key: groupToString(key)
+                };
+            }
+
+            function decryptH(ciphertext, keyStr) {
+                const C = stringToGroup(ciphertext);
+                const K = stringToGroup(keyStr);
+                const K_prime = deriveKey(K, hashMessage(groupToString(C)));
+                const mGroup = groupMultiply(groupMultiply(C, groupInverse(K_prime)), K);
+                return groupToMessage(mGroup);
+            }
+
+            // Helper functions
+            function generateGroupElement() {
+                let word = [];
+                for (let i = 0; i < 16; i++) {
+                    word.push(generators[Math.floor(Math.random() * generators.length)]);
+                }
+                return normalizeGroup(word);
+            }
+
+            function messageToGroup(msg) {
+                // Convert message to group elements
+                return [...msg].map(c => 
+                    generators[c.charCodeAt(0) % generators.length]);
+            }
+        </script>
     </div>
 
+    <!-- 2. Algebraic Variety Encryption -->
     <div class="method">
-        <h2>Hyperbolic Group Encryption (H-Cipher)</h2>
-        
-        <h3>Mathematical Foundation</h3>
-        <div class="math">
-            Let G = ⟨x₁, ..., xₙ | R₁, ..., Rₘ⟩ be a δ-hyperbolic group with:<br>
-            • Dehn function D(n) = O(n²)<br>
-            • Geodesic stability constant K(δ)<br>
-            • Asymptotic cone property: ∀ε>0 ∃N ∀n≥N, diam(γ) ≤ (1+ε)d(γ(0),γ(n))
-        </div>
-        
-        <h3>Key Generation</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 1.1: KeyGen(λ) → (K<sub>H</sub>, K'<sub>H</sub>)</div>
-            <ol>
-                <li>Select random reduced word w ∈ G of length ℓ(w) = λ² + Random(λ)</li>
-                <li>Compute normal form NF(w) using Dehn's algorithm:
-                    <div class="math">
-                        While ∃ subword u ⊂ w with |u| > D(δ) and u = v in G:<br>
-                        w ← w[u→v] where |v| < |u|
-                    </div>
-                </li>
-                <li>Verify ord(w) > 2<sup>2λ</sup> using:
-                    <div class="math">
-                        Test w^p ≠ 1 for all prime p < 2<sup>λ</sup> (AKS primality test variant)
-                    </div>
-                </li>
-                <li>Derive K'<sub>H</sub> = Derive(NF(w), "KeyDerivation") where:
-                    <div class="math">
-                        Derive(k, ctx) = NF(∏_{i=0}^{512} w^{SHA3-512(k∥ctx∥i)})
-                    </div>
-                </li>
-                <li>Output (K<sub>H</sub> = NF(w), K'<sub>H</sub>)
-            </ol>
-        </div>
-        
-        <h3>Encryption Scheme</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 1.2: Encrypt(m, K<sub>H</sub>) → C</div>
-            <ol>
-                <li>Encode message m as group element:
-                    <div class="math">
-                        m<sub>G</sub> = NF(∏_{i=0}^{⌈|m|/λ⌉} x_{m[iλ:(i+1)λ] mod n})
-                    </div>
-                </li>
-                <li>Compute ciphertext:
-                    <div class="math">
-                        C = NF(m<sub>G</sub> · K<sub>H</sub><sup>-1</sup>) · K'<sub>H</sub> mod p
-                    </div>
-                    where p = 2<sup>3072</sup> - 2<sup>256</sup> + 1
-                </li>
-                <li>Apply length normalization:
-                    <div class="math">
-                        C ← ShortLexReduce(C, max_len = 2λ³)
-                    </div>
-                </li>
-            </ol>
-        </div>
-        
-        <h3>Decryption Scheme</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 1.3: Decrypt(C, K<sub>H</sub>, K'<sub>H</sub>) → m</div>
-            <ol>
-                <li>Recover group element:
-                    <div class="math">
-                        m<sub>G</sub> = NF(NF(C · K'<sub>H</sub><sup>-1</sup>) · K<sub>H</sub>)
-                    </div>
-                </li>
-                <li>Decode to binary:
-                    <div class="math">
-                        m = Decode(m<sub>G</sub>) where:<br>
-                        Decode(g) = Concat(ExtractBits(ExponentSum(xᵢ in NF(g)) for i=1..n)
-                    </div>
-                </li>
-            </ol>
-        </div>
-        
-        <h3>Security Conditions</h3>
-        <div class="security-condition">
-            <strong>Theorem 1.1 (Semantic Security):</strong><br>
-            If the Word Problem in G is (t,ε)-hard and Derive is a PRF, then for all PPT adversaries 𝒜:
-            <div class="math">
-                Adv<sub>SS</sub>(𝒜) = |Pr[𝒜(Enc(m₀)) = 1] - Pr[𝒜(Enc(m₁)) = 1]| ≤ ε + negl(λ)
-            </div>
-        </div>
+        <h2>2. Singularity-X1 (Algebraic)</h2>
+        <textarea id="a-input" placeholder="Enter message here..."></textarea><br>
+        <button onclick="aEncrypt()">Encrypt</button>
+        <button onclick="aDecrypt()">Decrypt</button>
+        <div class="output" id="a-output"></div>
+
+        <script>
+            // Field parameters
+            const q = 2n**512n - 569n;
+            let secretPoly = generateRandomPolynomial();
+
+            function aEncrypt() {
+                const message = document.getElementById('a-input').value;
+                const point = embedMessage(message);
+                document.getElementById('a-output').innerHTML = `
+                    <strong>Encrypted Point:</strong> [${point.join(', ')}]`;
+            }
+
+            function aDecrypt() {
+                const pointStr = prompt("Enter encrypted point (comma separated):");
+                const point = pointStr.split(',').map(x => BigInt(x.trim()));
+                const message = extractMessage(point);
+                document.getElementById('a-output').innerHTML = `
+                    <strong>Decrypted:</strong> ${message}`;
+            }
+
+            function embedMessage(msg) {
+                const hash = sha3_512(msg);
+                const partial = [
+                    BigInt('0x' + hash.substring(0, 64)),
+                    BigInt('0x' + hash.substring(64, 128))
+                ];
+                // Solve f1(x0,x1,x2,x3) = 0 for x2,x3
+                const solution = solveSystem(partial);
+                return [...partial, ...solution];
+            }
+
+            function solveSystem(partial) {
+                // Simplified solver for demo
+                return [
+                    (secretPoly[0] * partial[0] + secretPoly[1]) % q,
+                    (secretPoly[2] * partial[1] + secretPoly[3]) % q
+                ];
+            }
+        </script>
     </div>
 
+    <!-- 3. Hypergraph Encryption -->
     <div class="method">
-        <h2>Algebraic Variety Encryption (Singularity-X1)</h2>
-        
-        <h3>Variety Definition</h3>
-        <div class="math">
-            𝒱 ⊂ ℙ⁵(𝔽<sub>q</sub>) defined by:<br>
-            ⎧ f₁(x₀,...,x₅) = ∑_{|α|=5} a₅x^α + ∑_{|α|=3} a₃x^α = 0<br>
-            ⎨ f₂(x₀,...,x₅) = ∑_{|β|=5} b₅x^β + ∑_{|β|=2} b₂x^β = 0<br>
-            ⎩ rank(J<sub>𝒱</sub>(P)) ≤ 3 ∀P ∈ 𝒱<br>
-            where q = 2<sup>512</sup> - 569, aᵢ,bⱼ ∈ 𝔽<sub>q</sub>
-        </div>
-        
-        <h3>Key Generation</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 2.1: KeyGen(λ) → (K<sub>S</sub>, K<sub>V</sub>)</div>
-            <ol>
-                <li>Generate random coefficients for f₁, f₂ with:
-                    <div class="math">
-                        ∀aᵢ,bⱼ ← 𝔽<sub>q</sub> s.t. ∃P∈𝒱 with dim(T<sub>P</sub>𝒱) = 3
-                    </div>
-                </li>
-                <li>Compute secret projection map:
-                    <div class="math">
-                        K<sub>V</sub> = [M|b] where M ∈ GL₃(𝔽<sub>q</sub>), b ∈ 𝔽<sub>q</sub>³
-                    </div>
-                </li>
-                <li>Select secret point P<sub>K</sub> ∈ 𝒱 with:
-                    <div class="math">
-                        P<sub>K</sub> = (SHA3-512(K<sub>S</sub>∥0), ..., SHA3-512(K<sub>S</sub>∥5)) mod q
-                    </div>
-                </li>
-                <li>Output (K<sub>S</sub> = (f₁,f₂), K<sub>V</sub>)
-            </ol>
-        </div>
-        
-        <h3>Encryption Scheme</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 2.2: Encrypt(m, K<sub>S</sub>, K<sub>V</sub>) → C</div>
-            <ol>
-                <li>Encode message as partial point:
-                    <div class="math">
-                        P<sub>m</sub> = (SHA3-512(m∥0), SHA3-512(m∥1), SHA3-512(m∥2), ?, ?, ?)
-                    </div>
-                </li>
-                <li>Solve for x₃,x₄,x₅:
-                    <div class="math">
-                        ⎧ f₁(P<sub>m</sub>) = 0<br>
-                        ⎨ f₂(P<sub>m</sub>) = 0<br>
-                        ⎩ x₃² + x₄² + x₅² = SHA3-512(m∥"norm")
-                    </div>
-                    using Gröbner basis with F₄ algorithm
-                </li>
-                <li>Apply projection:
-                    <div class="math">
-                        C = K<sub>V</sub> · P<sub>m</sub> + RandomNoise(λ)
-                    </div>
-                </li>
-            </ol>
-        </div>
-        
-        <h3>Decryption Scheme</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 2.3: Decrypt(C, K<sub>S</sub>, K<sub>V</sub>) → m</div>
-            <ol>
-                <li>Invert projection:
-                    <div class="math">
-                        P̃ = K<sub>V</sub><sup>-1</sup> · (C - b)
-                    </div>
-                </li>
-                <li>Recover original point:
-                    <div class="math">
-                        P<sub>m</sub> = argmin<sub>P∈𝒱</sub> ||P - P̃||<sub>2</sub>
-                    </div>
-                </li>
-                <li>Extract message:
-                    <div class="math">
-                        m = FindPreimage(P<sub>m</sub>[0:2], SHA3-512)
-                    </div>
-                </li>
-            </ol>
-        </div>
-        
-        <h3>Security Conditions</h3>
-        <div class="security-condition">
-            <strong>Theorem 2.1 (Algebraic Security):</strong><br>
-            Under the hardness of:<br>
-            1) MQ problem (solving quadratic systems over 𝔽<sub>q</sub>)<br>
-            2) IP1S (Isomorphism of Polynomials with 1 Secret)<br>
-            For all PPT adversaries 𝒜:
-            <div class="math">
-                Adv<sub>IND-CPA</sub>(𝒜) ≤ (q<sup>-3</sup> + ε<sub>MQ</sub> + ε<sub>IP1S</sub>)·poly(λ)
-            </div>
-        </div>
+        <h2>3. GraphLock-X1 (ZKP)</h2>
+        <textarea id="g-input" placeholder="Enter message here..."></textarea><br>
+        <button onclick="gEncrypt()">Encrypt</button>
+        <button onclick="gDecrypt()">Decrypt</button>
+        <div class="output" id="g-output"></div>
+
+        <script>
+            // Graph parameters
+            const graphSize = 32;
+            let secretGraph = generateRandomGraph();
+            let secretPermutation = generatePermutation();
+
+            function gEncrypt() {
+                const message = document.getElementById('g-input').value;
+                const subgraph = encodeToSubgraph(message, secretGraph);
+                const proof = generateZKP(secretGraph, subgraph, secretPermutation);
+                document.getElementById('g-output').innerHTML = `
+                    <strong>Encrypted Subgraph:</strong> ${JSON.stringify(subgraph)}<br>
+                    <strong>ZKP Proof:</strong> ${proof}`;
+            }
+
+            function gDecrypt() {
+                const subgraph = JSON.parse(prompt("Enter subgraph:"));
+                const proof = prompt("Enter ZKP proof:");
+                if (verifyZKP(proof)) {
+                    const message = decodeFromSubgraph(subgraph, secretPermutation);
+                    document.getElementById('g-output').innerHTML = `
+                        <strong>Decrypted:</strong> ${message}`;
+                } else {
+                    alert("Invalid proof!");
+                }
+            }
+
+            function generateZKP(baseGraph, transformedGraph, permutation) {
+                // Simplified ZKP for demo
+                const challenge = Math.random() > 0.5 ? 0 : 1;
+                if (challenge === 0) {
+                    return `Revealed 30% vertices: ${permutation.slice(0, 3).join(',')}`;
+                } else {
+                    return `Subgraph isomorphism proof`;
+                }
+            }
+        </script>
     </div>
 
+    <!-- Combined Crypto System -->
     <div class="method">
-        <h2>Hypergraph Isomorphism (GraphLock-X1)</h2>
-        
-        <h3>Graph Construction</h3>
-        <div class="math">
-            Γ = (V,E) where:<br>
-            • |V| = 3λ<br>
-            • |E| = 2λ²<br>
-            • Degree distribution: Pr[deg(v) = d] = Poisson(λ, d) for d ∈ [λ-5, λ+5]<br>
-            • Girth g(Γ) ≥ log₄(3λ)
-        </div>
-        
-        <h3>Key Generation</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 3.1: KeyGen(λ) → (Γ<sub>0</sub>, σ)</div>
-            <ol>
-                <li>Construct base graph Γ<sub>0</sub>:
-                    <div class="math">
-                        Γ<sub>0</sub> = RandomRegularHypergraph(3λ, 2λ², λ±5)
-                    </div>
-                </li>
-                <li>Generate secret isomorphism:
-                    <div class="math">
-                        σ ∈ S<sub>3λ</sub> with σ = ∏_{i=1}^λ (aᵢ bᵢ) (product of λ transpositions)
-                    </div>
-                </li>
-                <li>Compute verification tokens:
-                    <div class="math">
-                        ∀v∈V: token(v) = BLAKE3(Γ<sub>0</sub>(v) ∥ σ(v) ∥ v)
-                    </div>
-                </li>
-            </ol>
-        </div>
-        
-        <h3>Zero-Knowledge Protocol</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 3.2: ZKP-Prove(Γ<sub>0</sub>, Γ<sub>1</sub>, σ) → π</div>
-            <ol>
-                <li><strong>Commitment Phase</strong>:
-                    <div class="math">
-                        For i=1 to λ:<br>
-                        • Select random ρᵢ ∈ S<sub>3λ</sub><br>
-                        • Compute Γ̃ᵢ = ρᵢ(Γ<sub>0</sub>)<br>
-                        • Send hᵢ = BLAKE3(Γ̃ᵢ ∥ ρᵢ)
-                    </div>
-                </li>
-                <li><strong>Challenge Phase</strong>:
-                    <div class="math">
-                        Receive c ← {0,1}^λ
-                    </div>
-                </li>
-                <li><strong>Response Phase</strong>:
-                    <div class="math">
-                        For each bit cⱼ:<br>
-                        If cⱼ=0: reveal ρⱼ<br>
-                        If cⱼ=1: reveal τⱼ = ρⱼ ∘ σ<sup>-1</sup>
-                    </div>
-                </li>
-                <li>Output π = {(hᵢ, responses)}
-            </ol>
-        </div>
-        
-        <h3>Encryption Scheme</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 3.3: Encrypt(m, Γ<sub>K</sub>) → C</div>
-            <ol>
-                <li>Encode message as subgraph:
-                    <div class="math">
-                        G<sub>m</sub> = ConstructSubgraph(m, Γ<sub>K</sub>) where:<br>
-                        • Select 30% vertices V<sub>m</sub> ⊂ V via m-derived indices<br>
-                        • Include all edges E∩(V<sub>m</sub>×V<sub>m</sub>)
-                    </div>
-                </li>
-                <li>Generate proof:
-                    <div class="math">
-                        π = ZKP-Prove(Γ<sub>0</sub>, G<sub>m</sub>, σ)
-                    </div>
-                </li>
-                <li>Output C = (G<sub>m</sub>, π)
-            </ol>
-        </div>
-        
-        <h3>Decryption Scheme</h3>
-        <div class="algorithm">
-            <div class="algorithm-title">Algorithm 3.4: Decrypt(C, σ) → m</div>
-            <ol>
-                <li>Verify proof:
-                    <div class="math">
-                        Check ZKP-Verify(π, Γ<sub>0</sub>, G<sub>m</sub>)
-                    </div>
-                </li>
-                <li>Recover message:
-                    <div class="math">
-                        m = Decode(σ<sup>-1</sup>(G<sub>m</sub>)) by:<br>
-                        • Applying inverse permutation<br>
-                        • Extracting vertex indices<br>
-                        • Converting to binary via Gray code
-                    </div>
-                </li>
-            </ol>
-        </div>
-        
-        <h3>Security Conditions</h3>
-        <div class="security-condition">
-            <strong>Theorem 3.1 (Graph Security):</strong><br>
-            Under the hardness of:<br>
-            1) Hypergraph Isomorphism Problem<br>
-            2) Minimum Distortion Problem for S<sub>n</sub><br>
-            The scheme satisfies:
-            <div class="math">
-                ∀PPT 𝒜: Adv<sub>MIM</sub>(𝒜) ≤ λ·2<sup>-λ</sup> + ε<sub>HI</sub> + ε<sub>MD</sub>
-            </div>
-        </div>
+        <h2>Triad-X1 Full Protocol</h2>
+        <textarea id="full-input" placeholder="Enter message here..."></textarea><br>
+        <button onclick="fullEncrypt()">Full Encrypt</button>
+        <button onclick="fullDecrypt()">Full Decrypt</button>
+        <div class="output" id="full-output"></div>
+
+        <script>
+            async function fullEncrypt() {
+                const message = document.getElementById('full-input').value;
+                
+                // Step 1: H-Cipher
+                const hResult = encryptH(message);
+                
+                // Step 2: Algebraic
+                const aPoint = embedMessage(hResult.encrypted);
+                
+                // Step 3: GraphLock
+                const gResult = encodeToSubgraph(aPoint.join(','), secretGraph);
+                
+                document.getElementById('full-output').innerHTML = `
+                    <strong>Final Ciphertext:</strong><br>
+                    ${JSON.stringify(gResult, null, 2)}`;
+            }
+
+            function fullDecrypt() {
+                const cipher = JSON.parse(prompt("Enter full ciphertext:"));
+                
+                // Reverse steps
+                const aPoint = decodeFromSubgraph(cipher, secretPermutation).split(',');
+                const hText = extractMessage(aPoint.map(BigInt));
+                const plaintext = decryptH(hText, prompt("Enter H-Cipher key:"));
+                
+                document.getElementById('full-output').innerHTML = `
+                    <strong>Decrypted Message:</strong> ${plaintext}`;
+            }
+        </script>
     </div>
 
-    <div class="method">
-        <h2>Hybrid Composition Theorem</h2>
-        
-        <h3>Combined Security</h3>
-        <div class="security-condition">
-            <strong>Theorem 4.1 (Triad Security):</strong><br>
-            When composed as H-Cipher ∘ Singularity-X1 ∘ GraphLock-X1 with independent keys,<br>
-            the system achieves:
-            <div class="math">
-                Adv<sub>Triad</sub>(𝒜) ≤ min⎧Adv<sub>H-Cipher</sub><br>
-                                      ⎨Adv<sub>Singularity</sub><br>
-                                      ⎩Adv<sub>GraphLock</sub>
-            </div>
-            with failure probability δ ≤ 2<sup>-2λ</sup>.
-        </div>
-        
-        <h3>Performance Parameters</h3>
-        <table>
-            <tr>
-                <th>Operation</th>
-                <th>Time Complexity</th>
-                <th>Space Complexity</th>
-            </tr>
-            <tr>
-                <td>H-Cipher Encrypt</td>
-                <td>O(λ³ log p)</td>
-                <td>O(λ²)</td>
-            </tr>
-            <tr>
-                <td>Singularity Encrypt</td>
-                <td>O(λ⁶) [F₄ complexity]</td>
-                <td>O(λ⁴)</td>
-            </tr>
-            <tr>
-                <td>GraphLock Prove</td>
-                <td>O(λ³)</td>
-                <td>O(λ²)</td>
-            </tr>
-        </table>
-    </div>
+    <!-- Cryptographic primitives -->
+    <script>
+        // SHA3-512 implementation
+        function sha3_512(msg) {
+            // Browser-native implementation
+            const encoder = new TextEncoder();
+            const data = encoder.encode(msg);
+            return crypto.subtle.digest('SHA-512', data).then(hash => {
+                const hex = Array.from(new Uint8Array(hash))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+                return hex;
+            });
+        }
+
+        // Mock for demo purposes
+        function hashMessage(msg) {
+            return "mockhash" + msg.length;
+        }
+
+        // Group operations
+        function groupMultiply(a, b) {
+            return [...a, ...b]; // Simplified
+        }
+
+        function groupInverse(g) {
+            return g.slice().reverse();
+        }
+
+        // Graph operations
+        function generateRandomGraph() {
+            return { nodes: Array(graphSize).fill(0).map((_,i) => i),
+                     edges: [] };
+        }
+
+        function generatePermutation() {
+            return Array(graphSize).fill(0).map((_,i) => i)
+                   .sort(() => Math.random() - 0.5);
+        }
+    </script>
 </body>
 </html>
