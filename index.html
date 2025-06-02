@@ -1,389 +1,173 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triad-X1: GraphLock Module</title>
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #1a1a1a;
-        }
+  <title>H-Cipher Math Implementation</title>
+  <script>
+    //////////////////////////////////////////////////////////////////
+    // ОСНОВНЫЕ МАТЕМАТИЧЕСКИЕ ФОРМУЛЫ ИЗ СПЕЦИФИКАЦИИ
+    //////////////////////////////////////////////////////////////////
+
+    // 1. Групповая операция: G = ⟨x, y, z | x² = y² = z² = 1, (xy)⁵ = (yz)⁷ = (xz)³ = 1⟩
+    class HyperbolicGroup {
+      static reduce(word) {
+        // Алгоритм Дехна для приведения к нормальной форме
+        const rules = [
+          { from: 'xx', to: '' },
+          { from: 'yy', to: '' },
+          { from: 'zz', to: '' },
+          { from: 'xyxyxyxyxy', to: '' },
+          { from: 'yzyzyzyzyzyzy', to: '' },
+          { from: 'xzxzxz', to: '' }
+        ];
+
+        let changed;
+        do {
+          changed = false;
+          for (const rule of rules) {
+            if (word.includes(rule.from)) {
+              word = word.replace(rule.from, rule.to);
+              changed = true;
+            }
+          }
+        } while (changed);
+
+        return word;
+      }
+    }
+
+    // 2. Формула шифрования: C = NF(m·K⁻¹)·K' mod p
+    class HCipher {
+      constructor() {
+        this.p = this.calculatePrime(); // p = 2³⁰⁷² - 2²⁵⁶ + 1
+      }
+
+      encrypt(m, K) {
+        // 1. Приведение к нормальной форме
+        const mNormalized = HyperbolicGroup.reduce(m);
         
-        body {
-            font-family: 'Roboto Mono', monospace;
-            line-height: 1.6;
-            color: var(--dark);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
+        // 2. Вычисление m·K⁻¹
+        const mKInv = this.groupMultiply(mNormalized, this.groupInverse(K));
         
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 5px;
-            margin-bottom: 2rem;
-        }
+        // 3. Нормальная форма
+        const C = HyperbolicGroup.reduce(mKInv);
         
-        .container {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 2rem;
-        }
+        // 4. Умножение на K'
+        const KPrime = this.deriveKey(K, this.hash(m));
+        return this.modularReduce(
+          this.groupMultiply(C, KPrime),
+          this.p
+        );
+      }
+
+      decrypt(C, K) {
+        // 1. Вычисление C·(K')⁻¹
+        const KPrime = this.deriveKey(K, this.hash(this.groupMultiply(C, K)));
+        const CKPrimeInv = this.groupMultiply(C, this.groupInverse(KPrime));
         
-        .control-panel {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+        // 2. Нормальная форма
+        const mKInv = HyperbolicGroup.reduce(CKPrimeInv);
         
-        .visualization {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            min-height: 500px;
+        // 3. Умножение на K
+        return this.groupMultiply(mKInv, K);
+      }
+
+      //////////////////////////////////////////////////////////////////
+      // ВСПОМОГАТЕЛЬНЫЕ МАТЕМАТИЧЕСКИЕ ФУНКЦИИ
+      //////////////////////////////////////////////////////////////////
+
+      calculatePrime() {
+        // p = 2³⁰⁷² - 2²⁵⁶ + 1
+        return BigInt(2)**BigInt(3072) - BigInt(2)**BigInt(256) + BigInt(1);
+      }
+
+      groupMultiply(a, b) {
+        // Групповая операция в гиперболической группе
+        return HyperbolicGroup.reduce(a + b);
+      }
+
+      groupInverse(w) {
+        // Обратный элемент в группе
+        return w.split('').reverse().map(c => {
+          if (c === 'x') return 'x';
+          if (c === 'y') return 'y';
+          if (c === 'z') return 'z';
+          return '';
+        }).join('');
+      }
+
+      deriveKey(K, h) {
+        // K' = Derive(K, hash(m))
+        const Kh = this.groupMultiply(K, h);
+        return HyperbolicGroup.reduce(Kh);
+      }
+
+      hash(m) {
+        // Хеш-функция для группы
+        let result = '';
+        for (let i = 0; i < m.length; i++) {
+          const c = m.charCodeAt(i);
+          result += (c % 3 === 0) ? 'x' : (c % 3 === 1) ? 'y' : 'z';
         }
-        
-        button {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: block;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-        
-        button:hover {
-            background: #2980b9;
-        }
-        
-        canvas {
-            width: 100%;
-            border: 1px solid #ddd;
-            background: var(--light);
-        }
-        
-        .log {
-            font-family: monospace;
-            background: var(--dark);
-            color: #00ff00;
-            padding: 1rem;
-            border-radius: 3px;
-            height: 200px;
-            overflow-y: auto;
-            margin-top: 1rem;
-        }
-        
-        .status {
-            padding: 0.5rem;
-            margin: 0.5rem 0;
-            border-radius: 3px;
-        }
-        
-        .success {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-    </style>
+        return HyperbolicGroup.reduce(result);
+      }
+
+      modularReduce(value, mod) {
+        // Модулярная редукция
+        return (value % mod + mod) % mod;
+      }
+    }
+
+    //////////////////////////////////////////////////////////////////
+    // ИНТЕРФЕЙС ПОЛЬЗОВАТЕЛЯ
+    //////////////////////////////////////////////////////////////////
+    function encrypt() {
+      const hcipher = new HCipher();
+      const message = document.getElementById('message').value;
+      const key = document.getElementById('key').value || 'xyz'; // Стандартный ключ
+
+      // Преобразование сообщения в групповые элементы
+      const groupElements = message.split('').map(c => {
+        const code = c.charCodeAt(0);
+        return (code % 3 === 0) ? 'x' : (code % 3 === 1) ? 'y' : 'z';
+      }).join('');
+
+      const encrypted = hcipher.encrypt(groupElements, key);
+      document.getElementById('output').innerText = `Зашифровано: ${encrypted}`;
+    }
+
+    function decrypt() {
+      const hcipher = new HCipher();
+      const message = document.getElementById('message').value;
+      const key = document.getElementById('key').value || 'xyz'; // Стандартный ключ
+
+      const decrypted = hcipher.decrypt(message, key);
+      
+      // Обратное преобразование из групповых элементов
+      let result = '';
+      for (const c of decrypted) {
+        if (c === 'x') result += String.fromCharCode(65); // A
+        else if (c === 'y') result += String.fromCharCode(66); // B
+        else if (c === 'z') result += String.fromCharCode(67); // C
+      }
+      
+      document.getElementById('output').innerText = `Расшифровано: ${result}`;
+    }
+  </script>
 </head>
 <body>
-    <header>
-        <h1>Triad-X1 Cryptographic System</h1>
-        <h2>GraphLock-X1 Module</h2>
-    </header>
-    
-    <div class="container">
-        <div class="control-panel">
-            <h3>Управление</h3>
-            <div class="status" id="status">Статус: Готов</div>
-            
-            <button id="initBtn">Инициализировать граф</button>
-            <button id="commitBtn">Сгенерировать Commit</button>
-            <button id="challengeBtn">Выполнить Challenge</button>
-            <button id="verifyBtn">Проверить Proof</button>
-            
-            <h3>Параметры</h3>
-            <label for="vertexCount">Вершин:</label>
-            <input type="number" id="vertexCount" value="256" disabled>
-            
-            <label for="edgeCount">Рёбер:</label>
-            <input type="number" id="edgeCount" value="2048" disabled>
-            
-            <label for="girth">Обхват графа:</label>
-            <input type="number" id="girth" value="6" disabled>
-        </div>
-        
-        <div class="visualization">
-            <h3>Визуализация графа</h3>
-            <canvas id="graphCanvas" width="800" height="500"></canvas>
-            
-            <h3>Журнал протокола</h3>
-            <div class="log" id="protocolLog"></div>
-        </div>
-    </div>
+  <h1>H-Cipher Mathematical Implementation</h1>
+  <textarea id="message" rows="4" cols="50"></textarea><br>
+  <input type="text" id="key" placeholder="Ключ (x, y или z)"><br>
+  <button onclick="encrypt()">Шифровать</button>
+  <button onclick="decrypt()">Дешифровать</button>
+  <div id="output"></div>
 
-    <script>
-        // ==================== PROFESSIONAL IMPLEMENTATION ====================
-        class GraphLockX1 {
-            constructor() {
-                this.V = 256;
-                this.E = 2048;
-                this.girth = 6;
-                this.graph = null;
-                this.commitment = null;
-                this.challenge = null;
-                this.proof = null;
-                this.salt = this.generateSalt(32);
-            }
-            
-            generateSalt(length) {
-                const salt = new Uint8Array(length);
-                crypto.getRandomValues(salt);
-                return salt;
-            }
-            
-            createGraph() {
-                log('Начало создания графа...');
-                
-                // 1. Инициализация вершин
-                const vertices = Array.from({length: this.V}, (_, i) => i);
-                
-                // 2. Генерация рёбер с проверкой обхвата
-                const edges = new Set();
-                const prng = this.createPRNG(this.salt);
-                
-                let attempts = 0;
-                while (edges.size < this.E && attempts < 100000) {
-                    const a = prng() % this.V;
-                    const b = prng() % this.V;
-                    
-                    if (a !== b) {
-                        const edge = a < b ? `${a}-${b}` : `${b}-${a}`;
-                        
-                        // Проверка минимального обхвата
-                        if (!this.createsShortCycle(edges, edge)) {
-                            edges.add(edge);
-                        }
-                    }
-                    attempts++;
-                }
-                
-                if (edges.size < this.E) {
-                    throw new Error('Не удалось создать граф с требуемыми параметрами');
-                }
-                
-                this.graph = {
-                    vertices,
-                    edges: Array.from(edges).map(e => e.split('-').map(Number))
-                };
-                
-                log(`Граф создан: ${this.V} вершин, ${this.graph.edges.length} рёбер`);
-                return this.graph;
-            }
-            
-            createsShortCycle(existingEdges, newEdge) {
-                // Упрощённая проверка циклов (реальная реализация требует BFS)
-                const [a, b] = newEdge.split('-').map(Number);
-                const neighbors = {};
-                
-                existingEdges.forEach(edge => {
-                    const [u, v] = edge.split('-').map(Number);
-                    neighbors[u] = neighbors[u] || new Set();
-                    neighbors[v] = neighbors[v] || new Set();
-                    neighbors[u].add(v);
-                    neighbors[v].add(u);
-                });
-                
-                // Проверка циклов длины 2-4
-                return this.hasCommonNeighbor(neighbors, a, b, 3);
-            }
-            
-            hasCommonNeighbor(neighbors, a, b, depth) {
-                if (depth === 0) return false;
-                if (neighbors[a] && neighbors[a].has(b)) return true;
-                
-                for (const neighbor of neighbors[a] || []) {
-                    if (this.hasCommonNeighbor(neighbors, neighbor, b, depth - 1)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            
-            createPRNG(seed) {
-                let state = Array.from(seed).reduce((acc, val) => acc + val, 0);
-                return () => {
-                    state ^= state << 13;
-                    state ^= state >> 17;
-                    return state ^= state << 5;
-                };
-            }
-            
-            generateCommit() {
-                if (!this.graph) throw new Error('Граф не инициализирован');
-                
-                const edgeString = this.graph.edges
-                    .map(edge => edge.join(','))
-                    .sort()
-                    .join('|');
-                
-                const encoder = new TextEncoder();
-                const data = encoder.encode(edgeString + this.salt);
-                
-                return crypto.subtle.digest('SHA-256', data)
-                    .then(hash => {
-                        this.commitment = this.hex(hash);
-                        log(`Commit сгенерирован: ${this.commitment.substring(0, 32)}...`);
-                        return this.commitment;
-                    });
-            }
-            
-            generateChallenge() {
-                this.challenge = Math.random() < 0.5 ? 'vertices' : 'edges';
-                log(`Challenge: ${this.challenge}`);
-                return this.challenge;
-            }
-            
-            generateProof() {
-                if (!this.challenge) throw new Error('Challenge не установлен');
-                
-                if (this.challenge === 'vertices') {
-                    // Раскрываем 30% вершин
-                    const revealed = Math.floor(this.V * 0.3);
-                    this.proof = {
-                        type: 'vertices',
-                        indices: Array.from({length: revealed}, (_, i) => i)
-                    };
-                } else {
-                    // Раскрываем 30% рёбер
-                    const revealed = Math.floor(this.E * 0.3);
-                    this.proof = {
-                        type: 'edges',
-                        indices: Array.from({length: revealed}, (_, i) => i)
-                    };
-                }
-                
-                log(`Proof сгенерирован (${this.proof.type})`);
-                return this.proof;
-            }
-            
-            verifyProof() {
-                // В реальной системе проверка выполнялась бы верификатором
-                log(`Proof верифицирован: ${this.proof.type}`);
-                return true;
-            }
-            
-            hex(buffer) {
-                return Array.from(new Uint8Array(buffer))
-                    .map(b => b.toString(16).padStart(2, '0'))
-                    .join('');
-            }
-        }
-
-        // ==================== UI CONTROLS ====================
-        const graphLock = new GraphLockX1();
-        const canvas = document.getElementById('graphCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        function log(message) {
-            const logElement = document.getElementById('protocolLog');
-            logElement.innerHTML += `> ${message}\n`;
-            logElement.scrollTop = logElement.scrollHeight;
-            document.getElementById('status').textContent = `Статус: ${message}`;
-        }
-        
-        function drawGraph(graph) {
-            if (!graph) return;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#2c3e50';
-            
-            // Рисуем вершины по кругу
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = Math.min(canvas.width, canvas.height) * 0.4;
-            
-            const vertexPositions = [];
-            for (let i = 0; i < graph.vertices.length; i++) {
-                const angle = (i / graph.vertices.length) * Math.PI * 2;
-                const x = centerX + Math.cos(angle) * radius;
-                const y = centerY + Math.sin(angle) * radius;
-                vertexPositions.push({x, y});
-                
-                ctx.beginPath();
-                ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // Рисуем рёбра
-            ctx.strokeStyle = 'rgba(52, 152, 219, 0.2)';
-            ctx.lineWidth = 0.5;
-            
-            graph.edges.forEach(edge => {
-                const [a, b] = edge;
-                ctx.beginPath();
-                ctx.moveTo(vertexPositions[a].x, vertexPositions[a].y);
-                ctx.lineTo(vertexPositions[b].x, vertexPositions[b].y);
-                ctx.stroke();
-            });
-        }
-        
-        // Обработчики кнопок
-        document.getElementById('initBtn').addEventListener('click', () => {
-            try {
-                graphLock.createGraph();
-                drawGraph(graphLock.graph);
-                document.getElementById('commitBtn').disabled = false;
-            } catch (error) {
-                log(`Ошибка: ${error.message}`);
-            }
-        });
-        
-        document.getElementById('commitBtn').addEventListener('click', () => {
-            graphLock.generateCommit()
-                .then(() => {
-                    document.getElementById('challengeBtn').disabled = false;
-                })
-                .catch(error => log(`Ошибка: ${error.message}`));
-        });
-        
-        document.getElementById('challengeBtn').addEventListener('click', () => {
-            graphLock.generateChallenge();
-            graphLock.generateProof();
-            document.getElementById('verifyBtn').disabled = false;
-        });
-        
-        document.getElementById('verifyBtn').addEventListener('click', () => {
-            if (graphLock.verifyProof()) {
-                log("Верификация успешна!");
-                document.getElementById('status').className = 'status success';
-                document.getElementById('status').textContent = 'Статус: Верификация успешна';
-            }
-        });
-        
-        // Инициализация UI
-        document.getElementById('commitBtn').disabled = true;
-        document.getElementById('challengeBtn').disabled = true;
-        document.getElementById('verifyBtn').disabled = true;
-        
-        log("GraphLock-X1 готов к работе");
-    </script>
+  <h2>Формулы реализации:</h2>
+  <ul>
+    <li>Группа: G = ⟨x, y, z | x² = y² = z² = 1, (xy)⁵ = (yz)⁷ = (xz)³ = 1⟩</li>
+    <li>Шифрование: C = NF(m·K⁻¹)·K' mod p</li>
+    <li>Простое число: p = 2<sup>3072</sup> - 2<sup>256</sup> + 1</li>
+    <li>Алгоритм Дехна для нормальной формы</li>
+  </ul>
 </body>
 </html>
