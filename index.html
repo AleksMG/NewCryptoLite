@@ -1,793 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triad-X1 Hybrid Encryption System</title>
+    <title>Triad-X1 Криптографическая Система</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numpy/1.1.0/numpy.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/networkx/2.6.0/networkx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/blake2b@1.2.0/blake2b.min.js"></script>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --success: #27ae60;
-            --dark: #1a252f;
-            --light: #ecf0f1;
-            --gray: #7f8c8d;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--dark), #1a2a6c);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            max-width: 900px;
+            margin: 0 auto;
             padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
         }
-        
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
-        
-        header {
-            text-align: center;
-            padding: 30px 0;
-            margin-bottom: 30px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, var(--secondary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--gray);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .crypto-methods {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 40px 0;
-        }
-        
-        .method {
-            flex: 1;
-            min-width: 300px;
-            background: rgba(30, 40, 60, 0.7);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .method:hover {
-            transform: translateY(-5px);
-        }
-        
-        .method h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .method-icon {
-            background: var(--primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-        
-        .method-content {
-            margin-top: 15px;
-        }
-        
-        .panel-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .panel {
-            flex: 1;
-            min-width: 300px;
-            background: rgba(30, 40, 60, 0.7);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .panel-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
             padding-bottom: 10px;
-            border-bottom: 2px solid var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
-        
-        textarea {
-            width: 100%;
-            height: 150px;
+        pre {
+            background: #2c3e50;
+            color: #f8f8f2;
             padding: 15px;
-            background: rgba(0, 10, 30, 0.6);
-            border: 1px solid var(--secondary);
-            border-radius: 10px;
-            color: var(--light);
-            font-size: 16px;
-            margin-bottom: 20px;
-            resize: vertical;
+            border-radius: 5px;
+            overflow-x: auto;
         }
-        
-        textarea::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
         button {
-            flex: 1;
-            min-width: 120px;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(45deg, var(--secondary), #2980b9);
+            background: #3498db;
             color: white;
-            font-weight: bold;
-            font-size: 16px;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+            font-family: inherit;
+            transition: background 0.3s;
         }
-        
         button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            background: #2980b9;
         }
-        
-        button:active {
-            transform: translateY(1px);
-        }
-        
-        button.secondary {
-            background: linear-gradient(45deg, #8e44ad, #9b59b6);
-        }
-        
-        button.danger {
-            background: linear-gradient(45deg, var(--accent), #c0392b);
-        }
-        
-        .status {
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
+        .result {
             margin-top: 20px;
-        }
-        
-        .valid {
-            background: rgba(39, 174, 96, 0.3);
-            border: 1px solid var(--success);
-            color: var(--light);
-        }
-        
-        .invalid {
-            background: rgba(231, 76, 60, 0.3);
-            border: 1px solid var(--accent);
-            color: var(--light);
-        }
-        
-        .info-box {
-            background: rgba(0, 30, 60, 0.6);
-            border-left: 4px solid var(--secondary);
             padding: 15px;
-            border-radius: 0 8px 8px 0;
-            margin: 20px 0;
-        }
-        
-        .info-box h3 {
-            margin-bottom: 10px;
-            color: var(--secondary);
-        }
-        
-        .visualization {
-            display: flex;
-            justify-content: center;
-            margin: 30px 0;
-        }
-        
-        .graph {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-        
-        .node {
-            width: 40px;
-            height: 40px;
-            background: var(--secondary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
-            position: relative;
-        }
-        
-        .node.encrypted {
-            background: var(--accent);
-        }
-        
-        .security-levels {
-            display: flex;
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .security-level {
-            flex: 1;
-            text-align: center;
-            padding: 20px;
-            border-radius: 10px;
-            background: rgba(30, 40, 60, 0.7);
-        }
-        
-        .level-high {
-            border-top: 4px solid var(--accent);
-        }
-        
-        .level-medium {
-            border-top: 4px solid var(--secondary);
-        }
-        
-        .level-low {
-            border-top: 4px solid var(--success);
-        }
-        
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            margin-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--gray);
-        }
-        
-        @media (max-width: 768px) {
-            .crypto-methods, .panel-container, .security-levels {
-                flex-direction: column;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
+            background: #e8f4fc;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Triad-X1 Hybrid Encryption System</h1>
-            <p class="subtitle">Quantum-Resistant Cryptography Combining Three Cryptographic Primitives for Unparalleled Security</p>
-        </header>
+        <h1>Triad-X1 Криптографическая Система</h1>
         
-        <div class="info-box">
-            <h3>About Triad-X1</h3>
-            <p>Triad-X1 utilizes a unique hybrid approach combining three distinct cryptographic methods to provide security against both classical and quantum attacks. This implementation provides a simplified yet functional demonstration of the core concepts.</p>
+        <h2>1. H-Cipher X1 (Гиперболическое групповое шифрование)</h2>
+        <pre id="hcipher-code">
+class HCipher {
+    constructor(dimension = 8, prime = BigInt(2)**BigInt(768) - BigInt(569)) {
+        this.dim = dimension;
+        this.p = prime;
+        this.SL8 = this._generateSLGroup();
+    }
+
+    _generateSLGroup() {
+        while (true) {
+            let M = new Array(this.dim);
+            for (let i = 0; i < this.dim; i++) {
+                M[i] = new Array(this.dim);
+                for (let j = 0; j < this.dim; j++) {
+                    M[i][j] = BigInt(Math.floor(Math.random() * Number(this.p)));
+                }
+            }
+            // Упрощенная проверка детерминанта (в реальной реализации нужен точный расчет)
+            if (Math.random() > 0.5) return M; // Имитация условия
+        }
+    }
+
+    encrypt(message) {
+        const msgMatrix = this._messageToMatrix(message);
+        let encrypted = new Array(this.dim);
+        for (let i = 0; i < this.dim; i++) {
+            encrypted[i] = new Array(this.dim);
+            for (let j = 0; j < this.dim; j++) {
+                let sum = BigInt(0);
+                for (let k = 0; k < this.dim; k++) {
+                    sum += BigInt(this.SL8[i][k]) * BigInt(msgMatrix[k][j]);
+                }
+                encrypted[i][j] = sum % this.p;
+            }
+        }
+        return this._matrixToBytes(encrypted);
+    }
+
+    _messageToMatrix(msg) {
+        const padSize = (this.dim**2 - msg.length) % this.dim**2;
+        const msgPadded = new Uint8Array([...msg, ...new Array(padSize).fill(padSize)]);
+        
+        let matrix = new Array(this.dim);
+        for (let i = 0; i < this.dim; i++) {
+            matrix[i] = new Array(this.dim);
+            for (let j = 0; j < this.dim; j++) {
+                const idx = i * this.dim + j;
+                matrix[i][j] = idx < msgPadded.length ? BigInt(msgPadded[idx]) : BigInt(0);
+            }
+        }
+        return matrix;
+    }
+}</pre>
+        
+        <h2>2. Singularity-X1 (Алгебраическое многообразие)</h2>
+        <pre id="singularity-code">
+class SingularityCipher {
+    constructor(dimension = 6, fieldSize = BigInt(2)**BigInt(512)) {
+        this.dim = dimension;
+        this.field = fieldSize;
+    }
+
+    encrypt(message) {
+        const msgInt = BigInt('0x' + [...message].map(b => 
+            b.toString(16).padStart(2, '0')).join('')) % this.field;
+        
+        const coords = [msgInt];
+        for (let i = 1; i < this.dim; i++) {
+            const x_i = (msgInt + BigInt(i))**BigInt(3) % this.field;
+            coords.push(x_i);
+        }
+        
+        return coords.map(c => {
+            const hex = c.toString(16).padStart(128, '0');
+            return new Uint8Array(hex.match(/../g).map(h => parseInt(h, 16)));
+        });
+    }
+}</pre>
+        
+        <h2>3. GraphLock X1 (Гиперграфовый изоморфизм)</h2>
+        <pre id="graphlock-code">
+class GraphLock {
+    constructor(vertexCount = 256, degree = 3) {
+        this.G = this._generateRegularGraph(vertexCount, degree);
+        this.H = null;
+        this.isomorphism = null;
+    }
+
+    _generateRegularGraph(n, d) {
+        const nodes = Array.from({length: n}, (_, i) => i);
+        const edges = new Set();
+        
+        // Простое создание регулярного графа (в реальной реализации более сложная логика)
+        for (let i = 0; i < n; i++) {
+            for (let j = 1; j <= d; j++) {
+                const neighbor = (i + j) % n;
+                edges.add(`${i}-${neighbor}`);
+            }
+        }
+        
+        return {
+            nodes: nodes,
+            edges: Array.from(edges).map(e => e.split('-').map(Number))
+        };
+    }
+
+    encrypt(message) {
+        const seed = blake2b(message).digest();
+        const seedInt = BigInt('0x' + [...seed].map(b => 
+            b.toString(16).padStart(2, '0')).join(''));
+        
+        // Перемешивание узлов на основе seed
+        const shuffledNodes = [...this.G.nodes];
+        for (let i = shuffledNodes.length - 1; i > 0; i--) {
+            const j = Number(seedInt % BigInt(i + 1));
+            [shuffledNodes[i], shuffledNodes[j]] = [shuffledNodes[j], shuffledNodes[i]];
+        }
+        
+        this.H = {
+            nodes: shuffledNodes,
+            edges: this.G.edges.map(([u, v]) => 
+                [shuffledNodes[u], shuffledNodes[v]])
+        };
+        
+        this.isomorphism = shuffledNodes.reduce((map, node, idx) => {
+            map[node] = idx;
+            return map;
+        }, {});
+        
+        return this.H.edges;
+    }
+}</pre>
+        
+        <h2>Гибридное шифрование Triad-X1</h2>
+        <pre id="triad-code">
+class TriadX1 {
+    constructor() {
+        this.hcipher = new HCipher();
+        this.singularity = new SingularityCipher();
+        this.graphlock = new GraphLock();
+    }
+
+    async encrypt(message) {
+        // Конвертация сообщения в Uint8Array
+        const msgBytes = new TextEncoder().encode(message);
+        
+        // Шаг 1: Групповое шифрование
+        const hEnc = this.hcipher.encrypt(msgBytes);
+        
+        // Шаг 2: Алгебраическое шифрование
+        const sEnc = this.singularity.encrypt(hEnc);
+        
+        // Шаг 3: Графовое преобразование
+        const gEnc = this.graphlock.encrypt(sEnc[0]);
+        
+        return {
+            h_cipher: Array.from(hEnc).map(b => b.toString(16).padStart(2, '0')).join(''),
+            s_cipher: sEnc.map(arr => Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('')),
+            g_cipher: gEnc.slice(0, 5), // Показываем только первые 5 ребер
+            zkp_seed: this.graphlock.G.edges.slice(0, 3) // Пример ZKP
+        };
+    }
+}</pre>
+        
+        <div>
+            <h2>Демонстрация</h2>
+            <textarea id="message-input" rows="3" style="width: 100%; padding: 10px;" 
+                      placeholder="Введите сообщение для шифрования...">Тестовое сообщение</textarea>
+            <button onclick="runEncryption()">Зашифровать</button>
+            <div id="encryption-result" class="result">Результат появится здесь...</div>
         </div>
-        
-        <div class="crypto-methods">
-            <div class="method">
-                <h3><span class="method-icon">L</span> Lattice-Based Encryption</h3>
-                <div class="method-content">
-                    <p>Utilizes Learning With Errors (LWE) over polynomial rings to provide security against quantum attacks. Based on the hardness of lattice problems.</p>
-                    <p><strong>Security:</strong> Resistant to Shor's algorithm</p>
-                    <p><strong>Key Size:</strong> 1024 bits</p>
-                </div>
-            </div>
-            
-            <div class="method">
-                <h3><span class="method-icon">G</span> Group-Based Cryptography</h3>
-                <div class="method-content">
-                    <p>Uses non-abelian group actions for encryption, providing security based on the hardness of group isomorphism problems.</p>
-                    <p><strong>Security:</strong> Resistant to quantum Fourier sampling</p>
-                    <p><strong>Key Size:</strong> 768 bits</p>
-                </div>
-            </div>
-            
-            <div class="method">
-                <h3><span class="method-icon">Z</span> Zero-Knowledge Proofs</h3>
-                <div class="method-content">
-                    <p>Employs succinct non-interactive arguments of knowledge (SNARKs) to verify encryption without revealing secrets.</p>
-                    <p><strong>Security:</strong> Provides cryptographic proof of correctness</p>
-                    <p><strong>Proof Size:</strong> 1.2 KB</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="security-levels">
-            <div class="security-level level-high">
-                <h3>Military Grade</h3>
-                <p>384-bit security</p>
-                <p>Hybrid cascade mode</p>
-            </div>
-            <div class="security-level level-medium">
-                <h3>Enterprise Grade</h3>
-                <p>256-bit security</p>
-                <p>Parallel encryption</p>
-            </div>
-            <div class="security-level level-low">
-                <h3>Standard Grade</h3>
-                <p>128-bit security</p>
-                <p>Single method encryption</p>
-            </div>
-        </div>
-        
-        <div class="panel-container">
-            <div class="panel">
-                <h2 class="panel-title">Encryption</h2>
-                <textarea id="plaintext" placeholder="Enter text to encrypt...">Triad-X1 provides quantum-resistant security through advanced hybrid cryptography</textarea>
-                <div class="btn-group">
-                    <button onclick="encrypt('high')">Military Grade</button>
-                    <button onclick="encrypt('medium')" class="secondary">Enterprise Grade</button>
-                    <button onclick="encrypt('low')">Standard Grade</button>
-                </div>
-                
-                <h3>Encrypted Output</h3>
-                <textarea id="ciphertext" placeholder="Encrypted data will appear here..." readonly></textarea>
-                <div class="btn-group">
-                    <button onclick="copyCiphertext()">Copy to Decryption</button>
-                    <button onclick="saveToFile()" class="secondary">Save to File</button>
-                </div>
-            </div>
-            
-            <div class="panel">
-                <h2 class="panel-title">Decryption</h2>
-                <textarea id="ciphertext-input" placeholder="Paste encrypted data here..."></textarea>
-                <div class="btn-group">
-                    <button onclick="decrypt()">Decrypt Text</button>
-                    <button onclick="clearDecryption()" class="secondary">Clear</button>
-                    <button onclick="loadFromFile()">Load from File</button>
-                </div>
-                
-                <h3>Decrypted Text</h3>
-                <textarea id="decrypted" placeholder="Decrypted text will appear here..." readonly></textarea>
-                <div id="decryption-status" class="status">Awaiting decryption...</div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <h2 class="panel-title">Security Verification</h2>
-            <div class="btn-group">
-                <button onclick="verifyProof()">Verify Zero-Knowledge Proof</button>
-                <button onclick="simulateAttack()" class="danger">Simulate Quantum Attack</button>
-            </div>
-            
-            <div id="proof-status" class="status">Proof not verified yet</div>
-            
-            <div class="visualization">
-                <div class="graph" id="graph-visualization">
-                    <!-- Graph visualization will be generated here -->
-                </div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <h2 class="panel-title">System Information</h2>
-            <div class="info-box">
-                <h3>Cryptographic Parameters</h3>
-                <p><strong>Lattice Dimension:</strong> 1024</p>
-                <p><strong>Group Size:</strong> SL(8, F<sub>p</sub>) where p = 2<sup>768</sup> - 569</p>
-                <p><strong>ZKP System:</strong> Plonk-Halo2 with 1.2KB proofs</p>
-            </div>
-            
-            <div class="info-box">
-                <h3>Performance Metrics</h3>
-                <p><strong>Encryption Speed:</strong> 850 MB/s (x86), 280 MB/s (ARM)</p>
-                <p><strong>Decryption Speed:</strong> 920 MB/s (x86), 320 MB/s (ARM)</p>
-                <p><strong>Energy Efficiency:</strong> 0.25 mJ/MB</p>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Triad-X1 Hybrid Cryptographic System | Experimental Implementation | Not for Production Use</p>
-            <p>Based on RFC Draft from IETF PQC Working Group | Security Guaranteed until 2500</p>
-        </footer>
     </div>
 
     <script>
-        // Triad-X1 Hybrid Cryptosystem Implementation
-        
-        // System state
-        const state = {
-            securityLevel: 'medium',
-            baseGraph: null,
-            encryptedData: null,
-            originalText: "",
-            keys: {
-                lattice: null,
-                group: null,
-                zkp: null
+        // Реализация blake2b для браузера
+        function blake2b(data) {
+            const hash = new Uint8Array(64);
+            // Упрощенная реализация - в реальной системе используйте библиотеку
+            for (let i = 0; i < hash.length; i++) {
+                hash[i] = data[i % data.length] ^ i;
             }
-        };
-        
-        // Initialize the system
-        function initSystem() {
-            generateBaseGraph();
-            generateKeys();
-            
-            // Set default text
-            document.getElementById('plaintext').value = 
-                "Triad-X1 combines lattice-based cryptography, group-based encryption, " + 
-                "and zero-knowledge proofs for quantum-resistant security.";
-                
-            // Initialize graph visualization
-            visualizeGraph();
+            return hash;
         }
-        
-        // Generate base graph for encryption
-        function generateBaseGraph(size = 16) {
-            let graph = [];
-            for (let i = 0; i < size; i++) {
-                let row = [];
-                for (let j = 0; j < size; j++) {
-                    row.push(Math.floor(Math.random() * 2));
-                }
-                graph.push(row);
-            }
-            state.baseGraph = graph;
-        }
-        
-        // Generate cryptographic keys
-        function generateKeys() {
-            // In a real implementation, this would generate actual cryptographic keys
-            state.keys = {
-                lattice: "lattice_key_" + Math.random().toString(36).substr(2, 16),
-                group: "group_key_" + Math.random().toString(36).substr(2, 16),
-                zkp: "zkp_key_" + Math.random().toString(36).substr(2, 16)
-            };
-        }
-        
-        // Visualize the encryption graph
-        function visualizeGraph() {
-            const container = document.getElementById('graph-visualization');
-            container.innerHTML = '';
-            
-            if (!state.baseGraph) return;
-            
-            const size = state.baseGraph.length;
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    const node = document.createElement('div');
-                    node.className = 'node';
-                    node.textContent = state.baseGraph[i][j];
-                    node.title = `Node ${i}-${j}: ${state.baseGraph[i][j]}`;
-                    
-                    // Randomly mark some nodes as "encrypted"
-                    if (Math.random() > 0.7) {
-                        node.classList.add('encrypted');
-                    }
-                    
-                    container.appendChild(node);
-                }
-            }
-        }
-        
-        // Encrypt text using hybrid method
-        function encrypt(level) {
-            state.securityLevel = level;
-            const text = document.getElementById('plaintext').value;
-            if (!text) return;
-            
-            state.originalText = text;
-            
-            // Simulate hybrid encryption process
-            const encryptedText = hybridEncrypt(text, level);
-            
-            // Prepare output
-            const output = {
-                securityLevel: level,
-                ciphertext: encryptedText,
-                timestamp: new Date().toISOString(),
-                proof: generateZKP()
-            };
-            
-            // Format output for display
-            const displayText = formatEncryptedOutput(output);
-            document.getElementById('ciphertext').value = displayText;
-            
-            // Store for decryption
-            state.encryptedData = output;
-            
-            // Update status
-            document.getElementById('decryption-status').textContent = 
-                `Text encrypted with ${level} security`;
-            document.getElementById('decryption-status').className = "status valid";
-            
-            // Update visualization
-            visualizeGraph();
-        }
-        
-        // Hybrid encryption simulation
-        function hybridEncrypt(text, level) {
-            // In a real implementation, this would use actual cryptographic operations
-            
-            // Apply lattice-based encryption
-            let encrypted = latticeEncrypt(text);
-            
-            // Apply group-based encryption for higher security levels
-            if (level === 'medium' || level === 'high') {
-                encrypted = groupEncrypt(encrypted);
-            }
-            
-            // Apply additional transformations for military grade
-            if (level === 'high') {
-                encrypted = militaryGradeTransform(encrypted);
-            }
-            
-            return encrypted;
-        }
-        
-        // Simulate lattice encryption
-        function latticeEncrypt(text) {
-            let result = "";
-            for (let i = 0; i < text.length; i++) {
-                const charCode = text.charCodeAt(i);
-                // Simple transformation for demonstration
-                result += String.fromCharCode(charCode + 5);
-            }
-            return btoa(result);
-        }
-        
-        // Simulate group encryption
-        function groupEncrypt(text) {
-            let result = "";
-            for (let i = 0; i < text.length; i++) {
-                // Rotate characters
-                const rotated = text.charCodeAt(i) << 2 | text.charCodeAt(i) >> 6;
-                result += String.fromCharCode(rotated & 0xFF);
-            }
-            return result;
-        }
-        
-        // Military grade transformation
-        function militaryGradeTransform(text) {
-            // Add additional security layer
-            let transformed = "";
-            for (let i = 0; i < text.length; i++) {
-                transformed += String.fromCharCode(text.charCodeAt(i) ^ 0xAA);
-            }
-            return transformed;
-        }
-        
-        // Generate Zero-Knowledge Proof
-        function generateZKP() {
-            return {
-                hash: "zkp_" + Math.random().toString(36).substr(2, 12),
-                timestamp: new Date().toISOString()
-            };
-        }
-        
-        // Format encrypted output for display
-        function formatEncryptedOutput(data) {
-            return `Triad-X1 Encrypted Data (Security: ${data.securityLevel.toUpperCase()})
-====================================================
-Ciphertext: ${data.ciphertext.substr(0, 80)}...
-Proof: ${data.proof.hash}
-Timestamp: ${data.timestamp}
-----------------------------------------------------
-Lattice Key: ${state.keys.lattice.substr(0, 12)}...
-Group Key: ${state.keys.group.substr(0, 12)}...
-ZKP Key: ${state.keys.zkp.substr(0, 12)}...
-====================================================`;
-        }
-        
-        // Decrypt text
-        function decrypt() {
-            const input = document.getElementById('ciphertext-input').value;
-            if (!input) {
-                document.getElementById('decryption-status').textContent = "Error: No input provided";
-                document.getElementById('decryption-status').className = "status invalid";
-                return;
-            }
+
+        // Инициализация классов
+        class HCipher { /* ... см. код выше ... */ }
+        class SingularityCipher { /* ... см. код выше ... */ }
+        class GraphLock { /* ... см. код выше ... */ }
+        class TriadX1 { /* ... см. код выше ... */ }
+
+        async function runEncryption() {
+            const message = document.getElementById('message-input').value;
+            const triad = new TriadX1();
             
             try {
-                // In a real implementation, this would parse and properly decrypt
-                // For this demo, we'll just simulate decryption
-                
-                // Extract security level from input
-                let securityLevel = 'medium';
-                if (input.includes('Security: HIGH')) securityLevel = 'high';
-                if (input.includes('Security: LOW')) securityLevel = 'low';
-                
-                // Find ciphertext in the input
-                const cipherStart = input.indexOf('Ciphertext: ') + 12;
-                const cipherEnd = input.indexOf('...', cipherStart);
-                const ciphertext = input.substring(cipherStart, cipherEnd);
-                
-                // Simulate decryption
-                let decrypted = ciphertext;
-                
-                if (securityLevel === 'high') {
-                    decrypted = militaryGradeTransform(decrypted);
-                }
-                
-                if (securityLevel === 'medium' || securityLevel === 'high') {
-                    decrypted = groupDecrypt(decrypted);
-                }
-                
-                decrypted = latticeDecrypt(decrypted);
-                
-                document.getElementById('decrypted').value = decrypted;
-                document.getElementById('decryption-status').textContent = 
-                    `Decryption successful! Security level: ${securityLevel}`;
-                document.getElementById('decryption-status').className = "status valid";
-                
-            } catch (e) {
-                document.getElementById('decryption-status').textContent = 
-                    "Error: Decryption failed - invalid ciphertext";
-                document.getElementById('decryption-status').className = "status invalid";
+                const result = await triad.encrypt(message);
+                document.getElementById('encryption-result').innerHTML = 
+                    `<strong>Исходное сообщение:</strong> ${message}\n\n` +
+                    `<strong>H-Cipher (первые 32 байта):</strong> ${result.h_cipher.substring(0, 64)}...\n\n` +
+                    `<strong>Singularity (первое значение):</strong> ${result.s_cipher[0].substring(0, 32)}...\n\n` +
+                    `<strong>GraphLock (первые 5 ребер):</strong> ${JSON.stringify(result.g_cipher)}\n\n` +
+                    `<strong>ZKP Seed (первые 3 ребра):</strong> ${JSON.stringify(result.zkp_seed)}`;
+            } catch (error) {
+                document.getElementById('encryption-result').innerHTML = 
+                    `Ошибка: ${error.message}`;
             }
         }
-        
-        // Simulate lattice decryption
-        function latticeDecrypt(text) {
-            try {
-                const decoded = atob(text);
-                let result = "";
-                for (let i = 0; i < decoded.length; i++) {
-                    result += String.fromCharCode(decoded.charCodeAt(i) - 5);
-                }
-                return result;
-            } catch {
-                return "Decryption error";
-            }
-        }
-        
-        // Simulate group decryption
-        function groupDecrypt(text) {
-            let result = "";
-            for (let i = 0; i < text.length; i++) {
-                // Reverse rotation
-                const rotated = text.charCodeAt(i);
-                result += String.fromCharCode((rotated >> 2) | ((rotated & 3) << 6));
-            }
-            return result;
-        }
-        
-        // Verify Zero-Knowledge Proof
-        function verifyProof() {
-            if (!state.encryptedData) {
-                document.getElementById('proof-status').textContent = "No encrypted data available";
-                document.getElementById('proof-status').className = "status invalid";
-                return;
-            }
-            
-            // In a real implementation, this would verify the proof
-            // For demo, we'll randomly succeed or fail
-            const valid = Math.random() > 0.3; // 70% success rate
-            
-            if (valid) {
-                document.getElementById('proof-status').textContent = 
-                    "Proof valid: Encryption is mathematically sound";
-                document.getElementById('proof-status').className = "status valid";
-            } else {
-                document.getElementById('proof-status').textContent = 
-                    "Proof invalid: Potential security compromise detected";
-                document.getElementById('proof-status').className = "status invalid";
-            }
-        }
-        
-        // Simulate quantum attack
-        function simulateAttack() {
-            if (!state.encryptedData) {
-                document.getElementById('proof-status').textContent = "No data to attack";
-                document.getElementById('proof-status').className = "status invalid";
-                return;
-            }
-            
-            // Simulate attack
-            const attackSuccessful = Math.random() > 0.8; // 20% success rate
-            
-            if (attackSuccessful) {
-                document.getElementById('proof-status').textContent = 
-                    "Quantum attack simulation SUCCEEDED - upgrade security immediately!";
-                document.getElementById('proof-status').className = "status invalid";
-            } else {
-                document.getElementById('proof-status').textContent = 
-                    "Quantum attack simulation FAILED - system security maintained";
-                document.getElementById('proof-status').className = "status valid";
-            }
-        }
-        
-        // Copy ciphertext to decryption input
-        function copyCiphertext() {
-            document.getElementById('ciphertext-input').value = document.getElementById('ciphertext').value;
-        }
-        
-        // Clear decryption fields
-        function clearDecryption() {
-            document.getElementById('ciphertext-input').value = '';
-            document.getElementById('decrypted').value = '';
-            document.getElementById('decryption-status').textContent = "Cleared";
-            document.getElementById('decryption-status').className = "status";
-        }
-        
-        // Save to file
-        function saveToFile() {
-            const content = document.getElementById('ciphertext').value;
-            if (!content) return;
-            
-            const blob = new Blob([content], {type: 'text/plain'});
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'triad-x1-encrypted.txt';
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
-        }
-        
-        // Load from file
-        function loadFromFile() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.txt';
-            
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = event => {
-                    document.getElementById('ciphertext-input').value = event.target.result;
-                };
-                
-                reader.readAsText(file);
-            };
-            
-            input.click();
-        }
-        
-        // Initialize on load
-        window.onload = initSystem;
+
+        // Добавляем классы в глобальную область видимости для тестирования в консоли
+        window.HCipher = HCipher;
+        window.SingularityCipher = SingularityCipher;
+        window.GraphLock = GraphLock;
+        window.TriadX1 = TriadX1;
     </script>
 </body>
-</html>
+        </html>
