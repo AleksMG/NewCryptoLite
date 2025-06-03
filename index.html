@@ -3,131 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lattice Encryption</title>
+    <title>Lattice Encryption (LWE)</title>
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --dark: #2d3436;
-            --light: #f5f6fa;
-            --success: #00b894;
-            --error: #d63031;
-        }
         body {
-            font-family: 'Roboto', sans-serif;
-            background: var(--light);
-            color: var(--dark);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1000px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .panel {
-            background: white;
-            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        textarea {
+        textarea, button {
             width: 100%;
-            min-height: 100px;
+            margin: 10px 0;
             padding: 10px;
-            border: 2px solid var(--secondary);
-            border-radius: 5px;
-            font-family: 'Fira Code', monospace;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 2px solid var(--secondary);
-            border-radius: 5px;
         }
         button {
-            background: var(--primary);
+            background: #4CAF50;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
         }
-        button:hover {
-            background: #5649d2;
-        }
-        .status {
-            margin-top: 15px;
+        #status {
             padding: 10px;
+            margin: 10px 0;
             border-radius: 5px;
-            display: none;
         }
         .success {
-            background-color: rgba(0, 184, 148, 0.2);
-            color: var(--success);
-            display: block;
+            background: #d4edda;
+            color: #155724;
         }
         .error {
-            background-color: rgba(214, 48, 49, 0.2);
-            color: var(--error);
-            display: block;
-        }
-        .grid {
-            margin-top: 20px;
-            font-family: 'Fira Code', monospace;
-            white-space: pre;
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
-    <h1>🔒 Lattice-Based Encryption</h1>
-    
-    <div class="container">
-        <!-- Encryption Panel -->
-        <div class="panel">
-            <h2>Encryption</h2>
-            <label for="plaintext">Plaintext:</label>
-            <textarea id="plaintext" placeholder="Enter text to encrypt"></textarea>
-            
-            <label for="key">Key:</label>
-            <input type="text" id="key" placeholder="Secret key">
-            
-            <button id="encryptBtn">Encrypt</button>
-            <div id="encryptStatus" class="status"></div>
-            
-            <div class="grid" id="encryptGrid"></div>
-        </div>
+    <h1>Lattice-Based Encryption (LWE)</h1>
 
-        <!-- Decryption Panel -->
-        <div class="panel">
-            <h2>Decryption</h2>
-            <label for="ciphertext">Ciphertext:</label>
-            <textarea id="ciphertext" placeholder="Enter text to decrypt"></textarea>
-            
-            <label for="decryptKey">Key:</label>
-            <input type="text" id="decryptKey" placeholder="Secret key">
-            
-            <button id="decryptBtn">Decrypt</button>
-            <div id="decryptStatus" class="status"></div>
-            
-            <div class="grid" id="decryptGrid"></div>
-        </div>
-    </div>
+    <!-- Key Generation -->
+    <button id="generateKeys">Generate Keys</button>
+    <div>Public Key: <span id="publicKey">Not generated</span></div>
+    <div>Secret Key: <span id="secretKey">Not generated</span></div>
 
+    <!-- Encryption -->
+    <h2>Encrypt</h2>
+    <textarea id="plaintext" placeholder="Enter message"></textarea>
+    <button id="encryptBtn">Encrypt</button>
+
+    <!-- Decryption -->
+    <h2>Decrypt</h2>
+    <textarea id="ciphertext" placeholder="Paste ciphertext here"></textarea>
+    <button id="decryptBtn">Decrypt</button>
+    <textarea id="decryptedText" placeholder="Decrypted message" readonly></textarea>
+
+    <!-- Status Messages -->
+    <div id="status"></div>
+
+    <!-- Scripts -->
     <script src="lattice.js"></script>
+    <script>
+        // Main thread logic (UI)
+        const crypto = new LatticeCrypto(64); // Smaller dimension for browser
+        let keys = null;
+        const worker = new Worker('worker.js');
+
+        // Generate Keys
+        document.getElementById('generateKeys').addEventListener('click', () => {
+            worker.postMessage({ action: 'generateKeys' });
+        });
+
+        // Encrypt
+        document.getElementById('encryptBtn').addEventListener('click', () => {
+            if (!keys) {
+                showStatus("Generate keys first!", "error");
+                return;
+            }
+            const message = document.getElementById('plaintext').value;
+            worker.postMessage({ 
+                action: 'encrypt', 
+                message, 
+                publicKey: keys.publicKey 
+            });
+        });
+
+        // Decrypt
+        document.getElementById('decryptBtn').addEventListener('click', () => {
+            if (!keys) {
+                showStatus("Generate keys first!", "error");
+                return;
+            }
+            const ciphertext = document.getElementById('ciphertext').value;
+            worker.postMessage({ 
+                action: 'decrypt', 
+                ciphertext, 
+                secretKey: keys.secretKey 
+            });
+        });
+
+        // Handle worker responses
+        worker.onmessage = function(e) {
+            const { action, result, error } = e.data;
+            if (error) {
+                showStatus(error, "error");
+                return;
+            }
+
+            switch (action) {
+                case 'generateKeys':
+                    keys = result;
+                    document.getElementById('publicKey').textContent = 
+                        `A: [...], b: [${result.publicKey.b.slice(0, 3)}...]`;
+                    document.getElementById('secretKey').textContent = 
+                        `[${result.secretKey.slice(0, 5)}...]`;
+                    showStatus("Keys generated!", "success");
+                    break;
+
+                case 'encrypt':
+                    document.getElementById('ciphertext').value = 
+                        JSON.stringify(result);
+                    showStatus("Encryption successful!", "success");
+                    break;
+
+                case 'decrypt':
+                    document.getElementById('decryptedText').value = result;
+                    showStatus("Decryption successful!", "success");
+                    break;
+            }
+        };
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = type;
+        }
+    </script>
 </body>
 </html>
