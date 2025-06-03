@@ -3,138 +3,427 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lattice Encryption (LWE)</title>
+    <title>Lattice Cryptography Tool</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f5f5f5;
         }
-        textarea, button {
-            width: 100%;
-            margin: 10px 0;
-            padding: 10px;
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            flex: 1;
+            min-width: 300px;
+        }
+        h1, h2 {
+            color: #2c3e50;
         }
         button {
-            background: #4CAF50;
+            background-color: #3498db;
             color: white;
             border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
         }
-        #status {
+        button:hover {
+            background-color: #2980b9;
+        }
+        textarea, input {
+            width: 100%;
             padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
         }
-        .success {
-            background: #d4edda;
-            color: #155724;
+        .visualization {
+            height: 300px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            position: relative;
+            background-color: #f9f9f9;
+        }
+        .key-display {
+            word-break: break-all;
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
         }
         .error {
-            background: #f8d7da;
-            color: #721c24;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .matrix {
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #3498db;
+            border-radius: 50%;
+            transform: translate(-3px, -3px);
+        }
+        .vector {
+            position: absolute;
+            height: 2px;
+            background-color: #e74c3c;
+            transform-origin: left center;
         }
     </style>
 </head>
 <body>
-    <h1>Lattice-Based Encryption (LWE)</h1>
+    <h1>Lattice-Based Cryptography Tool</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Key Generation</h2>
+            <div>
+                <label for="dimension">Lattice Dimension (n):</label>
+                <input type="number" id="dimension" min="2" max="10" value="4">
+            </div>
+            <div>
+                <label for="modulus">Modulus (q):</label>
+                <input type="number" id="modulus" min="5" max="997" value="97">
+            </div>
+            <div>
+                <label for="error-size">Error Size (σ):</label>
+                <input type="number" id="error-size" min="1" max="10" value="2" step="0.1">
+            </div>
+            <button id="generate-key">Generate Keys</button>
+            
+            <div id="key-output" style="margin-top: 20px; display: none;">
+                <h3>Generated Keys</h3>
+                <p><strong>Public Key (A):</strong></p>
+                <div id="public-key" class="key-display matrix"></div>
+                <p><strong>Secret Key (s):</strong></p>
+                <div id="secret-key" class="key-display matrix"></div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Encryption</h2>
+            <div>
+                <label for="plaintext">Plaintext (as integer vector):</label>
+                <input type="text" id="plaintext" placeholder="e.g., 1 0 1 1">
+            </div>
+            <button id="encrypt-btn">Encrypt</button>
+            
+            <div id="ciphertext-output" style="margin-top: 20px; display: none;">
+                <h3>Ciphertext</h3>
+                <div id="ciphertext" class="key-display matrix"></div>
+                <p><strong>Error Vector (e):</strong></p>
+                <div id="error-vector" class="key-display matrix"></div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Decryption</h2>
+            <div>
+                <label for="ciphertext-input">Ciphertext (u, v):</label>
+                <input type="text" id="ciphertext-input" placeholder="Paste ciphertext here">
+            </div>
+            <button id="decrypt-btn">Decrypt</button>
+            
+            <div id="decrypted-output" style="margin-top: 20px; display: none;">
+                <h3>Decrypted Plaintext</h3>
+                <div id="decrypted-text" class="key-display"></div>
+                <div id="decryption-result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel">
+        <h2>Lattice Visualization</h2>
+        <div class="visualization" id="lattice-vis"></div>
+        <p>This 2D projection shows the relationship between basis vectors and encrypted points.</p>
+    </div>
+    
+    <div class="panel">
+        <h2>Technical Details</h2>
+        <p>This tool implements a Learning With Errors (LWE) cryptosystem:</p>
+        <ul>
+            <li><strong>Key Generation:</strong> A = random n×n matrix mod q, s = random secret vector</li>
+            <li><strong>Encryption:</strong> (u, v) = (Aᵀr + e₁, bᵀr + e₂ + m⌊q/2⌋) mod q</li>
+            <li><strong>Decryption:</strong> m' = round((v - sᵀu)/(q/2)) mod 2</li>
+        </ul>
+        <p>The lattice visualization shows the 2D projection of the encrypted message in the lattice space.</p>
+    </div>
 
-    <!-- Key Generation -->
-    <button id="generateKeys">Generate Keys</button>
-    <div>Public Key: <span id="publicKey">Not generated</span></div>
-    <div>Secret Key: <span id="secretKey">Not generated</span></div>
-
-    <!-- Encryption -->
-    <h2>Encrypt</h2>
-    <textarea id="plaintext" placeholder="Enter message"></textarea>
-    <button id="encryptBtn">Encrypt</button>
-
-    <!-- Decryption -->
-    <h2>Decrypt</h2>
-    <textarea id="ciphertext" placeholder="Paste ciphertext here"></textarea>
-    <button id="decryptBtn">Decrypt</button>
-    <textarea id="decryptedText" placeholder="Decrypted message" readonly></textarea>
-
-    <!-- Status Messages -->
-    <div id="status"></div>
-
-    <!-- Scripts -->
-    <script src="lattice.js"></script>
     <script>
-        // Main thread logic (UI)
-        const crypto = new LatticeCrypto(64); // Smaller dimension for browser
-        let keys = null;
-        const worker = new Worker('worker.js');
-
-        // Generate Keys
-        document.getElementById('generateKeys').addEventListener('click', () => {
-            worker.postMessage({ action: 'generateKeys' });
-        });
-
-        // Encrypt
-        document.getElementById('encryptBtn').addEventListener('click', () => {
-            if (!keys) {
-                showStatus("Generate keys first!", "error");
-                return;
-            }
-            const message = document.getElementById('plaintext').value;
-            worker.postMessage({ 
-                action: 'encrypt', 
-                message, 
-                publicKey: keys.publicKey 
+        // Global variables to store keys
+        let publicKey = null;
+        let secretKey = null;
+        let modulus = 0;
+        let dimension = 0;
+        
+        // Helper functions
+        function mod(a, q) {
+            return ((a % q) + q) % q;
+        }
+        
+        function generateRandomMatrix(rows, cols, q) {
+            return Array.from({length: rows}, () => 
+                Array.from({length: cols}, () => Math.floor(Math.random() * q))
+        }
+        
+        function generateErrorVector(n, sigma) {
+            // Discrete Gaussian-like distribution
+            return Array.from({length: n}, () => {
+                let sum = 0;
+                for (let i = 0; i < 12; i++) {
+                    sum += Math.random() - 0.5;
+                }
+                return Math.round(sum * sigma);
             });
+        }
+        
+        function matrixToString(matrix) {
+            return matrix.map(row => row.join(' ')).join('\n');
+        }
+        
+        function vectorToString(vector) {
+            return vector.join(' ');
+        }
+        
+        // Generate keys
+        document.getElementById('generate-key').addEventListener('click', function() {
+            dimension = parseInt(document.getElementById('dimension').value);
+            modulus = parseInt(document.getElementById('modulus').value);
+            const sigma = parseFloat(document.getElementById('error-size').value);
+            
+            // Generate public key (A) and secret key (s)
+            publicKey = generateRandomMatrix(dimension, dimension, modulus);
+            secretKey = Array.from({length: dimension}, () => Math.floor(Math.random() * modulus));
+            
+            // Display keys
+            document.getElementById('public-key').textContent = matrixToString(publicKey);
+            document.getElementById('secret-key').textContent = vectorToString(secretKey);
+            document.getElementById('key-output').style.display = 'block';
+            
+            // Prepare visualization
+            visualizeLattice();
         });
-
-        // Decrypt
-        document.getElementById('decryptBtn').addEventListener('click', () => {
-            if (!keys) {
-                showStatus("Generate keys first!", "error");
+        
+        // Encryption
+        document.getElementById('encrypt-btn').addEventListener('click', function() {
+            if (!publicKey || !secretKey) {
+                alert('Please generate keys first');
                 return;
             }
-            const ciphertext = document.getElementById('ciphertext').value;
-            worker.postMessage({ 
-                action: 'decrypt', 
-                ciphertext, 
-                secretKey: keys.secretKey 
-            });
+            
+            try {
+                const plaintext = document.getElementById('plaintext').value
+                    .split(' ')
+                    .map(x => parseInt(x.trim()));
+                
+                if (plaintext.length !== dimension || plaintext.some(isNaN)) {
+                    throw new Error(`Plaintext must be a vector of ${dimension} integers`);
+                }
+                
+                const sigma = parseFloat(document.getElementById('error-size').value);
+                const q = modulus;
+                
+                // Generate random vector r
+                const r = Array.from({length: dimension}, () => Math.floor(Math.random() * 2));
+                
+                // Generate error vectors
+                const e1 = generateErrorVector(dimension, sigma);
+                const e2 = generateErrorVector(1, sigma)[0];
+                
+                // Compute u = A^T r + e1 mod q
+                const u = Array.from({length: dimension}, (_, i) => {
+                    let sum = e1[i];
+                    for (let j = 0; j < dimension; j++) {
+                        sum += publicKey[j][i] * r[j];
+                    }
+                    return mod(sum, q);
+                });
+                
+                // Compute b = A s + e (implicit in the scheme)
+                // Compute v = b^T r + e2 + m * floor(q/2) mod q
+                let v = e2;
+                for (let i = 0; i < dimension; i++) {
+                    let b_i = 0;
+                    for (let j = 0; j < dimension; j++) {
+                        b_i += publicKey[i][j] * secretKey[j];
+                    }
+                    // Add small error (implicit in b)
+                    b_i += generateErrorVector(1, sigma)[0];
+                    v += b_i * r[i];
+                }
+                
+                // Add the message (encoded as 0 -> 0, 1 -> floor(q/2))
+                const message = plaintext.reduce((sum, bit, idx) => {
+                    return sum + (bit * Math.floor(q/2) * (idx === 0 ? 1 : 0)); // For simplicity, encode only first bit
+                }, 0);
+                
+                v = mod(v + message, q);
+                
+                // Display ciphertext
+                document.getElementById('ciphertext').textContent = `u: [${u.join(', ')}]\nv: ${v}`;
+                document.getElementById('error-vector').textContent = `e1: [${e1.join(', ')}]\ne2: ${e2}`;
+                document.getElementById('ciphertext-output').style.display = 'block';
+                
+                // Update visualization with encrypted point
+                visualizeEncryptedPoint(u, v);
+                
+            } catch (error) {
+                alert(`Encryption error: ${error.message}`);
+            }
         });
-
-        // Handle worker responses
-        worker.onmessage = function(e) {
-            const { action, result, error } = e.data;
-            if (error) {
-                showStatus(error, "error");
+        
+        // Decryption
+        document.getElementById('decrypt-btn').addEventListener('click', function() {
+            if (!secretKey) {
+                alert('Please generate keys first');
                 return;
             }
-
-            switch (action) {
-                case 'generateKeys':
-                    keys = result;
-                    document.getElementById('publicKey').textContent = 
-                        `A: [...], b: [${result.publicKey.b.slice(0, 3)}...]`;
-                    document.getElementById('secretKey').textContent = 
-                        `[${result.secretKey.slice(0, 5)}...]`;
-                    showStatus("Keys generated!", "success");
-                    break;
-
-                case 'encrypt':
-                    document.getElementById('ciphertext').value = 
-                        JSON.stringify(result);
-                    showStatus("Encryption successful!", "success");
-                    break;
-
-                case 'decrypt':
-                    document.getElementById('decryptedText').value = result;
-                    showStatus("Decryption successful!", "success");
-                    break;
+            
+            try {
+                const ciphertextInput = document.getElementById('ciphertext-input').value;
+                const match = ciphertextInput.match(/u:\s*\[([^\]]+)\]\s*v:\s*([^\s]+)/i);
+                
+                if (!match) {
+                    throw new Error('Invalid ciphertext format. Expected "u: [..., ...], v: ..."');
+                }
+                
+                const u = match[1].split(',').map(x => parseInt(x.trim()));
+                const v = parseInt(match[2].trim());
+                
+                if (u.length !== dimension || u.some(isNaN) || isNaN(v)) {
+                    throw new Error(`Ciphertext must match dimension ${dimension}`);
+                }
+                
+                const q = modulus;
+                
+                // Compute s^T u
+                let sTu = 0;
+                for (let i = 0; i < dimension; i++) {
+                    sTu += secretKey[i] * u[i];
+                }
+                
+                // Compute v - s^T u mod q
+                const inner = mod(v - sTu, q);
+                
+                // Decode message: round(inner / (q/2)) mod 2
+                const threshold = q / 2;
+                let decryptedBit = Math.abs(inner) < threshold / 2 ? 0 : 1;
+                
+                // For demo purposes, we'll just show the first bit
+                const decryptedPlaintext = Array(dimension).fill(0);
+                decryptedPlaintext[0] = decryptedBit;
+                
+                // Display results
+                document.getElementById('decrypted-text').textContent = vectorToString(decryptedPlaintext);
+                
+                const resultDiv = document.getElementById('decryption-result');
+                resultDiv.textContent = `Decryption successful (inner value: ${inner}, threshold: ±${threshold/2})`;
+                resultDiv.className = 'success';
+                resultDiv.style.display = 'block';
+                document.getElementById('decrypted-output').style.display = 'block';
+                
+            } catch (error) {
+                const resultDiv = document.getElementById('decryption-result');
+                resultDiv.textContent = `Decryption error: ${error.message}`;
+                resultDiv.className = 'error';
+                resultDiv.style.display = 'block';
+                document.getElementById('decrypted-output').style.display = 'block';
             }
-        };
-
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.className = type;
+        });
+        
+        // Visualization functions
+        function visualizeLattice() {
+            if (!publicKey || dimension < 2) return;
+            
+            const vis = document.getElementById('lattice-vis');
+            vis.innerHTML = '';
+            const width = vis.clientWidth;
+            const height = vis.clientHeight;
+            
+            // We'll visualize the first two dimensions of the lattice
+            const scale = Math.min(width, height) * 0.4 / modulus;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Draw basis vectors (first two columns of public key)
+            for (let i = 0; i < 2; i++) {
+                const vec = publicKey.map(row => row[i]);
+                const x = vec[0] * scale;
+                const y = vec[1] * scale;
+                
+                const line = document.createElement('div');
+                line.className = 'vector';
+                line.style.width = `${Math.sqrt(x*x + y*y)}px`;
+                line.style.left = `${centerX}px`;
+                line.style.top = `${centerY}px`;
+                line.style.transform = `rotate(${Math.atan2(y, x)}rad)`;
+                vis.appendChild(line);
+                
+                // Label
+                const label = document.createElement('div');
+                label.textContent = `b${i+1}`;
+                label.style.position = 'absolute';
+                label.style.left = `${centerX + x/2}px`;
+                label.style.top = `${centerY + y/2}px`;
+                vis.appendChild(label);
+            }
+            
+            // Draw origin point
+            const origin = document.createElement('div');
+            origin.className = 'point';
+            origin.style.left = `${centerX}px`;
+            origin.style.top = `${centerY}px`;
+            origin.style.backgroundColor = '#2ecc71';
+            vis.appendChild(origin);
+        }
+        
+        function visualizeEncryptedPoint(u, v) {
+            const vis = document.getElementById('lattice-vis');
+            if (!vis.hasChildNodes()) return;
+            
+            const width = vis.clientWidth;
+            const height = vis.clientHeight;
+            const scale = Math.min(width, height) * 0.4 / modulus;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Visualize u (first two dimensions)
+            const point = document.createElement('div');
+            point.className = 'point';
+            point.style.left = `${centerX + u[0] * scale}px`;
+            point.style.top = `${centerY + u[1] * scale}px`;
+            point.title = `Encrypted point: [${u.slice(0, 2).join(', ')}...] (v=${v})`;
+            vis.appendChild(point);
+            
+            // Label
+            const label = document.createElement('div');
+            label.textContent = 'c';
+            label.style.position = 'absolute';
+            label.style.left = `${centerX + u[0] * scale + 10}px`;
+            label.style.top = `${centerY + u[1] * scale}px`;
+            vis.appendChild(label);
         }
     </script>
 </body>
