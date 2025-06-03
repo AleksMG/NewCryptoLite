@@ -1,928 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Lattice Cryptography Tool</title>
+    <title>Lattice-шифр с ключом</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 1200px;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
         }
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .panel {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            flex: 1;
-            min-width: 300px;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        textarea, input, select {
+        input, textarea, button {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: monospace;
-            margin-bottom: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
         }
-        .visualization {
-            height: 300px;
-            border: 1px solid #ddd;
-            margin-top: 20px;
-            position: relative;
-            background-color: #f9f9f9;
-        }
-        .key-display {
-            word-break: break-all;
-            font-family: monospace;
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 4px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .error {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .success {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        .matrix {
-            font-family: monospace;
-            white-space: pre;
-            overflow-x: auto;
-        }
-        .point {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background-color: #3498db;
-            border-radius: 50%;
-            transform: translate(-4px, -4px);
-        }
-        .vector {
-            position: absolute;
-            height: 2px;
-            background-color: #e74c3c;
-            transform-origin: left center;
-            z-index: 1;
-        }
-        .grid-line {
-            position: absolute;
-            height: 1px;
-            width: 1px;
-            background-color: rgba(0,0,0,0.1);
-            z-index: 0;
-        }
-        .controls {
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            min-width: 120px;
-        }
-        .tab-container {
-            display: flex;
-            margin-bottom: 15px;
-        }
-        .tab {
-            padding: 8px 15px;
-            background: #ecf0f1;
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
             cursor: pointer;
-            border-radius: 4px 4px 0 0;
-            margin-right: 5px;
         }
-        .tab.active {
-            background: #3498db;
-            color: white;
+        button:hover {
+            background: #45a049;
         }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .status {
-            padding: 8px 12px;
-            border-radius: 4px;
+        .result {
+            background: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
             margin-top: 10px;
-        }
-        .tooltip {
-            position: absolute;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 100;
-        }
-        .legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-        }
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            margin-right: 5px;
-            border-radius: 2px;
         }
     </style>
 </head>
 <body>
-    <h1>Advanced Lattice-Based Cryptography Tool</h1>
+    <h1>Lattice-шифрование с ключом</h1>
     
-    <div class="container">
-        <div class="panel">
-            <h2>Key Generation</h2>
-            <div class="controls">
-                <div class="control-group">
-                    <label for="dimension">Lattice Dimension (n):</label>
-                    <input type="number" id="dimension" min="2" max="16" value="8">
-                </div>
-                <div class="control-group">
-                    <label for="modulus">Modulus (q):</label>
-                    <input type="number" id="modulus" min="5" max="9973" value="97">
-                </div>
-                <div class="control-group">
-                    <label for="error-size">Error Std Dev (σ):</label>
-                    <input type="number" id="error-size" min="0.1" max="10" value="2" step="0.1">
-                </div>
-            </div>
-            <button id="generate-key">Generate Keys</button>
-            
-            <div id="key-output" style="margin-top: 20px; display: none;">
-                <h3>Generated Keys</h3>
-                <p><strong>Public Key (A):</strong></p>
-                <div id="public-key" class="key-display matrix"></div>
-                <p><strong>Secret Key (s):</strong></p>
-                <div id="secret-key" class="key-display matrix"></div>
-                <p><strong>Public Key (b = As + e):</strong></p>
-                <div id="public-key-b" class="key-display matrix"></div>
-                <div id="key-status" class="status"></div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <h2>Encryption</h2>
-            <div class="tab-container">
-                <div class="tab active" data-tab="binary">Binary Message</div>
-                <div class="tab" data-tab="text">Text Message</div>
-                <div class="tab" data-tab="vector">Vector Input</div>
-            </div>
-            
-            <div id="binary-tab" class="tab-content active">
-                <label for="binary-plaintext">Binary Message (0s and 1s):</label>
-                <input type="text" id="binary-plaintext" placeholder="e.g., 1 0 1 1 0 1 0 0">
-            </div>
-            
-            <div id="text-tab" class="tab-content">
-                <label for="text-plaintext">Text Message:</label>
-                <input type="text" id="text-plaintext" placeholder="Enter text to encrypt">
-                <label for="text-encoding">Encoding:</label>
-                <select id="text-encoding">
-                    <option value="ascii">ASCII (8 bits per char)</option>
-                    <option value="utf8">UTF-8 (variable length)</option>
-                </select>
-            </div>
-            
-            <div id="vector-tab" class="tab-content">
-                <label for="vector-plaintext">Integer Vector (space-separated):</label>
-                <input type="text" id="vector-plaintext" placeholder="e.g., 1 0 1 1">
-            </div>
-            
-            <button id="encrypt-btn" disabled>Encrypt</button>
-            
-            <div id="ciphertext-output" style="margin-top: 20px; display: none;">
-                <h3>Ciphertext</h3>
-                <div id="ciphertext" class="key-display matrix"></div>
-                <p><strong>Error Vector (e):</strong></p>
-                <div id="error-vector" class="key-display matrix"></div>
-                <div id="encryption-status" class="status"></div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <h2>Decryption</h2>
-            <div>
-                <label for="ciphertext-input">Ciphertext (u, v):</label>
-                <textarea id="ciphertext-input" rows="4" placeholder="Paste ciphertext here"></textarea>
-            </div>
-            <button id="decrypt-btn" disabled>Decrypt</button>
-            
-            <div id="decrypted-output" style="margin-top: 20px; display: none;">
-                <h3>Decrypted Plaintext</h3>
-                <div id="decrypted-text" class="key-display"></div>
-                <div id="decryption-result" class="status"></div>
-            </div>
-        </div>
-    </div>
+    <label for="key">Ключ (слово):</label>
+    <input type="text" id="key" placeholder="Например: КОД">
     
-    <div class="panel">
-        <h2>Lattice Visualization</h2>
-        <div class="controls">
-            <div class="control-group">
-                <label for="vis-dimension-x">X Dimension:</label>
-                <select id="vis-dimension-x">
-                    <!-- Filled by JS -->
-                </select>
-            </div>
-            <div class="control-group">
-                <label for="vis-dimension-y">Y Dimension:</label>
-                <select id="vis-dimension-y">
-                    <!-- Filled by JS -->
-                </select>
-            </div>
-            <div class="control-group">
-                <label for="vis-scale">Zoom:</label>
-                <select id="vis-scale">
-                    <option value="0.5">50%</option>
-                    <option value="0.75">75%</option>
-                    <option value="1" selected>100%</option>
-                    <option value="1.5">150%</option>
-                    <option value="2">200%</option>
-                </select>
-            </div>
-        </div>
-        <div class="visualization" id="lattice-vis"></div>
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #e74c3c;"></div>
-                <span>Basis Vectors</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #2ecc71;"></div>
-                <span>Origin</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #3498db;"></div>
-                <span>Encrypted Point</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #9b59b6;"></div>
-                <span>Decrypted Point</span>
-            </div>
-        </div>
-    </div>
+    <label for="text">Текст:</label>
+    <textarea id="text" rows="4" placeholder="Введите текст..."></textarea>
     
-    <div class="panel">
-        <h2>Technical Implementation</h2>
-        <p>This tool implements a full Learning With Errors (LWE) cryptosystem:</p>
-        
-        <h3>Key Generation</h3>
-        <ul>
-            <li><strong>A</strong>: Random n×n matrix mod q (public)</li>
-            <li><strong>s</strong>: Random secret vector mod q (private)</li>
-            <li><strong>b</strong>: Computed as As + e mod q, where e is small error (public)</li>
-        </ul>
-        
-        <h3>Encryption</h3>
-        <p>For message m ∈ {0,1}<sup>n</sup>:</p>
-        <ol>
-            <li>Generate random binary vector r ∈ {0,1}<sup>n</sup></li>
-            <li>Compute u = A<sup>T</sup>r + e<sub>1</sub> mod q</li>
-            <li>Compute v = b<sup>T</sup>r + e<sub>2</sub> + m⌊q/2⌋ mod q</li>
-            <li>Ciphertext is (u, v)</li>
-        </ol>
-        
-        <h3>Decryption</h3>
-        <ol>
-            <li>Compute inner = v - s<sup>T</sup>u mod q</li>
-            <li>Recover m' = round(inner / (q/2)) mod 2</li>
-        </ol>
-        
-        <h3>Security Parameters</h3>
-        <p>The security depends on:</p>
-        <ul>
-            <li>Dimension n (typically 256-1024 for real-world security)</li>
-            <li>Modulus q (large enough to allow error correction)</li>
-            <li>Error distribution σ (small enough for correct decryption)</li>
-        </ul>
-    </div>
-
-    <div class="tooltip" id="tooltip" style="display: none;"></div>
+    <button onclick="encrypt()">Зашифровать</button>
+    <button onclick="decrypt()">Расшифровать</button>
+    
+    <div class="result" id="result"></div>
 
     <script>
-        // Global variables to store cryptographic state
-        let cryptoState = {
-            publicKeyA: null,
-            publicKeyB: null,
-            secretKey: null,
-            modulus: 0,
-            dimension: 0,
-            sigma: 0,
-            lastCiphertext: null,
-            lastPlaintext: null,
-            lastError: null
-        };
-        
-        // Helper functions
-        function mod(a, q) {
-            return ((a % q) + q) % q;
-        }
-        
-        function gaussianRandom(mean=0, stdev=1) {
-            // Box-Muller transform for Gaussian distribution
-            const u = 1 - Math.random();
-            const v = Math.random();
-            const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-            return z * stdev + mean;
-        }
-        
-        function generateRandomMatrix(rows, cols, q) {
-            return Array.from({length: rows}, () => 
-                Array.from({length: cols}, () => Math.floor(Math.random() * q))
-            );
-        }
-        
-        function generateErrorVector(n, sigma) {
-            return Array.from({length: n}, () => {
-                // Discrete Gaussian distribution
-                const sample = Math.round(gaussianRandom(0, sigma));
-                return sample;
-            });
-        }
-        
-        function matrixToString(matrix) {
-            if (!matrix) return "Not generated";
-            if (matrix.length === 0) return "Empty";
+        function textToLattice(text, key) {
+            // Преобразуем текст и ключ в числовые коды (Unicode)
+            const textCodes = Array.from(text).map(c => c.charCodeAt(0));
+            const keyCodes = Array.from(key).map(c => c.charCodeAt(0));
             
-            if (matrix[0].length === undefined) {
-                // It's a vector
-                return '[' + matrix.join(', ') + ']';
+            // Шифруем по принципу решетки (простое сложение по модулю)
+            const encrypted = [];
+            for (let i = 0; i < textCodes.length; i++) {
+                const keyChar = keyCodes[i % keyCodes.length];
+                encrypted.push((textCodes[i] + keyChar) % 65536); // Unicode диапазон
             }
             
-            return matrix.map(row => row.join(' ')).join('\n');
+            return String.fromCharCode(...encrypted);
         }
-        
-        function vectorToString(vector) {
-            if (!vector) return "Not generated";
-            return '[' + vector.join(', ') + ']';
-        }
-        
-        function binaryStringToVector(binStr, length) {
-            const bits = binStr.replace(/\s/g, '').split('').map(bit => parseInt(bit));
-            if (bits.some(b => b !== 0 && b !== 1)) {
-                throw new Error("Binary string must contain only 0s and 1s");
+
+        function latticeToText(cipher, key) {
+            const cipherCodes = Array.from(cipher).map(c => c.charCodeAt(0));
+            const keyCodes = Array.from(key).map(c => c.charCodeAt(0));
+            
+            const decrypted = [];
+            for (let i = 0; i < cipherCodes.length; i++) {
+                const keyChar = keyCodes[i % keyCodes.length];
+                decrypted.push((cipherCodes[i] - keyChar + 65536) % 65536);
             }
             
-            if (length && bits.length !== length) {
-                throw new Error(`Binary string must be exactly ${length} bits`);
-            }
-            
-            return bits;
+            return String.fromCharCode(...decrypted);
         }
-        
-        function textToBinary(text, encoding='ascii') {
-            let binaryStr = '';
+
+        function encrypt() {
+            const key = document.getElementById('key').value;
+            const text = document.getElementById('text').value;
             
-            if (encoding === 'ascii') {
-                for (let i = 0; i < text.length; i++) {
-                    const charCode = text.charCodeAt(i);
-                    if (charCode > 255) {
-                        throw new Error("ASCII encoding only supports characters 0-255");
-                    }
-                    binaryStr += charCode.toString(2).padStart(8, '0');
-                }
-            } else if (encoding === 'utf8') {
-                for (let i = 0; i < text.length; i++) {
-                    const charCode = text.charCodeAt(i);
-                    if (charCode <= 0x7F) {
-                        binaryStr += charCode.toString(2).padStart(8, '0');
-                    } else if (charCode <= 0x7FF) {
-                        binaryStr += (0xC0 | (charCode >> 6)).toString(2).padStart(8, '0');
-                        binaryStr += (0x80 | (charCode & 0x3F)).toString(2).padStart(8, '0');
-                    } else if (charCode <= 0xFFFF) {
-                        binaryStr += (0xE0 | (charCode >> 12)).toString(2).padStart(8, '0');
-                        binaryStr += (0x80 | ((charCode >> 6) & 0x3F)).toString(2).padStart(8, '0');
-                        binaryStr += (0x80 | (charCode & 0x3F)).toString(2).padStart(8, '0');
-                    } else {
-                        throw new Error("Characters above U+FFFF not supported");
-                    }
-                }
-            }
-            
-            return binaryStr.split('').map(bit => parseInt(bit));
-        }
-        
-        function binaryToText(binary, encoding='ascii') {
-            let text = '';
-            const bitString = binary.join('');
-            
-            if (encoding === 'ascii') {
-                for (let i = 0; i < bitString.length; i += 8) {
-                    const byte = bitString.substr(i, 8);
-                    if (byte.length < 8) break; // Incomplete byte
-                    const charCode = parseInt(byte, 2);
-                    text += String.fromCharCode(charCode);
-                }
-            } else if (encoding === 'utf8') {
-                let i = 0;
-                while (i < bitString.length) {
-                    if (bitString.length - i < 8) break; // Not enough bits left
-                    
-                    const byte1 = parseInt(bitString.substr(i, 8), 2);
-                    i += 8;
-                    
-                    if ((byte1 & 0x80) === 0) {
-                        // 1-byte sequence
-                        text += String.fromCharCode(byte1);
-                    } else if ((byte1 & 0xE0) === 0xC0) {
-                        // 2-byte sequence
-                        if (bitString.length - i < 8) break;
-                        const byte2 = parseInt(bitString.substr(i, 8), 2);
-                        i += 8;
-                        const charCode = ((byte1 & 0x1F) << 6) | (byte2 & 0x3F);
-                        text += String.fromCharCode(charCode);
-                    } else if ((byte1 & 0xF0) === 0xE0) {
-                        // 3-byte sequence
-                        if (bitString.length - i < 16) break;
-                        const byte2 = parseInt(bitString.substr(i, 8), 2);
-                        i += 8;
-                        const byte3 = parseInt(bitString.substr(i, 8), 2);
-                        i += 8;
-                        const charCode = ((byte1 & 0x0F) << 12) | ((byte2 & 0x3F) << 6) | (byte3 & 0x3F);
-                        text += String.fromCharCode(charCode);
-                    } else {
-                        // Invalid UTF-8 sequence
-                        text += '�';
-                    }
-                }
-            }
-            
-            return text;
-        }
-        
-        // Tab switching functionality
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Remove active class from all tabs and content
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab and corresponding content
-                this.classList.add('active');
-                const tabId = this.getAttribute('data-tab');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-            });
-        });
-        
-        // Generate keys
-        document.getElementById('generate-key').addEventListener('click', function() {
-            cryptoState.dimension = parseInt(document.getElementById('dimension').value);
-            cryptoState.modulus = parseInt(document.getElementById('modulus').value);
-            cryptoState.sigma = parseFloat(document.getElementById('error-size').value);
-            
-            if (cryptoState.dimension < 2 || cryptoState.dimension > 16) {
-                alert('Dimension must be between 2 and 16 for this demonstration');
+            if (!key || !text) {
+                alert("Введите ключ и текст!");
                 return;
             }
             
-            if (cryptoState.modulus < 5 || cryptoState.modulus > 9973) {
-                alert('Modulus must be between 5 and 9973 for this demonstration');
-                return;
-            }
-            
-            // Generate public key A (random n×n matrix mod q)
-            cryptoState.publicKeyA = generateRandomMatrix(cryptoState.dimension, cryptoState.dimension, cryptoState.modulus);
-            
-            // Generate secret key s (random vector mod q)
-            cryptoState.secretKey = Array.from({length: cryptoState.dimension}, 
-                () => Math.floor(Math.random() * cryptoState.modulus));
-            
-            // Generate error vector e (small entries)
-            const errorVector = generateErrorVector(cryptoState.dimension, cryptoState.sigma);
-            
-            // Compute public key b = As + e mod q
-            cryptoState.publicKeyB = Array.from({length: cryptoState.dimension}, (_, i) => {
-                let sum = errorVector[i];
-                for (let j = 0; j < cryptoState.dimension; j++) {
-                    sum += cryptoState.publicKeyA[i][j] * cryptoState.secretKey[j];
-                }
-                return mod(sum, cryptoState.modulus);
-            });
-            
-            // Display keys
-            document.getElementById('public-key').textContent = matrixToString(cryptoState.publicKeyA);
-            document.getElementById('secret-key').textContent = vectorToString(cryptoState.secretKey);
-            document.getElementById('public-key-b').textContent = vectorToString(cryptoState.publicKeyB);
-            document.getElementById('key-output').style.display = 'block';
-            
-            // Update status
-            const statusDiv = document.getElementById('key-status');
-            statusDiv.textContent = `Keys generated successfully (n=${cryptoState.dimension}, q=${cryptoState.modulus}, σ=${cryptoState.sigma})`;
-            statusDiv.className = 'status success';
-            
-            // Enable encryption/decryption buttons
-            document.getElementById('encrypt-btn').disabled = false;
-            document.getElementById('decrypt-btn').disabled = false;
-            
-            // Prepare visualization
-            prepareVisualization();
-        });
-        
-        // Encryption
-        document.getElementById('encrypt-btn').addEventListener('click', function() {
-            if (!cryptoState.publicKeyA || !cryptoState.secretKey) {
-                alert('Please generate keys first');
-                return;
-            }
-            
-            try {
-                let plaintext;
-                const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
-                
-                if (activeTab === 'binary') {
-                    const binaryInput = document.getElementById('binary-plaintext').value;
-                    plaintext = binaryStringToVector(binaryInput, cryptoState.dimension);
-                } else if (activeTab === 'text') {
-                    const textInput = document.getElementById('text-plaintext').value;
-                    const encoding = document.getElementById('text-encoding').value;
-                    const binaryVector = textToBinary(textInput, encoding);
-                    
-                    // Pad or truncate to match dimension
-                    plaintext = binaryVector.slice(0, cryptoState.dimension);
-                    while (plaintext.length < cryptoState.dimension) {
-                        plaintext.push(0);
-                    }
-                } else if (activeTab === 'vector') {
-                    const vectorInput = document.getElementById('vector-plaintext').value;
-                    plaintext = vectorInput.split(/\s+/).map(x => parseInt(x.trim()));
-                    
-                    if (plaintext.length !== cryptoState.dimension || plaintext.some(isNaN)) {
-                        throw new Error(`Plaintext must be a vector of ${cryptoState.dimension} integers`);
-                    }
-                }
-                
-                cryptoState.lastPlaintext = plaintext;
-                const q = cryptoState.modulus;
-                const n = cryptoState.dimension;
-                const sigma = cryptoState.sigma;
-                
-                // Generate random binary vector r ∈ {0,1}^n
-                const r = Array.from({length: n}, () => Math.floor(Math.random() * 2));
-                
-                // Generate error vectors
-                const e1 = generateErrorVector(n, sigma);
-                const e2 = generateErrorVector(1, sigma)[0];
-                
-                // Compute u = A^T r + e1 mod q
-                const u = Array.from({length: n}, (_, i) => {
-                    let sum = e1[i];
-                    for (let j = 0; j < n; j++) {
-                        sum += cryptoState.publicKeyA[j][i] * r[j];
-                    }
-                    return mod(sum, q);
-                });
-                
-                // Compute v = b^T r + e2 + m * floor(q/2) mod q
-                let v = e2;
-                for (let i = 0; i < n; i++) {
-                    v += cryptoState.publicKeyB[i] * r[i];
-                }
-                
-                // Add the message (encoded as 0 -> 0, 1 -> floor(q/2))
-                const message = plaintext.reduce((sum, bit) => {
-                    return sum + (bit * Math.floor(q/2));
-                }, 0);
-                
-                v = mod(v + message, q);
-                
-                // Store ciphertext and error for visualization
-                cryptoState.lastCiphertext = { u, v };
-                cryptoState.lastError = { e1, e2 };
-                
-                // Display ciphertext
-                document.getElementById('ciphertext').textContent = `u: ${vectorToString(u)}\nv: ${v}`;
-                document.getElementById('error-vector').textContent = `e1: ${vectorToString(e1)}\ne2: ${e2}`;
-                document.getElementById('ciphertext-output').style.display = 'block';
-                
-                // Update status
-                const statusDiv = document.getElementById('encryption-status');
-                statusDiv.textContent = `Encryption successful (${plaintext.length} bits)`;
-                statusDiv.className = 'status success';
-                
-                // Update visualization with encrypted point
-                updateVisualization();
-                
-            } catch (error) {
-                const statusDiv = document.getElementById('encryption-status');
-                statusDiv.textContent = `Encryption error: ${error.message}`;
-                statusDiv.className = 'status error';
-                document.getElementById('ciphertext-output').style.display = 'block';
-            }
-        });
-        
-        // Decryption
-        document.getElementById('decrypt-btn').addEventListener('click', function() {
-            if (!cryptoState.secretKey) {
-                alert('Please generate keys first');
-                return;
-            }
-            
-            try {
-                const ciphertextInput = document.getElementById('ciphertext-input').value;
-                
-                // Try to parse different ciphertext formats
-                let u, v;
-                
-                // Format 1: u: [1, 2, 3], v: 4
-                const match1 = ciphertextInput.match(/u:\s*\[([^\]]+)\]\s*v:\s*([^\s,]+)/i);
-                
-                // Format 2: JSON-like {u: [1,2,3], v: 4}
-                const match2 = ciphertextInput.match(/{?\s*u\s*:\s*\[([^\]]+)\]\s*,\s*v\s*:\s*([^\s,}]+)/i);
-                
-                if (match1) {
-                    u = match1[1].split(',').map(x => parseInt(x.trim()));
-                    v = parseInt(match2 ? match2[2].trim() : match1[2].trim());
-                } else if (match2) {
-                    u = match2[1].split(',').map(x => parseInt(x.trim()));
-                    v = parseInt(match2[2].trim());
-                } else {
-                    // Try to parse as just an array
-                    const parts = ciphertextInput.split(/\s+/).filter(x => x.trim() !== '');
-                    if (parts.length >= cryptoState.dimension + 1) {
-                        u = parts.slice(0, cryptoState.dimension).map(x => parseInt(x));
-                        v = parseInt(parts[cryptoState.dimension]);
-                    } else {
-                        throw new Error('Invalid ciphertext format. Expected "u: [..., ...], v: ..." or similar');
-                    }
-                }
-                
-                if (u.length !== cryptoState.dimension || u.some(isNaN) || isNaN(v)) {
-                    throw new Error(`Ciphertext must match dimension ${cryptoState.dimension}`);
-                }
-                
-                const q = cryptoState.modulus;
-                const n = cryptoState.dimension;
-                
-                // Compute s^T u
-                let sTu = 0;
-                for (let i = 0; i < n; i++) {
-                    sTu += cryptoState.secretKey[i] * u[i];
-                }
-                
-                // Compute v - s^T u mod q
-                const inner = mod(v - sTu, q);
-                
-                // Decode message: round(inner / (q/2)) mod 2 for each bit
-                const threshold = q / 2;
-                const decryptedPlaintext = [];
-                
-                // For multi-bit messages, we need to know how many bits to extract
-                // In this demo, we'll decrypt the same number of bits as our dimension
-                for (let i = 0; i < n; i++) {
-                    // For multi-bit messages, we'd need to adjust how we encode bits
-                    // Here we're just doing a simple single-bit demonstration
-                    const bitValue = (i === 0) ? inner : 0;
-                    const decryptedBit = Math.abs(bitValue) < threshold / 2 ? 0 : 1;
-                    decryptedPlaintext.push(decryptedBit);
-                }
-                
-                // Display results
-                const decryptedTextDiv = document.getElementById('decrypted-text');
-                
-                // Try to display as text if it looks like ASCII
-                if (decryptedPlaintext.length % 8 === 0) {
-                    const asText = binaryToText(decryptedPlaintext, 'ascii');
-                    if (/^[\x20-\x7E]+$/.test(asText)) {
-                        decryptedTextDiv.textContent = `Text: "${asText}"\nBinary: ${decryptedPlaintext.join(' ')}`;
-                    } else {
-                        decryptedTextDiv.textContent = `Binary: ${decryptedPlaintext.join(' ')}`;
-                    }
-                } else {
-                    decryptedTextDiv.textContent = `Vector: ${decryptedPlaintext.join(' ')}`;
-                }
-                
-                const resultDiv = document.getElementById('decryption-result');
-                resultDiv.textContent = `Decryption successful (inner value: ${inner}, threshold: ±${threshold/2})`;
-                resultDiv.className = 'status success';
-                document.getElementById('decrypted-output').style.display = 'block';
-                
-                // Store decrypted plaintext for visualization
-                cryptoState.lastDecrypted = decryptedPlaintext;
-                updateVisualization();
-                
-            } catch (error) {
-                const resultDiv = document.getElementById('decryption-result');
-                resultDiv.textContent = `Decryption error: ${error.message}`;
-                resultDiv.className = 'status error';
-                document.getElementById('decrypted-output').style.display = 'block';
-            }
-        });
-        
-        // Visualization functions
-        function prepareVisualization() {
-            const vis = document.getElementById('lattice-vis');
-            vis.innerHTML = '';
-            
-            // Populate dimension selectors
-            const dimXSelect = document.getElementById('vis-dimension-x');
-            const dimYSelect = document.getElementById('vis-dimension-y');
-            
-            dimXSelect.innerHTML = '';
-            dimYSelect.innerHTML = '';
-            
-            for (let i = 0; i < cryptoState.dimension; i++) {
-                const option1 = document.createElement('option');
-                option1.value = i;
-                option1.textContent = `Dimension ${i+1}`;
-                dimXSelect.appendChild(option1);
-                
-                const option2 = document.createElement('option');
-                option2.value = i;
-                option2.textContent = `Dimension ${i+1}`;
-                dimYSelect.appendChild(option2);
-            }
-            
-            // Set default dimensions to first two
-            dimXSelect.value = 0;
-            dimYSelect.value = 1;
-            
-            // Add event listeners for dimension changes
-            dimXSelect.addEventListener('change', updateVisualization);
-            dimYSelect.addEventListener('change', updateVisualization);
-            document.getElementById('vis-scale').addEventListener('change', updateVisualization);
-            
-            // Initial visualization
-            updateVisualization();
+            const cipher = textToLattice(text, key);
+            document.getElementById('result').textContent = "Зашифровано: " + cipher;
         }
-        
-        function updateVisualization() {
-            if (!cryptoState.publicKeyA || cryptoState.dimension < 2) return;
+
+        function decrypt() {
+            const key = document.getElementById('key').value;
+            const cipher = document.getElementById('text').value;
             
-            const vis = document.getElementById('lattice-vis');
-            vis.innerHTML = '';
-            
-            const width = vis.clientWidth;
-            const height = vis.clientHeight;
-            const scale = parseFloat(document.getElementById('vis-scale').value) * 
-                         Math.min(width, height) * 0.4 / cryptoState.modulus;
-            const centerX = width / 2;
-            const centerY = height / 2;
-            
-            const dimX = parseInt(document.getElementById('vis-dimension-x').value);
-            const dimY = parseInt(document.getElementById('vis-dimension-y').value);
-            
-            if (dimX === dimY) return; // Can't visualize same dimension on both axes
-            
-            // Draw grid lines
-            for (let i = -10; i <= 10; i++) {
-                // Vertical lines
-                const vLine = document.createElement('div');
-                vLine.className = 'grid-line';
-                vLine.style.width = '1px';
-                vLine.style.height = `${height}px`;
-                vLine.style.left = `${centerX + i * scale}px`;
-                vLine.style.top = '0';
-                vis.appendChild(vLine);
-                
-                // Horizontal lines
-                const hLine = document.createElement('div');
-                hLine.className = 'grid-line';
-                hLine.style.width = `${width}px`;
-                hLine.style.height = '1px';
-                hLine.style.left = '0';
-                hLine.style.top = `${centerY + i * scale}px`;
-                vis.appendChild(hLine);
+            if (!key || !cipher) {
+                alert("Введите ключ и зашифрованный текст!");
+                return;
             }
             
-            // Draw basis vectors (columns of publicKeyA corresponding to selected dimensions)
-            for (let i = 0; i < 2; i++) {
-                const col = i === 0 ? dimX : dimY;
-                const vec = cryptoState.publicKeyA.map(row => row[col]);
-                
-                const x = vec[dimX] * scale;
-                const y = vec[dimY] * scale;
-                
-                const line = document.createElement('div');
-                line.className = 'vector';
-                line.style.width = `${Math.sqrt(x*x + y*y)}px`;
-                line.style.left = `${centerX}px`;
-                line.style.top = `${centerY}px`;
-                line.style.transform = `rotate(${Math.atan2(y, x)}rad)`;
-                vis.appendChild(line);
-                
-                // Label
-                const label = document.createElement('div');
-                label.textContent = `b${i+1}`;
-                label.style.position = 'absolute';
-                label.style.left = `${centerX + x/2}px`;
-                label.style.top = `${centerY + y/2}px`;
-                vis.appendChild(label);
-            }
-            
-            // Draw origin point
-            const origin = document.createElement('div');
-            origin.className = 'point';
-            origin.style.left = `${centerX}px`;
-            origin.style.top = `${centerY}px`;
-            origin.style.backgroundColor = '#2ecc71';
-            vis.appendChild(origin);
-            
-            // Draw encrypted point if available
-            if (cryptoState.lastCiphertext) {
-                const u = cryptoState.lastCiphertext.u;
-                const point = document.createElement('div');
-                point.className = 'point';
-                point.style.left = `${centerX + u[dimX] * scale}px`;
-                point.style.top = `${centerY + u[dimY] * scale}px`;
-                point.dataset.tooltip = `Encrypted: [${u[dimX]}, ${u[dimY]}]`;
-                vis.appendChild(point);
-                
-                // Label
-                const label = document.createElement('div');
-                label.textContent = 'c';
-                label.style.position = 'absolute';
-                label.style.left = `${centerX + u[dimX] * scale + 10}px`;
-                label.style.top = `${centerY + u[dimY] * scale}px`;
-                vis.appendChild(label);
-            }
-            
-            // Draw decrypted point if available
-            if (cryptoState.lastDecrypted) {
-                // For visualization, we'll show where the decrypted plaintext would map to
-                const decryptedValue = cryptoState.lastDecrypted.reduce((sum, bit) => {
-                    return sum + (bit * Math.floor(cryptoState.modulus/2));
-                }, 0);
-                
-                const point = document.createElement('div');
-                point.className = 'point';
-                point.style.left = `${centerX}px`; // x=0 for decrypted
-                point.style.top = `${centerY + decryptedValue * scale}px`;
-                point.style.backgroundColor = '#9b59b6';
-                point.dataset.tooltip = `Decrypted value: ${decryptedValue}`;
-                vis.appendChild(point);
-                
-                // Label
-                const label = document.createElement('div');
-                label.textContent = 'm';
-                label.style.position = 'absolute';
-                label.style.left = `${centerX + 10}px`;
-                label.style.top = `${centerY + decryptedValue * scale}px`;
-                vis.appendChild(label);
-            }
-            
-            // Add tooltip functionality
-            const tooltip = document.getElementById('tooltip');
-            vis.addEventListener('mousemove', function(e) {
-                const point = document.elementFromPoint(e.clientX, e.clientY);
-                if (point && point.dataset.tooltip) {
-                    tooltip.textContent = point.dataset.tooltip;
-                    tooltip.style.display = 'block';
-                    tooltip.style.left = `${e.pageX + 10}px`;
-                    tooltip.style.top = `${e.pageY + 10}px`;
-                } else {
-                    tooltip.style.display = 'none';
-                }
-            });
-            
-            vis.addEventListener('mouseout', function() {
-                tooltip.style.display = 'none';
-            });
+            const text = latticeToText(cipher, key);
+            document.getElementById('result').textContent = "Расшифровано: " + text;
         }
     </script>
 </body>
