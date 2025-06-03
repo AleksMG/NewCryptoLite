@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum-Safe LWE Cipher</title>
+    <title>Unrestricted LWE Encryption</title>
     <style>
         :root {
             --primary: #4361ee;
@@ -139,6 +139,7 @@
             background-color: var(--light);
             white-space: pre-wrap;
             font-family: monospace;
+            overflow-x: auto;
         }
 
         .success {
@@ -175,7 +176,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Quantum-Safe LWE Cipher</h1>
+        <h1>Unrestricted LWE Encryption</h1>
         
         <div class="tabs">
             <div class="tab active" onclick="switchTab('encrypt-tab')">Encrypt</div>
@@ -188,10 +189,10 @@
             <div class="settings-panel">
                 <div class="settings-row">
                     <div class="setting">
-                        <label for="alphabet-type">Alphabet Type</label>
+                        <label for="alphabet-type">Output Encoding</label>
                         <select id="alphabet-type">
-                            <option value="LETTERS">A-Z (26 letters)</option>
-                            <option value="DIGITS">0-9 (10 digits)</option>
+                            <option value="BASE64">Base64 (recommended)</option>
+                            <option value="HEX">Hexadecimal</option>
                             <option value="CUSTOM">Custom Alphabet</option>
                         </select>
                     </div>
@@ -203,15 +204,15 @@
                 <div class="settings-row">
                     <div class="setting">
                         <label for="lattice-dimension">Lattice Dimension (n)</label>
-                        <input type="number" id="lattice-dimension" min="4" max="256" value="4">
+                        <input type="number" id="lattice-dimension" min="4" max="1024" value="256">
                     </div>
                     <div class="setting">
                         <label for="modulus">Modulus (q)</label>
-                        <input type="number" id="modulus" min="11" max="65536" value="251">
+                        <input type="number" id="modulus" min="257" max="65536" value="2053">
                     </div>
                     <div class="setting">
                         <label for="error-sigma">Error Sigma</label>
-                        <input type="number" id="error-sigma" min="1" max="10" value="2" step="0.5">
+                        <input type="number" id="error-sigma" min="1" max="10" value="3" step="0.5">
                     </div>
                 </div>
             </div>
@@ -223,21 +224,21 @@
         <!-- Encryption Tab -->
         <div id="encrypt-tab" class="tab-content active">
             <div class="form-group">
-                <label for="encrypt-key">Secret Key (12+ characters recommended)</label>
+                <label for="encrypt-key">Secret Key (any length)</label>
                 <input type="text" id="encrypt-key" placeholder="Enter your secret key">
             </div>
 
             <div class="form-group">
                 <label for="encrypt-message">Message to Encrypt</label>
-                <textarea id="encrypt-message" placeholder="Enter your message"></textarea>
+                <textarea id="encrypt-message" placeholder="Enter your message (any length)"></textarea>
             </div>
 
             <div class="btn-group">
                 <button class="btn" onclick="encrypt()">
-                    <span class="icon">🔒</span> Encrypt
+                    Encrypt
                 </button>
                 <button class="btn btn-secondary" onclick="copyResult('encrypt-result')">
-                    <span class="icon">⎘</span> Copy
+                    Copy Result
                 </button>
             </div>
 
@@ -258,10 +259,10 @@
 
             <div class="btn-group">
                 <button class="btn" onclick="decrypt()">
-                    <span class="icon">🔓</span> Decrypt
+                    Decrypt
                 </button>
                 <button class="btn btn-secondary" onclick="copyResult('decrypt-result')">
-                    <span class="icon">⎘</span> Copy
+                    Copy Result
                 </button>
             </div>
 
@@ -272,22 +273,15 @@
     <script>
         // Default Settings
         const DEFAULT_SETTINGS = {
-            alphabetType: "LETTERS",
+            alphabetType: "BASE64",
             customAlphabet: "",
-            n: 4,
-            q: 251,
-            errorSigma: 2
+            n: 256,
+            q: 2053,
+            errorSigma: 3
         };
 
         // Current Settings
         let settings = {...DEFAULT_SETTINGS};
-
-        // Alphabet Definitions
-        const ALPHABETS = {
-            LETTERS: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            DIGITS: "0123456789",
-            CUSTOM: ""
-        };
 
         // Initialize the application
         function init() {
@@ -328,10 +322,6 @@
             document.getElementById('lattice-dimension').value = settings.n;
             document.getElementById('modulus').value = settings.q;
             document.getElementById('error-sigma').value = settings.errorSigma;
-            
-            if (settings.alphabetType === 'CUSTOM') {
-                ALPHABETS.CUSTOM = settings.customAlphabet;
-            }
         }
 
         // Show/hide custom alphabet field
@@ -392,33 +382,8 @@
                 });
         }
 
-        // Get current alphabet
-        function getAlphabet() {
-            const type = settings.alphabetType;
-            if (type === 'CUSTOM' && settings.customAlphabet) {
-                return settings.customAlphabet;
-            }
-            return ALPHABETS[type] || ALPHABETS.LETTERS;
-        }
-
-        // Convert character to number
-        function charToNum(char, alphabet) {
-            const index = alphabet.indexOf(char);
-            if (index === -1) throw new Error(`Character '${char}' not in alphabet`);
-            return index;
-        }
-
-        // Convert number to character
-        function numToChar(num, alphabet) {
-            return alphabet[num % alphabet.length];
-        }
-
         // Generate key vector from string
-        function keyToVector(keyStr) {
-            const alphabet = getAlphabet();
-            const q = settings.q;
-            const n = settings.n;
-            
+        function keyToVector(keyStr, length) {
             // Simple hash function (for demo purposes)
             let hash = 0;
             for (let i = 0; i < keyStr.length; i++) {
@@ -428,8 +393,8 @@
             
             // Distribute hash into n values
             const vector = [];
-            for (let i = 0; i < n; i++) {
-                vector.push(Math.abs(hash + i * 2654435761) % q);
+            for (let i = 0; i < length; i++) {
+                vector.push(Math.abs(hash + i * 2654435761) % settings.q);
             }
             
             return vector;
@@ -443,41 +408,80 @@
             return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
         }
 
-        // Encrypt function
+        // Encrypt function - handles any length
         function encrypt() {
             try {
                 const keyStr = document.getElementById('encrypt-key').value;
                 const message = document.getElementById('encrypt-message').value;
-                const alphabet = getAlphabet();
                 
                 if (!keyStr) throw new Error("Secret key is required");
                 if (!message) throw new Error("Message cannot be empty");
-                if (message.length !== settings.n) {
-                    throw new Error(`Message must be exactly ${settings.n} characters`);
+                
+                const q = settings.q;
+                const n = settings.n;
+                const blockSize = n;
+                const fullBlocks = Math.ceil(message.length / blockSize);
+                
+                // Convert message to bytes
+                const msgBytes = new TextEncoder().encode(message);
+                const totalBytes = fullBlocks * blockSize;
+                const paddedBytes = new Uint8Array(totalBytes);
+                paddedBytes.set(msgBytes);
+                
+                let ciphertext = '';
+                
+                // Process each block
+                for (let block = 0; block < fullBlocks; block++) {
+                    const start = block * blockSize;
+                    const end = start + blockSize;
+                    const blockBytes = paddedBytes.slice(start, end);
+                    
+                    // Generate fresh key vector for this block
+                    const key = keyToVector(keyStr + block, blockSize);
+                    
+                    // Generate random vector r ∈ {0,1}^n
+                    const r = new Array(blockSize).fill(0).map(() => Math.round(Math.random()));
+                    
+                    // Compute u = A * r mod q
+                    const u = key.map((k, i) => (k * r[i]) % q);
+                    
+                    // Compute v = B * r + m * q/2 + error mod q
+                    const v = key.map((k, i) => {
+                        const B_i = (k * 123456789 + 987654321) % q;
+                        const error = Math.round(gaussian() * settings.errorSigma);
+                        return (B_i * r[i] + Math.floor(q/2) * blockBytes[i] + error) % q;
+                    });
+                    
+                    // Convert to bytes
+                    const cipherBytes = new Uint8Array(v.length * 2);
+                    for (let i = 0; i < v.length; i++) {
+                        cipherBytes[i*2] = v[i] >> 8;
+                        cipherBytes[i*2+1] = v[i] & 0xFF;
+                    }
+                    
+                    // Encode based on settings
+                    switch(settings.alphabetType) {
+                        case 'BASE64':
+                            ciphertext += btoa(String.fromCharCode(...cipherBytes));
+                            break;
+                        case 'HEX':
+                            ciphertext += Array.from(cipherBytes).map(b => 
+                                b.toString(16).padStart(2, '0')).join('');
+                            break;
+                        case 'CUSTOM':
+                            const alphabet = settings.customAlphabet;
+                            if (!alphabet || alphabet.length < 2) {
+                                throw new Error("Custom alphabet must have at least 2 characters");
+                            }
+                            for (let byte of cipherBytes) {
+                                ciphertext += alphabet[byte % alphabet.length];
+                            }
+                            break;
+                    }
                 }
                 
-                const key = keyToVector(keyStr);
-                const q = settings.q;
-                const msgNums = [...message].map(c => charToNum(c, alphabet));
-                
-                // Generate random vector r ∈ {0,1}^n
-                const r = new Array(settings.n).fill(0).map(() => Math.round(Math.random()));
-                
-                // Compute u = A * r mod q
-                const u = key.map((k, i) => (k * r[i]) % q);
-                
-                // Compute v = B * r + m * q/2 + error mod q
-                const v = key.map((k, i) => {
-                    const B_i = (k * 123456789 + 987654321) % q;
-                    const error = Math.round(gaussian() * settings.errorSigma);
-                    return (B_i * r[i] + Math.floor(q/2) * msgNums[i] + error) % q;
-                });
-                
-                // Convert to ciphertext characters
-                const ciphertext = v.map(num => numToChar(num, alphabet)).join('');
-                
                 // Show result
-                showResult('encrypt-result', `Encryption successful!\n\nCiphertext: ${ciphertext}`);
+                showResult('encrypt-result', `Encryption successful!\n\nCiphertext:\n${ciphertext}\n\nLength: ${ciphertext.length} chars`);
                 
                 // Auto-populate decrypt fields
                 document.getElementById('decrypt-key').value = keyStr;
@@ -488,32 +492,78 @@
             }
         }
 
-        // Decrypt function
+        // Decrypt function - handles any length
         function decrypt() {
             try {
                 const keyStr = document.getElementById('decrypt-key').value;
                 const ciphertext = document.getElementById('ciphertext').value;
-                const alphabet = getAlphabet();
                 
                 if (!keyStr) throw new Error("Secret key is required");
                 if (!ciphertext) throw new Error("Ciphertext cannot be empty");
-                if (ciphertext.length !== settings.n) {
-                    throw new Error(`Ciphertext must be exactly ${settings.n} characters`);
+                
+                const q = settings.q;
+                const n = settings.n;
+                let cipherBytes;
+                
+                // Decode based on settings
+                switch(settings.alphabetType) {
+                    case 'BASE64':
+                        cipherBytes = new Uint8Array(atob(ciphertext).split('').map(c => c.charCodeAt(0)));
+                        break;
+                    case 'HEX':
+                        cipherBytes = new Uint8Array(ciphertext.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                        break;
+                    case 'CUSTOM':
+                        const alphabet = settings.customAlphabet;
+                        if (!alphabet || alphabet.length < 2) {
+                            throw new Error("Custom alphabet must have at least 2 characters");
+                        }
+                        const charToValue = {};
+                        for (let i = 0; i < alphabet.length; i++) {
+                            charToValue[alphabet[i]] = i;
+                        }
+                        cipherBytes = new Uint8Array([...ciphertext].map(c => charToValue[c]));
+                        break;
                 }
                 
-                const key = keyToVector(keyStr);
-                const q = settings.q;
-                const v = [...ciphertext].map(c => charToNum(c, alphabet));
+                const blockSize = n * 2; // Each block produces 2n bytes
+                if (cipherBytes.length % blockSize !== 0) {
+                    throw new Error(`Ciphertext length must be multiple of ${blockSize} for current settings`);
+                }
                 
-                // Decrypt each character
-                const decrypted = v.map((v_i, i) => {
-                    const B_i = (key[i] * 123456789 + 987654321) % q;
-                    const d = (v_i - B_i) % q;
-                    const correctedD = d < 0 ? d + q : d;
-                    return numToChar((correctedD > q/4 && correctedD < 3*q/4) ? 1 : 0, alphabet);
-                }).join('');
+                const fullBlocks = cipherBytes.length / blockSize;
+                let decryptedBytes = new Uint8Array(fullBlocks * n);
                 
-                showResult('decrypt-result', `Decryption successful!\n\nMessage: ${decrypted}`);
+                // Process each block
+                for (let block = 0; block < fullBlocks; block++) {
+                    const start = block * blockSize;
+                    const end = start + blockSize;
+                    const blockBytes = cipherBytes.slice(start, end);
+                    
+                    // Convert back to v vector
+                    const v = [];
+                    for (let i = 0; i < blockBytes.length; i += 2) {
+                        v.push((blockBytes[i] << 8) | blockBytes[i+1]);
+                    }
+                    
+                    // Generate same key vector used for encryption
+                    const key = keyToVector(keyStr + block, n);
+                    
+                    // Decrypt each value
+                    for (let i = 0; i < v.length; i++) {
+                        const B_i = (key[i] * 123456789 + 987654321) % q;
+                        const d = (v[i] - B_i) % q;
+                        const correctedD = d < 0 ? d + q : d;
+                        decryptedBytes[block * n + i] = (correctedD > q/4 && correctedD < 3*q/4) ? 1 : 0;
+                    }
+                }
+                
+                // Remove padding and convert to string
+                const textDecoder = new TextDecoder();
+                let decrypted = textDecoder.decode(decryptedBytes);
+                decrypted = decrypted.replace(/\x00+$/, ''); // Remove trailing null bytes
+                
+                showResult('decrypt-result', `Decryption successful!\n\nMessage:\n${decrypted}`);
                 
             } catch (e) {
                 showResult('decrypt-result', "Decryption error: " + e.message, false);
