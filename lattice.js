@@ -1,216 +1,56 @@
 class LatticeCrypto {
-    constructor() {
-        this.gridSize = 5; // Fixed size for demo
+    constructor(dimension = 128) {
+        this.dim = dimension;
+        this.q = 2053; // Prime modulus
     }
 
-    // Generate a numeric key stream
-    generateKeyStream(key, length) {
-        let keyStream = [];
-        for (let i = 0; i < length; i++) {
-            keyStream.push(key.charCodeAt(i % key.length));
-        }
-        return keyStream;
+    // Key generation (publicKey = { A, b }, secretKey = s)
+    generateKeys() {
+        const secretKey = this._generateBinaryVector(this.dim);
+        const A = this._generateRandomMatrix(this.dim, this.q);
+        const error = this._generateSmallError();
+
+        const b = A.map(row => 
+            (row.reduce((sum, val, j) => sum + val * secretKey[j], 0) + error) % this.q
+        );
+
+        return { publicKey: { A, b }, secretKey };
     }
 
-    // Build a grid from text
-    buildGrid(text, key) {
-        let grid = [];
-        let paddedText = text.padEnd(this.gridSize * this.gridSize, ' ');
-        let keyStream = this.generateKeyStream(key, paddedText.length);
+    // Encrypt single bit (0 or 1)
+    encryptBit(publicKey, bit) {
+        const { A, b } = publicKey;
+        const r = this._generateBinaryVector(this.dim);
 
-        for (let i = 0; i < this.gridSize; i++) {
-            let row = [];
-            for (let j = 0; j < this.gridSize; j++) {
-                const idx = i * this.gridSize + j;
-                const charCode = paddedText.charCodeAt(idx) ^ keyStream[idx];
-                row.push(String.fromCharCode(charCode));
-            }
-            grid.push(row);
-        }
-        return grid;
+        const u = A[0].map((_, j) =>
+            A.reduce((sum, row, i) => sum + row[j] * r[i], 0) % this.q
+        );
+
+        const v = (b.reduce((sum, val, i) => sum + val * r[i], 0) + 
+                  Math.floor(this.q / 2) * bit) % this.q;
+
+        return { u, v };
     }
 
-    // Spiral traversal for encryption
-    spiralEncrypt(grid) {
-        let result = '';
-        let [x, y, dx, dy] = [0, 0, 0, 1];
-        
-        for (let i = 0; i < this.gridSize * this.gridSize; i++) {
-            result += grid[x][y];
-            grid[x][y] = null; // Mark as visited
-            
-            // Change direction if next cell is invalid
-            if (x + dx >= this.gridSize || y + dy >= this.gridSize || 
-                x + dx < 0 || y + dy < 0 || grid[x + dx][y + dy] === null) {
-                [dx, dy] = [dy, -dx]; // 90° turn
-            }
-            
-            x += dx;
-            y += dy;
-        }
-        return result;
+    // Decrypt single bit
+    decryptBit(secretKey, ciphertext) {
+        const { u, v } = ciphertext;
+        const inner = u.reduce((sum, val, i) => sum + val * secretKey[i], 0) % this.q;
+        return Math.abs(v - inner) < this.q / 4 ? 0 : 1;
     }
 
-    // Encrypt function
-    encrypt(plaintext, key) {
-        try {
-            const grid = this.buildGrid(plaintext, key);
-            const ciphertext = this.spiralEncrypt(grid);
-            return {
-                ciphertext: ciphertext,
-                grid: grid
-class LatticeCrypto {
-    constructor() {
-        this.gridSize = 5;
+    // Helpers
+    _generateBinaryVector(size) {
+        return Array(size).fill(0).map(() => Math.floor(Math.random() * 2));
     }
 
-    // Фиксим генерацию ключа
-    generateKeyStream(key, length) {
-        let keyStream = [];
-        for (let i = 0; i < length; i++) {
-            // Теперь ключ не повторяется тупо, а хэшируется
-            keyStream.push(key.charCodeAt(i % key.length) * (i + 1) % 256);
-        }
-        return keyStream;
+    _generateRandomMatrix(rows, cols) {
+        return Array(rows).fill(0).map(() => 
+            Array(cols).fill(0).map(() => Math.floor(Math.random() * this.q))
+        );
     }
 
-    // Фиксим построение сетки
-    buildGrid(text, key) {
-        let grid = [];
-        let paddedText = text.padEnd(this.gridSize * this.gridSize, ' ');
-        let keyStream = this.generateKeyStream(key, paddedText.length);
-
-        for (let i = 0; i < this.gridSize; i++) {
-            let row = [];
-            for (let j = 0; j < this.gridSize; j++) {
-                const idx = i * this.gridSize + j;
-                const charCode = paddedText.charCodeAt(idx) ^ keyStream[idx];
-                row.push(String.fromCharCode(charCode));
-            }
-            grid.push(row);
-        }
-        return grid;
-    }
-
-    // Фиксим спиральный обход (теперь не теряет символы)
-    spiralTraverse(grid) {
-        let result = '';
-        let [x, y, dx, dy] = [0, 0, 0, 1];
-        
-        for (let i = 0; i < this.gridSize * this.gridSize; i++) {
-            if (grid[x][y] !== null) {
-                result += grid[x][y];
-                grid[x][y] = null;
-            }
-
-            // Поворот, если вышли за границы или уже посещали
-            if (x + dx >= this.gridSize || y + dy >= this.gridSize || 
-                x + dx < 0 || y + dy < 0 || grid[x + dx][y + dy] === null) {
-                [dx, dy] = [dy, -dx];
-            }
-            
-            x += dx;
-            y += dy;
-        }
-        return result;
-    }
-
-    encrypt(plaintext, key) {
-        try {
-            if (!plaintext || !key) throw new Error("Нет текста или ключа");
-            const grid = this.buildGrid(plaintext, key);
-            const ciphertext = this.spiralTraverse(grid);
-            return { ciphertext, grid };
-        } catch (error) {
-            return { error: error.message };
-        }
-    }
-
-    decrypt(ciphertext, key) {
-        try {
-            if (!ciphertext || !key) throw new Error("Нет шифртекста или ключа");
-            
-            // Обратная спираль
-            let grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(null));
-            let [x, y, dx, dy] = [0, 0, 0, 1];
-            
-            for (let i = 0; i < ciphertext.length; i++) {
-                grid[x][y] = ciphertext[i];
-                
-                if (x + dx >= this.gridSize || y + dy >= this.gridSize || 
-                    x + dx < 0 || y + dy < 0 || grid[x + dx][y + dy] !== null) {
-                    [dx, dy] = [dy, -dx];
-                }
-                
-                x += dx;
-                y += dy;
-            }
-            
-            // Восстанавливаем текст
-            let plaintext = '';
-            let keyStream = this.generateKeyStream(key, this.gridSize * this.gridSize);
-            
-            for (let i = 0; i < this.gridSize; i++) {
-                for (let j = 0; j < this.gridSize; j++) {
-                    const charCode = grid[i][j].charCodeAt(0) ^ keyStream[i * this.gridSize + j];
-                    plaintext += String.fromCharCode(charCode);
-                }
-            }
-            
-            return { plaintext: plaintext.trim(), grid };
-        } catch (error) {
-            return { error: error.message };
-        }
+    _generateSmallError() {
+        return Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
     }
 }
-
-// UI Integration
-document.addEventListener('DOMContentLoaded', () => {
-    const crypto = new LatticeCrypto();
-    
-    document.getElementById('encryptBtn').addEventListener('click', () => {
-        const plaintext = document.getElementById('plaintext').value;
-        const key = document.getElementById('key').value;
-        
-        if (!plaintext || !key) {
-            document.getElementById('encryptStatus').textContent = "Error: Enter text and key!";
-            document.getElementById('encryptStatus').className = "status error";
-            return;
-        }
-        
-        const result = crypto.encrypt(plaintext, key);
-        
-        if (result.error) {
-            document.getElementById('encryptStatus').textContent = "Error: " + result.error;
-            document.getElementById('encryptStatus').className = "status error";
-        } else {
-            document.getElementById('ciphertext').value = result.ciphertext;
-            document.getElementById('encryptStatus').textContent = "Encryption successful!";
-            document.getElementById('encryptStatus').className = "status success";
-            document.getElementById('encryptGrid').textContent = result.grid.map(row => row.join(' ')).join('\n');
-        }
-    });
-    
-    document.getElementById('decryptBtn').addEventListener('click', () => {
-        const ciphertext = document.getElementById('ciphertext').value;
-        const key = document.getElementById('decryptKey').value;
-        
-        if (!ciphertext || !key) {
-            document.getElementById('decryptStatus').textContent = "Error: Enter text and key!";
-            document.getElementById('decryptStatus').className = "status error";
-            return;
-        }
-        
-        const result = crypto.decrypt(ciphertext, key);
-        
-        if (result.error) {
-            document.getElementById('decryptStatus').textContent = "Error: " + result.error;
-            document.getElementById('decryptStatus').className = "status error";
-        } else {
-            document.getElementById('plaintext').value = result.plaintext;
-            document.getElementById('decryptStatus').textContent = "Decryption successful!";
-            document.getElementById('decryptStatus').className = "status success";
-            document.getElementById('decryptGrid').textContent = result.grid.map(row => row.join(' ')).join('\n');
-        }
-    });
-});
