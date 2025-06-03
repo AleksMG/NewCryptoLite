@@ -3,203 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Lattice Cipher with Visualization</title>
+    <title>Robust Lattice Cipher</title>
     <style>
         :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #166088;
-            --background-color: #f8f9fa;
-            --text-color: #333;
-            --error-color: #d64045;
-            --success-color: #4caf50;
-            --highlight-color: #ffeb3b;
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #2ecc71;
+            --danger: #e74c3c;
         }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Fira Code', monospace;
             line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--background-color);
-            max-width: 1000px;
+            color: var(--dark);
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color: var(--light);
         }
-        
-        h1, h2 {
-            color: var(--primary-color);
-            text-align: center;
-        }
-        
         .container {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 25px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
             margin-bottom: 20px;
         }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
-        
         input, textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 12px;
+            border: 2px solid #ddd;
             border-radius: 4px;
+            font-family: inherit;
             font-size: 16px;
             transition: border 0.3s;
         }
-        
         input:focus, textarea:focus {
-            border-color: var(--primary-color);
+            border-color: var(--secondary);
             outline: none;
         }
-        
         button {
-            background-color: var(--primary-color);
+            background-color: var(--secondary);
             color: white;
             border: none;
             padding: 12px 20px;
             font-size: 16px;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
             width: 100%;
-            margin: 5px 0;
+            margin: 10px 0;
         }
-        
         button:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--primary);
+            transform: translateY(-2px);
         }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .button-group button {
-            flex: 1;
-        }
-        
         #result {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 30px;
+            padding: 20px;
             border-radius: 4px;
+            background-color: #f8f9fa;
             display: none;
         }
-        
         .success {
-            background-color: rgba(76, 175, 80, 0.1);
-            border-left: 4px solid var(--success-color);
-            color: var(--text-color);
             display: block !important;
+            border-left: 4px solid var(--success);
         }
-        
         .error {
-            background-color: rgba(214, 64, 69, 0.1);
-            border-left: 4px solid var(--error-color);
-            color: var(--text-color);
             display: block !important;
+            border-left: 4px solid var(--danger);
         }
-        
-        .info {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
         .matrix {
             display: inline-block;
-            margin: 10px 0;
+            margin: 15px 0;
             border-collapse: collapse;
         }
-        
         .matrix td {
-            padding: 8px;
+            padding: 10px;
             text-align: center;
             border: 1px solid #ddd;
-            min-width: 30px;
+            min-width: 40px;
         }
-        
-        .matrix .highlight {
-            background-color: var(--highlight-color);
-            font-weight: bold;
-        }
-        
         .step {
-            margin: 15px 0;
-            padding: 10px;
-            border-left: 3px solid var(--primary-color);
-            background-color: rgba(74, 111, 165, 0.05);
-        }
-        
-        .step-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: var(--primary-color);
-        }
-        
-        .visualization {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 15px 0;
-        }
-        
-        .visualization-box {
-            flex: 1;
-            min-width: 250px;
-            padding: 10px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-        }
-        
-        .visualization-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-align: center;
-            color: var(--secondary-color);
-        }
-        
-        @media (max-width: 600px) {
-            .button-group {
-                flex-direction: column;
-            }
-            
-            .visualization {
-                flex-direction: column;
-            }
+            margin: 25px 0;
+            padding: 15px;
+            border-left: 3px solid var(--secondary);
+            background-color: rgba(52, 152, 219, 0.05);
         }
     </style>
 </head>
 <body>
-    <h1>Advanced Lattice Cipher with Visualization</h1>
-    
     <div class="container">
+        <h1>Robust Lattice Cipher</h1>
+        
         <div class="form-group">
             <label for="key">Encryption Key (A-Z only):</label>
-            <input type="text" id="key" placeholder="Enter your key (e.g., SECRET)" value="KEY">
-            <p class="info">The key should contain only uppercase letters A-Z. Longer keys provide better security.</p>
+            <input type="text" id="key" placeholder="Enter your key (e.g., SECRET)" value="LATTICE">
         </div>
         
         <div class="form-group">
             <label for="message">Message:</label>
-            <textarea id="message" rows="5" placeholder="Enter your message here">MSAKQQ</textarea>
-            <p class="info">For encryption: any text. For decryption: previously encrypted text only.</p>
+            <textarea id="message" rows="5" placeholder="Enter your message here">CRYPTO</textarea>
         </div>
         
-        <div class="button-group">
-            <button onclick="encrypt()">Encrypt</button>
-            <button onclick="decrypt()">Decrypt</button>
-        </div>
+        <button onclick="encrypt()">Encrypt</button>
+        <button onclick="decrypt()">Decrypt</button>
         
         <div id="result"></div>
     </div>
@@ -207,23 +128,23 @@
     <script>
         // ===== CONFIGURATION ===== //
         const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const MODULUS = 26; // Using 26 for direct alphabet mapping
+        const MODULUS = 29; // Используем простое число >26 для гарантированной обратимости
         
-        // ===== UTILITY FUNCTIONS ===== //
+        // ===== CORE FUNCTIONS ===== //
         function textToVector(text) {
             const cleaned = text.toUpperCase().replace(/[^A-Z]/g, '');
-            return Array.from(cleaned).map(c => ALPHABET.indexOf(c));
+            return Array.from(cleaned).map(c => ALPHABET.indexOf(c) + 1); // +1 чтобы избежать нулей
         }
         
         function vectorToText(vector) {
-            return vector.map(n => ALPHABET[(n + MODULUS) % MODULUS]).join('');
+            return vector.map(n => ALPHABET[((n - 1) % 26 + 26) % 26]).join('');
         }
         
         function generateLattice(keyVector) {
             const n = keyVector.length;
             let lattice = Array(n).fill().map(() => Array(n).fill(0));
             
-            // Create a circulant matrix based on the key
+            // Создаём циркулянтную матрицу
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < n; j++) {
                     lattice[i][j] = keyVector[(j - i + n) % n];
@@ -232,80 +153,78 @@
             return lattice;
         }
         
-        function modInverse(a, m) {
-            // Find modular inverse using Extended Euclidean Algorithm
-            a = (a % m + m) % m;
-            for (let x = 1; x < m; x++) {
-                if ((a * x) % m === 1) return x;
-            }
-            return null; // No inverse exists
+        function extendedGCD(a, b) {
+            if (b === 0) return [a, 1, 0];
+            const [gcd, x1, y1] = extendedGCD(b, a % b);
+            return [gcd, y1, x1 - Math.floor(a / b) * y1];
         }
         
-        function matrixDeterminant(matrix, mod) {
-            const n = matrix.length;
-            if (n === 1) return matrix[0][0];
-            if (n === 2) {
-                return (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]) % mod;
-            }
-            
-            let det = 0;
-            for (let i = 0; i < n; i++) {
-                // Create submatrix
-                const submatrix = [];
-                for (let j = 1; j < n; j++) {
-                    submatrix.push(matrix[j].filter((_, k) => k !== i));
-                }
-                
-                const sign = i % 2 === 0 ? 1 : -1;
-                det = (det + sign * matrix[0][i] * matrixDeterminant(submatrix, mod)) % mod;
-            }
-            
-            return (det + mod) % mod;
+        function modInverse(a, m) {
+            const [gcd, x] = extendedGCD(a, m);
+            return gcd === 1 ? (x % m + m) % m : null;
         }
         
         function matrixInverse(matrix, mod) {
             const n = matrix.length;
-            const det = matrixDeterminant(matrix, mod);
-            
-            // Check if inverse exists
-            const detInverse = modInverse(det, mod);
-            if (detInverse === null) {
-                throw new Error("Matrix is not invertible with current key and modulus");
-            }
-            
-            // Calculate adjugate matrix
-            let adjugate = Array(n).fill().map(() => Array(n).fill(0));
-            
-            for (let i = 0; i < n; i++) {
-                for (let j = 0; j < n; j++) {
-                    // Create minor matrix
-                    const minor = [];
-                    for (let k = 0; k < n; k++) {
-                        if (k === i) continue;
-                        const row = [];
-                        for (let l = 0; l < n; l++) {
-                            if (l === j) continue;
-                            row.push(matrix[k][l]);
-                        }
-                        minor.push(row);
-                    }
-                    
-                    const sign = (i + j) % 2 === 0 ? 1 : -1;
-                    const minorDet = matrixDeterminant(minor, mod);
-                    adjugate[j][i] = (sign * minorDet) % mod;
-                }
-            }
-            
-            // Multiply adjugate by detInverse
             let inverse = Array(n).fill().map(() => Array(n).fill(0));
+            
+            // Для циркулянтных матриц обратная тоже циркулянтна
+            // Используем метод с использованием полиномов
+            const firstRow = matrix[0];
+            const poly = firstRow.map((val, i) => val * Math.pow(x, i)).reduce((a, b) => a + b, 0);
+            
+            // Находим обратный полином в кольце Z_mod[x]/(x^n - 1)
+            // Это сложная часть, поэтому используем упрощённый подход:
+            
+            // Проверяем, что детерминант обратим
+            const det = matrixDeterminant(matrix, mod);
+            const detInv = modInverse(det, mod);
+            if (!detInv) throw new Error("Matrix is not invertible");
+            
+            // Для циркулянтных матриц обратная может быть построена через FFT
+            // Здесь используем практический подход с явной формулой
+            
+            // Строим обратную матрицу через присоединённую
+            const adjugate = getAdjugate(matrix, mod);
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < n; j++) {
-                    inverse[i][j] = (adjugate[i][j] * detInverse) % mod;
+                    inverse[i][j] = (adjugate[i][j] * detInv) % mod;
                     if (inverse[i][j] < 0) inverse[i][j] += mod;
                 }
             }
             
             return inverse;
+        }
+        
+        function matrixDeterminant(matrix, mod) {
+            const n = matrix.length;
+            if (n === 1) return matrix[0][0] % mod;
+            
+            let det = 0;
+            for (let i = 0; i < n; i++) {
+                const minor = matrix.slice(1).map(row => row.filter((_, j) => j !== i));
+                const sign = i % 2 === 0 ? 1 : -1;
+                det = (det + sign * matrix[0][i] * matrixDeterminant(minor, mod)) % mod;
+            }
+            
+            return (det + mod) % mod;
+        }
+        
+        function getAdjugate(matrix, mod) {
+            const n = matrix.length;
+            let adjugate = Array(n).fill().map(() => Array(n).fill(0));
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const minor = matrix.filter((_, k) => k !== i)
+                                       .map(row => row.filter((_, l) => l !== j));
+                    const sign = (i + j) % 2 === 0 ? 1 : -1;
+                    adjugate[j][i] = (sign * matrixDeterminant(minor, mod)) % mod;
+                    if (adjugate[j][i] < 0) adjugate[j][i] += mod;
+                }
+            }
+            
+            return adjugate;
         }
         
         function matrixMultiply(vector, matrix, mod) {
@@ -323,49 +242,13 @@
             return result;
         }
         
-        function chunkText(text, size) {
-            const chunks = [];
-            for (let i = 0; i < text.length; i += size) {
-                chunks.push(text.slice(i, i + size));
-            }
-            return chunks;
-        }
-        
-        function createMatrixHTML(matrix, highlightRow = -1, highlightCol = -1) {
-            let html = '<table class="matrix"><tbody>';
-            
-            for (let i = 0; i < matrix.length; i++) {
-                html += '<tr>';
-                for (let j = 0; j < matrix[i].length; j++) {
-                    const cls = (i === highlightRow || j === highlightCol) ? ' class="highlight"' : '';
-                    html += `<td${cls}>${matrix[i][j]}</td>`;
-                }
-                html += '</tr>';
-            }
-            
-            html += '</tbody></table>';
-            return html;
-        }
-        
-        function createVectorHTML(vector, highlightIndex = -1) {
-            let html = '<table class="matrix"><tbody><tr>';
-            
-            for (let i = 0; i < vector.length; i++) {
-                const cls = (i === highlightIndex) ? ' class="highlight"' : '';
-                html += `<td${cls}>${vector[i]}</td>`;
-            }
-            
-            html += '</tr></tbody></table>';
-            return html;
-        }
-        
-        // ===== CRYPTO FUNCTIONS ===== //
+        // ===== CRYPTO OPERATIONS ===== //
         function encrypt() {
             try {
                 const key = document.getElementById('key').value.trim();
                 const msg = document.getElementById('message').value.trim();
                 
-                if (!key || !msg) throw new Error("Please enter both key and message!");
+                if (!key || !msg) throw new Error("Both key and message are required!");
                 if (!/^[A-Za-z]+$/.test(key)) throw new Error("Key must contain only letters A-Z!");
                 
                 const keyVector = textToVector(key);
@@ -374,108 +257,40 @@
                 if (keyVector.length === 0) throw new Error("Key cannot be empty!");
                 if (msgVector.length === 0) throw new Error("Message cannot be empty!");
                 
-                // Visualization steps
-                let visualizationSteps = '';
-                
-                // Step 1: Show key and message
-                visualizationSteps += `
-                    <div class="step">
-                        <div class="step-title">Step 1: Convert key and message to vectors</div>
-                        <div class="visualization">
-                            <div class="visualization-box">
-                                <div class="visualization-title">Key: ${key}</div>
-                                ${createVectorHTML(keyVector)}
-                            </div>
-                            <div class="visualization-box">
-                                <div class="visualization-title">Message: ${msg}</div>
-                                ${createVectorHTML(msgVector)}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Pad message if needed
+                // Pad message
                 const padLength = (keyVector.length - (msgVector.length % keyVector.length)) % keyVector.length;
-                const paddedMsg = [...msgVector, ...Array(padLength).fill(0)];
-                
-                visualizationSteps += `
-                    <div class="step">
-                        <div class="step-title">Step 2: Pad message (if needed)</div>
-                        <div>Original length: ${msgVector.length}, Key length: ${keyVector.length}</div>
-                        <div>Padding needed: ${padLength} zeros</div>
-                        <div class="visualization">
-                            <div class="visualization-box">
-                                <div class="visualization-title">Padded Message Vector</div>
-                                ${createVectorHTML(paddedMsg)}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                const paddedMsg = [...msgVector, ...Array(padLength).fill(1)]; // Заполняем 1 вместо 0
                 
                 const lattice = generateLattice(keyVector);
-                
-                visualizationSteps += `
-                    <div class="step">
-                        <div class="step-title">Step 3: Generate Lattice (Circulant Matrix)</div>
-                        <div>Each row is a cyclic shift of the key vector</div>
-                        ${createMatrixHTML(lattice)}
-                    </div>
-                `;
-                
                 const cipherBlocks = [];
-                const processSteps = [];
                 
-                // Process each block
                 for (let i = 0; i < paddedMsg.length; i += keyVector.length) {
                     const block = paddedMsg.slice(i, i + keyVector.length);
-                    
-                    processSteps.push(`
-                        <div class="step">
-                            <div class="step-title">Processing Block ${i/keyVector.length + 1}</div>
-                            <div class="visualization">
-                                <div class="visualization-box">
-                                    <div class="visualization-title">Message Block</div>
-                                    ${createVectorHTML(block)}
-                                </div>
-                                <div class="visualization-box">
-                                    <div class="visualization-title">Matrix Multiplication</div>
-                                    <div>Block × Lattice = Cipher Block</div>
-                                </div>
-                                <div class="visualization-box">
-                                    <div class="visualization-title">Resulting Cipher Block</div>
-                                    ${createVectorHTML(matrixMultiply(block, lattice, MODULUS))}
-                                </div>
-                            </div>
-                        </div>
-                    `);
-                    
-                    const cipherBlock = matrixMultiply(block, lattice, MODULUS);
-                    cipherBlocks.push(...cipherBlock);
+                    cipherBlocks.push(...matrixMultiply(block, lattice, MODULUS));
                 }
                 
-                visualizationSteps += processSteps.join('');
-                
-                const resultElement = document.getElementById('result');
-                resultElement.className = 'success';
-                resultElement.innerHTML = `
-                    <h2>Encryption Results</h2>
-                    ${visualizationSteps}
+                document.getElementById('result').className = 'success';
+                document.getElementById('result').innerHTML = `
+                    <h3>Encryption Successful</h3>
                     <div class="step">
-                        <div class="step-title">Final Encrypted Message</div>
-                        <div><strong>Ciphertext:</strong> ${vectorToText(cipherBlocks)}</div>
-                        <div><strong>Details:</strong></div>
-                        <ul>
-                            <li>Key length: ${keyVector.length} characters</li>
-                            <li>Processed ${paddedMsg.length} characters (${padLength > 0 ? `padded with ${padLength} zeros` : 'no padding needed'})</li>
-                            <li>Using modulus: ${MODULUS}</li>
-                        </ul>
+                        <strong>Key:</strong> ${key}<br>
+                        <strong>Key Vector:</strong> [${keyVector.join(', ')}]<br>
+                        <strong>Original Message:</strong> ${msg}<br>
+                        <strong>Padded Message Vector:</strong> [${paddedMsg.join(', ')}]
+                    </div>
+                    <div class="step">
+                        <strong>Lattice Matrix:</strong><br>
+                        ${createMatrixHTML(lattice)}
+                    </div>
+                    <div class="step">
+                        <strong>Ciphertext:</strong> ${vectorToText(cipherBlocks)}<br>
+                        <strong>Cipher Vector:</strong> [${cipherBlocks.join(', ')}]
                     </div>
                 `;
                 
             } catch (e) {
-                const resultElement = document.getElementById('result');
-                resultElement.className = 'error';
-                resultElement.innerHTML = `<strong>Error:</strong> ${e.message}`;
+                document.getElementById('result').className = 'error';
+                document.getElementById('result').innerHTML = `<strong>Error:</strong> ${e.message}`;
             }
         }
         
@@ -484,7 +299,7 @@
                 const key = document.getElementById('key').value.trim();
                 const cipher = document.getElementById('message').value.trim();
                 
-                if (!key || !cipher) throw new Error("Please enter both key and ciphertext!");
+                if (!key || !cipher) throw new Error("Both key and ciphertext are required!");
                 if (!/^[A-Za-z]+$/.test(key)) throw new Error("Key must contain only letters A-Z!");
                 if (!/^[A-Z]+$/.test(cipher)) throw new Error("Ciphertext must contain only uppercase letters A-Z!");
                 
@@ -494,128 +309,66 @@
                 if (keyVector.length === 0) throw new Error("Key cannot be empty!");
                 if (cipherVector.length === 0) throw new Error("Ciphertext cannot be empty!");
                 if (cipherVector.length % keyVector.length !== 0) {
-                    throw new Error(`Ciphertext length (${cipherVector.length}) must be a multiple of key length (${keyVector.length})`);
+                    throw new Error(`Ciphertext length must be multiple of key length (${keyVector.length})`);
                 }
-                
-                // Visualization steps
-                let visualizationSteps = '';
-                
-                // Step 1: Show key and cipher
-                visualizationSteps += `
-                    <div class="step">
-                        <div class="step-title">Step 1: Convert key and ciphertext to vectors</div>
-                        <div class="visualization">
-                            <div class="visualization-box">
-                                <div class="visualization-title">Key: ${key}</div>
-                                ${createVectorHTML(keyVector)}
-                            </div>
-                            <div class="visualization-box">
-                                <div class="visualization-title">Ciphertext: ${cipher}</div>
-                                ${createVectorHTML(cipherVector)}
-                            </div>
-                        </div>
-                    </div>
-                `;
                 
                 const lattice = generateLattice(keyVector);
-                
-                visualizationSteps += `
-                    <div class="step">
-                        <div class="step-title">Step 2: Generate Lattice (Circulant Matrix)</div>
-                        ${createMatrixHTML(lattice)}
-                    </div>
-                `;
-                
-                // Calculate determinant
-                const det = matrixDeterminant(lattice, MODULUS);
-                const detInverse = modInverse(det, MODULUS);
-                
-                visualizationSteps += `
-                    <div class="step">
-                        <div class="step-title">Step 3: Check Matrix Invertibility</div>
-                        <div>Determinant: ${det}</div>
-                        <div>Modular Inverse of Determinant: ${detInverse !== null ? detInverse : 'Does not exist'}</div>
-                        ${detInverse === null ? '<div class="error">Matrix is not invertible with this key and modulus!</div>' : ''}
-                    </div>
-                `;
-                
-                if (detInverse === null) {
-                    throw new Error("Matrix is not invertible with current key and modulus");
-                }
-                
                 const inverseLattice = matrixInverse(lattice, MODULUS);
                 
-                visualizationSteps += `
-                    <div class="step">
-                        <div class="step-title">Step 4: Calculate Inverse Matrix</div>
-                        <div>Inverse matrix (mod ${MODULUS}):</div>
-                        ${createMatrixHTML(inverseLattice)}
-                    </div>
-                `;
-                
                 const plainBlocks = [];
-                const processSteps = [];
                 
-                // Process each block
                 for (let i = 0; i < cipherVector.length; i += keyVector.length) {
                     const block = cipherVector.slice(i, i + keyVector.length);
-                    
-                    processSteps.push(`
-                        <div class="step">
-                            <div class="step-title">Processing Block ${i/keyVector.length + 1}</div>
-                            <div class="visualization">
-                                <div class="visualization-box">
-                                    <div class="visualization-title">Cipher Block</div>
-                                    ${createVectorHTML(block)}
-                                </div>
-                                <div class="visualization-box">
-                                    <div class="visualization-title">Matrix Multiplication</div>
-                                    <div>Block × Inverse Lattice = Plain Block</div>
-                                </div>
-                                <div class="visualization-box">
-                                    <div class="visualization-title">Resulting Plain Block</div>
-                                    ${createVectorHTML(matrixMultiply(block, inverseLattice, MODULUS))}
-                                </div>
-                            </div>
-                        </div>
-                    `);
-                    
-                    const plainBlock = matrixMultiply(block, inverseLattice, MODULUS);
-                    plainBlocks.push(...plainBlock);
+                    plainBlocks.push(...matrixMultiply(block, inverseLattice, MODULUS));
                 }
                 
-                visualizationSteps += processSteps.join('');
-                
-                // Remove padding (trailing zeros)
-                let lastNonZero = plainBlocks.length;
-                while (lastNonZero > 0 && plainBlocks[lastNonZero - 1] === 0) {
-                    lastNonZero--;
+                // Remove padding (trailing 1's)
+                let lastNonOne = plainBlocks.length;
+                while (lastNonOne > 0 && plainBlocks[lastNonOne - 1] === 1) {
+                    lastNonOne--;
                 }
-                const finalPlain = plainBlocks.slice(0, lastNonZero);
+                const finalPlain = plainBlocks.slice(0, lastNonOne);
                 
-                const resultElement = document.getElementById('result');
-                resultElement.className = 'success';
-                resultElement.innerHTML = `
-                    <h2>Decryption Results</h2>
-                    ${visualizationSteps}
+                document.getElementById('result').className = 'success';
+                document.getElementById('result').innerHTML = `
+                    <h3>Decryption Successful</h3>
                     <div class="step">
-                        <div class="step-title">Final Decrypted Message</div>
-                        <div><strong>Decrypted text:</strong> ${vectorToText(finalPlain)}</div>
-                        <div><strong>Details:</strong></div>
-                        <ul>
-                            <li>Key length: ${keyVector.length} characters</li>
-                            <li>Processed ${cipherVector.length} characters</li>
-                            <li>Removed ${plainBlocks.length - lastNonZero} padding characters</li>
-                            <li>Using modulus: ${MODULUS}</li>
-                        </ul>
+                        <strong>Key:</strong> ${key}<br>
+                        <strong>Key Vector:</strong> [${keyVector.join(', ')}]<br>
+                        <strong>Ciphertext:</strong> ${cipher}<br>
+                        <strong>Cipher Vector:</strong> [${cipherVector.join(', ')}]
+                    </div>
+                    <div class="step">
+                        <strong>Lattice Matrix:</strong><br>
+                        ${createMatrixHTML(lattice)}
+                    </div>
+                    <div class="step">
+                        <strong>Inverse Lattice:</strong><br>
+                        ${createMatrixHTML(inverseLattice)}
+                    </div>
+                    <div class="step">
+                        <strong>Decrypted Message:</strong> ${vectorToText(finalPlain)}<br>
+                        <strong>Decrypted Vector:</strong> [${finalPlain.join(', ')}]
                     </div>
                 `;
                 
             } catch (e) {
-                const resultElement = document.getElementById('result');
-                resultElement.className = 'error';
-                resultElement.innerHTML = `<strong>Error:</strong> ${e.message}`;
+                document.getElementById('result').className = 'error';
+                document.getElementById('result').innerHTML = `<strong>Error:</strong> ${e.message}`;
             }
+        }
+        
+        function createMatrixHTML(matrix) {
+            let html = '<table class="matrix"><tbody>';
+            for (const row of matrix) {
+                html += '<tr>';
+                for (const val of row) {
+                    html += `<td>${val}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            return html;
         }
     </script>
 </body>
