@@ -1,320 +1,339 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Улучшенный Lattice-шифр</title>
+    <title>Advanced Lattice Cipher</title>
     <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --error-color: #d64045;
+            --success-color: #4caf50;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
+        
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 20px;
         }
-        .settings {
-            flex: 1;
-            min-width: 300px;
+        
+        .form-group {
+            margin-bottom: 15px;
         }
-        .main {
-            flex: 2;
-            min-width: 400px;
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
-        input, textarea, button, select {
+        
+        input, textarea {
             width: 100%;
             padding: 10px;
-            margin: 5px 0;
-            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border 0.3s;
         }
+        
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
         button {
-            background: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
             border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin: 5px 0;
         }
+        
         button:hover {
-            background: #45a049;
+            background-color: var(--secondary-color);
         }
-        .result {
-            background: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-            white-space: pre-wrap;
-            word-break: break-all;
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
         }
-        .settings-group {
-            margin-bottom: 15px;
-            padding: 10px;
-            border: 1px solid #eee;
-            border-radius: 5px;
+        
+        .button-group button {
+            flex: 1;
         }
-        h3 {
-            margin-top: 0;
+        
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .success {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid var(--success-color);
+            color: var(--text-color);
+            display: block !important;
+        }
+        
+        .error {
+            background-color: rgba(214, 64, 69, 0.1);
+            border-left: 4px solid var(--error-color);
+            color: var(--text-color);
+            display: block !important;
+        }
+        
+        .info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Улучшенный Lattice-шифр</h1>
+    <h1>Advanced Lattice Cipher</h1>
     
     <div class="container">
-        <div class="settings">
-            <div class="settings-group">
-                <h3>Настройки алфавита</h3>
-                <label for="alphabet">Алфавит:</label>
-                <textarea id="alphabet" rows="4">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789 .,!?"';:-()</textarea>
-                
-                <label for="caseSensitive">Чувствительность к регистру:</label>
-                <select id="caseSensitive">
-                    <option value="true">Да</option>
-                    <option value="false">Нет</option>
-                </select>
-            </div>
-            
-            <div class="settings-group">
-                <h3>Настройки шифрования</h3>
-                <label for="outputFormat">Формат вывода:</label>
-                <select id="outputFormat">
-                    <option value="numbers">Числа (разделенные пробелами)</option>
-                    <option value="unicode">Unicode символы</option>
-                    <option value="base64">Base64</option>
-                    <option value="hex">Шестнадцатеричный</option>
-                </select>
-                
-                <label for="latticeType">Тип решетки:</label>
-                <select id="latticeType">
-                    <option value="additive">Аддитивная (сложение)</option>
-                    <option value="multiplicative">Мультипликативная (умножение)</option>
-                    <option value="xor">XOR</option>
-                    <option value="mixed">Смешанная</option>
-                </select>
-                
-                <label for="modulus">Модуль:</label>
-                <input type="number" id="modulus" value="65536" min="2">
-            </div>
+        <div class="form-group">
+            <label for="key">Encryption Key (A-Z only):</label>
+            <input type="text" id="key" placeholder="Enter your key (e.g., SECRET)">
+            <p class="info">The key should contain only uppercase letters A-Z. Longer keys provide better security.</p>
         </div>
         
-        <div class="main">
-            <label for="key">Ключ:</label>
-            <input type="text" id="key" placeholder="Введите ключ">
-            
-            <label for="text">Текст:</label>
-            <textarea id="text" rows="4" placeholder="Введите текст..."></textarea>
-            
-            <button onclick="encrypt()">Зашифровать</button>
-            <button onclick="decrypt()">Расшифровать</button>
-            
-            <div class="result" id="result"></div>
+        <div class="form-group">
+            <label for="message">Message:</label>
+            <textarea id="message" rows="5" placeholder="Enter your message here"></textarea>
+            <p class="info">For encryption: any text. For decryption: previously encrypted text only.</p>
         </div>
+        
+        <div class="button-group">
+            <button onclick="encrypt()">Encrypt</button>
+            <button onclick="decrypt()">Decrypt</button>
+        </div>
+        
+        <div id="result"></div>
     </div>
 
     <script>
-        // Инициализация настроек
-        let settings = {
-            alphabet: document.getElementById('alphabet').value,
-            caseSensitive: document.getElementById('caseSensitive').value === 'true',
-            outputFormat: document.getElementById('outputFormat').value,
-            latticeType: document.getElementById('latticeType').value,
-            modulus: parseInt(document.getElementById('modulus').value)
-        };
-
-        // Обновление настроек при изменении
-        document.getElementById('alphabet').addEventListener('input', updateSettings);
-        document.getElementById('caseSensitive').addEventListener('change', updateSettings);
-        document.getElementById('outputFormat').addEventListener('change', updateSettings);
-        document.getElementById('latticeType').addEventListener('change', updateSettings);
-        document.getElementById('modulus').addEventListener('input', updateSettings);
-
-        function updateSettings() {
-            settings = {
-                alphabet: document.getElementById('alphabet').value,
-                caseSensitive: document.getElementById('caseSensitive').value === 'true',
-                outputFormat: document.getElementById('outputFormat').value,
-                latticeType: document.getElementById('latticeType').value,
-                modulus: parseInt(document.getElementById('modulus').value)
-            };
+        // ===== CONFIGURATION ===== //
+        const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const MODULUS = 26; // Using 26 for direct alphabet mapping
+        
+        // ===== UTILITY FUNCTIONS ===== //
+        function textToVector(text) {
+            const cleaned = text.toUpperCase().replace(/[^A-Z]/g, '');
+            return Array.from(cleaned).map(c => ALPHABET.indexOf(c));
         }
-
-        // Функция для создания числового представления текста
-        function textToNumbers(text, alphabet, caseSensitive) {
-            if (!caseSensitive) {
-                text = text.toLowerCase();
-                alphabet = alphabet.toLowerCase();
+        
+        function vectorToText(vector) {
+            return vector.map(n => ALPHABET[(n + MODULUS) % MODULUS]).join('');
+        }
+        
+        function generateLattice(keyVector) {
+            const n = keyVector.length;
+            let lattice = Array(n).fill().map(() => Array(n).fill(0));
+            
+            // Create a circulant matrix based on the key
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    lattice[i][j] = keyVector[(j - i + n) % n];
+                }
+            }
+            return lattice;
+        }
+        
+        function modInverse(a, m) {
+            // Find modular inverse using Extended Euclidean Algorithm
+            a = (a % m + m) % m;
+            for (let x = 1; x < m; x++) {
+                if ((a * x) % m === 1) return x;
+            }
+            return null; // No inverse exists
+        }
+        
+        function matrixInverse(matrix, mod) {
+            const n = matrix.length;
+            let inverse = Array(n).fill().map(() => Array(n).fill(0));
+            
+            // Calculate determinant
+            let det = 1;
+            for (let i = 0; i < n; i++) {
+                det = (det * matrix[i][i]) % mod;
             }
             
+            // Check if inverse exists
+            const detInverse = modInverse(det, mod);
+            if (detInverse === null) {
+                throw new Error("Matrix is not invertible with current key and modulus");
+            }
+            
+            // For circulant matrices, the inverse is also circulant
+            // This is a simplified approach - in practice you'd use proper matrix inversion
+            const firstRow = matrix[0].map(val => (val * detInverse) % mod);
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    inverse[i][j] = firstRow[(j - i + n) % n];
+                }
+            }
+            
+            return inverse;
+        }
+        
+        function matrixMultiply(vector, matrix, mod) {
             const result = [];
-            for (const char of text) {
-                const index = alphabet.indexOf(char);
-                if (index !== -1) {
-                    result.push(index);
-                } else {
-                    // Если символ не найден в алфавите, используем его код
-                    result.push(char.charCodeAt(0));
+            const n = matrix.length;
+            
+            for (let i = 0; i < n; i++) {
+                let sum = 0;
+                for (let j = 0; j < n; j++) {
+                    sum += vector[j] * matrix[i][j];
                 }
-            }
-            return result;
-        }
-
-        // Функция для преобразования чисел обратно в текст
-        function numbersToText(numbers, alphabet, caseSensitive) {
-            if (!caseSensitive) {
-                alphabet = alphabet.toLowerCase();
+                result.push(sum % mod);
             }
             
-            let result = '';
-            for (const num of numbers) {
-                if (num < alphabet.length) {
-                    result += alphabet[num];
-                } else {
-                    // Если число выходит за пределы алфавита, используем код символа
-                    result += String.fromCharCode(num);
-                }
-            }
             return result;
         }
-
-        // Функция для применения операции решетки
-        function applyLatticeOperation(a, b, operation, modulus) {
-            switch (operation) {
-                case 'additive':
-                    return (a + b) % modulus;
-                case 'multiplicative':
-                    return (a * b) % modulus;
-                case 'xor':
-                    return (a ^ b) % modulus;
-                case 'mixed':
-                    return ((a * 3 + b * 7) ^ (a + b)) % modulus;
-                default:
-                    return (a + b) % modulus;
+        
+        function chunkText(text, size) {
+            const chunks = [];
+            for (let i = 0; i < text.length; i += size) {
+                chunks.push(text.slice(i, i + size));
             }
+            return chunks;
         }
-
-        // Функция для обратной операции решетки
-        function reverseLatticeOperation(a, b, operation, modulus) {
-            switch (operation) {
-                case 'additive':
-                    return (a - b + modulus) % modulus;
-                case 'multiplicative':
-                    // Требуется модульное обратное
-                    for (let i = 1; i < modulus; i++) {
-                        if ((b * i) % modulus === 1) {
-                            return (a * i) % modulus;
-                        }
-                    }
-                    return a;
-                case 'xor':
-                    return (a ^ b) % modulus;
-                case 'mixed':
-                    // Для смешанной операции обратное преобразование сложнее
-                    // Это упрощенная версия, в реальности нужно точное обратное преобразование
-                    return (a ^ (a * 3 + b * 7)) % modulus;
-                default:
-                    return (a - b + modulus) % modulus;
-            }
-        }
-
-        // Функция шифрования
+        
+        // ===== CRYPTO FUNCTIONS ===== //
         function encrypt() {
-            const key = document.getElementById('key').value;
-            const text = document.getElementById('text').value;
-            
-            if (!key || !text) {
-                alert("Введите ключ и текст!");
-                return;
+            try {
+                const key = document.getElementById('key').value.trim();
+                const msg = document.getElementById('message').value.trim();
+                
+                if (!key || !msg) throw new Error("Please enter both key and message!");
+                if (!/^[A-Za-z]+$/.test(key)) throw new Error("Key must contain only letters A-Z!");
+                
+                const keyVector = textToVector(key);
+                const msgVector = textToVector(msg);
+                
+                if (keyVector.length === 0) throw new Error("Key cannot be empty!");
+                if (msgVector.length === 0) throw new Error("Message cannot be empty!");
+                
+                // Pad message if needed
+                const padLength = (keyVector.length - (msgVector.length % keyVector.length)) % keyVector.length;
+                const paddedMsg = [...msgVector, ...Array(padLength).fill(0)];
+                
+                const lattice = generateLattice(keyVector);
+                const cipherBlocks = [];
+                
+                // Process each block
+                for (let i = 0; i < paddedMsg.length; i += keyVector.length) {
+                    const block = paddedMsg.slice(i, i + keyVector.length);
+                    const cipherBlock = matrixMultiply(block, lattice, MODULUS);
+                    cipherBlocks.push(...cipherBlock);
+                }
+                
+                const resultElement = document.getElementById('result');
+                resultElement.className = 'success';
+                resultElement.innerHTML = `
+                    <strong>Encrypted Message:</strong><br>
+                    <code>${vectorToText(cipherBlocks)}</code><br><br>
+                    <strong>Details:</strong><br>
+                    - Key length: ${keyVector.length} characters<br>
+                    - Processed ${paddedMsg.length} characters (${padLength > 0 ? `padded with ${padLength} zeros` : 'no padding needed'})<br>
+                    - Using modulus: ${MODULUS}
+                `;
+                
+            } catch (e) {
+                const resultElement = document.getElementById('result');
+                resultElement.className = 'error';
+                resultElement.innerHTML = `<strong>Error:</strong> ${e.message}`;
             }
-            
-            // Преобразуем текст и ключ в числовые последовательности
-            const textNumbers = textToNumbers(text, settings.alphabet, settings.caseSensitive);
-            const keyNumbers = textToNumbers(key, settings.alphabet, settings.caseSensitive);
-            
-            // Шифруем с использованием решетки
-            const encrypted = [];
-            for (let i = 0; i < textNumbers.length; i++) {
-                const keyChar = keyNumbers[i % keyNumbers.length];
-                const encryptedChar = applyLatticeOperation(
-                    textNumbers[i], 
-                    keyChar, 
-                    settings.latticeType, 
-                    settings.modulus
-                );
-                encrypted.push(encryptedChar);
-            }
-            
-            // Форматируем вывод
-            let output;
-            switch (settings.outputFormat) {
-                case 'numbers':
-                    output = encrypted.join(' ');
-                    break;
-                case 'unicode':
-                    output = String.fromCharCode(...encrypted);
-                    break;
-                case 'base64':
-                    output = btoa(String.fromCharCode(...encrypted));
-                    break;
-                case 'hex':
-                    output = encrypted.map(n => n.toString(16).padStart(4, '0')).join(' ');
-                    break;
-                default:
-                    output = encrypted.join(' ');
-            }
-            
-            document.getElementById('result').textContent = "Зашифровано:\n" + output;
         }
-
-        // Функция дешифрования
+        
         function decrypt() {
-            const key = document.getElementById('key').value;
-            const cipher = document.getElementById('text').value;
-            
-            if (!key || !cipher) {
-                alert("Введите ключ и зашифрованный текст!");
-                return;
+            try {
+                const key = document.getElementById('key').value.trim();
+                const cipher = document.getElementById('message').value.trim();
+                
+                if (!key || !cipher) throw new Error("Please enter both key and ciphertext!");
+                if (!/^[A-Za-z]+$/.test(key)) throw new Error("Key must contain only letters A-Z!");
+                if (!/^[A-Z]+$/.test(cipher)) throw new Error("Ciphertext must contain only uppercase letters A-Z!");
+                
+                const keyVector = textToVector(key);
+                const cipherVector = textToVector(cipher);
+                
+                if (keyVector.length === 0) throw new Error("Key cannot be empty!");
+                if (cipherVector.length === 0) throw new Error("Ciphertext cannot be empty!");
+                if (cipherVector.length % keyVector.length !== 0) {
+                    throw new Error(`Ciphertext length (${cipherVector.length}) must be a multiple of key length (${keyVector.length})`);
+                }
+                
+                const lattice = generateLattice(keyVector);
+                const inverseLattice = matrixInverse(lattice, MODULUS);
+                
+                const plainBlocks = [];
+                
+                // Process each block
+                for (let i = 0; i < cipherVector.length; i += keyVector.length) {
+                    const block = cipherVector.slice(i, i + keyVector.length);
+                    const plainBlock = matrixMultiply(block, inverseLattice, MODULUS);
+                    plainBlocks.push(...plainBlock);
+                }
+                
+                // Remove padding (trailing zeros)
+                let lastNonZero = plainBlocks.length;
+                while (lastNonZero > 0 && plainBlocks[lastNonZero - 1] === 0) {
+                    lastNonZero--;
+                }
+                const finalPlain = plainBlocks.slice(0, lastNonZero);
+                
+                const resultElement = document.getElementById('result');
+                resultElement.className = 'success';
+                resultElement.innerHTML = `
+                    <strong>Decrypted Message:</strong><br>
+                    <code>${vectorToText(finalPlain)}</code><br><br>
+                    <strong>Details:</strong><br>
+                    - Key length: ${keyVector.length} characters<br>
+                    - Processed ${cipherVector.length} characters<br>
+                    - Removed ${plainBlocks.length - lastNonZero} padding characters<br>
+                    - Using modulus: ${MODULUS}
+                `;
+                
+            } catch (e) {
+                const resultElement = document.getElementById('result');
+                resultElement.className = 'error';
+                resultElement.innerHTML = `<strong>Error:</strong> ${e.message}`;
             }
-            
-            // Преобразуем входные данные в числовую последовательность
-            let cipherNumbers;
-            switch (settings.outputFormat) {
-                case 'numbers':
-                    cipherNumbers = cipher.split(' ').map(Number);
-                    break;
-                case 'unicode':
-                    cipherNumbers = Array.from(cipher).map(c => c.charCodeAt(0));
-                    break;
-                case 'base64':
-                    const binaryString = atob(cipher);
-                    cipherNumbers = Array.from(binaryString).map(c => c.charCodeAt(0));
-                    break;
-                case 'hex':
-                    cipherNumbers = cipher.split(' ').map(s => parseInt(s, 16));
-                    break;
-                default:
-                    cipherNumbers = cipher.split(' ').map(Number);
-            }
-            
-            const keyNumbers = textToNumbers(key, settings.alphabet, settings.caseSensitive);
-            
-            // Дешифруем
-            const decrypted = [];
-            for (let i = 0; i < cipherNumbers.length; i++) {
-                const keyChar = keyNumbers[i % keyNumbers.length];
-                const decryptedChar = reverseLatticeOperation(
-                    cipherNumbers[i], 
-                    keyChar, 
-                    settings.latticeType, 
-                    settings.modulus
-                );
-                decrypted.push(decryptedChar);
-            }
-            
-            // Преобразуем числа обратно в текст
-            const text = numbersToText(decrypted, settings.alphabet, settings.caseSensitive);
-            
-            document.getElementById('result').textContent = "Расшифровано:\n" + text;
         }
     </script>
 </body>
