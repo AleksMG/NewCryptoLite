@@ -3,237 +3,556 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Working Lattice Cipher</title>
+    <title>LWE-based Lattice Cipher</title>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #f8f9fa;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --border-color: #ddd;
+            --text-color: #333;
+            --light-text: #7f8c8d;
+        }
+
         body {
-            font-family: 'Courier New', monospace;
-            max-width: 600px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background: #f0f8ff;
+            background-color: #f5f5f5;
         }
+
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        h2 {
-            color: #2c3e50;
+
+        h1 {
             text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            font-weight: 600;
         }
-        .input-group {
-            margin: 15px 0;
+
+        .form-group {
+            margin-bottom: 20px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
         }
-        input, textarea {
+
+        input[type="text"],
+        textarea,
+        select {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #3498db;
-            border-radius: 5px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s;
         }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
         button {
-            background: #3498db;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px;
-            width: 100%;
-            margin: 5px 0;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            flex: 1;
         }
+
         button:hover {
-            background: #2980b9;
+            background-color: #2980b9;
         }
+
+        button.secondary {
+            background-color: var(--secondary-color);
+        }
+
+        button.secondary:hover {
+            background-color: #1a252f;
+        }
+
         #result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            background: #eaf7ff;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: var(--background-color);
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
-        .error {
-            background: #ffecec;
-            border-left: 4px solid #e74c3c;
-            padding: 10px;
-        }
+
         .success {
-            background: #e8f7e8;
-            border-left: 4px solid #2ecc71;
-            padding: 10px;
+            color: var(--success-color);
         }
-        .lattice {
-            margin: 15px 0;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 5px;
+
+        .error {
+            color: var(--error-color);
+        }
+
+        .info {
+            color: var(--light-text);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .key-generation {
+            margin-top: 20px;
+        }
+
+        .full-width {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Lattice Cipher (Working Version)</h2>
+        <h1>LWE-based Lattice Cipher</h1>
         
-        <div class="input-group">
-            <label>Key (A-Z only):</label>
-            <input type="text" id="key" value="LATTICE">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('encrypt-tab')">Encryption</div>
+            <div class="tab" onclick="switchTab('decrypt-tab')">Decryption</div>
+            <div class="tab" onclick="switchTab('keygen-tab')">Key Generation</div>
         </div>
-        
-        <div class="input-group">
-            <label>Message:</label>
-            <textarea id="message" rows="4">BLVMNQW</textarea>
+
+        <!-- Encryption Tab -->
+        <div id="encrypt-tab" class="tab-content active">
+            <div class="form-group">
+                <label for="encrypt-key">Secret Key (hex):</label>
+                <input type="text" id="encrypt-key" placeholder="Enter secret key in hexadecimal format">
+                <p class="info">Example: 1a4f9c72e5 or generate a new key below</p>
+            </div>
+
+            <div class="form-group">
+                <label for="encrypt-message">Message:</label>
+                <textarea id="encrypt-message" placeholder="Enter message to encrypt"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button onclick="encrypt()">Encrypt</button>
+                <button class="secondary" onclick="copyResult('encrypt-result')">Copy Result</button>
+            </div>
+
+            <div id="encrypt-result" class="result"></div>
         </div>
-        
-        <button onclick="encrypt()">Encrypt</button>
-        <button onclick="decrypt()">Decrypt</button>
-        
-        <div id="result"></div>
-        <div id="lattice"></div>
+
+        <!-- Decryption Tab -->
+        <div id="decrypt-tab" class="tab-content">
+            <div class="form-group">
+                <label for="decrypt-key">Secret Key (hex):</label>
+                <input type="text" id="decrypt-key" placeholder="Enter secret key in hexadecimal format">
+            </div>
+
+            <div class="form-group">
+                <label for="ciphertext-u">Ciphertext Vector u (comma-separated):</label>
+                <textarea id="ciphertext-u" placeholder="Enter ciphertext vector u values"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="ciphertext-v">Ciphertext Vector v (comma-separated):</label>
+                <textarea id="ciphertext-v" placeholder="Enter ciphertext vector v values"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button onclick="decrypt()">Decrypt</button>
+                <button class="secondary" onclick="copyResult('decrypt-result')">Copy Result</button>
+            </div>
+
+            <div id="decrypt-result" class="result"></div>
+        </div>
+
+        <!-- Key Generation Tab -->
+        <div id="keygen-tab" class="tab-content">
+            <div class="form-group">
+                <label>Security Parameters:</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex: 1;">
+                        <label for="param-n">Lattice Dimension (n):</label>
+                        <input type="text" id="param-n" value="256" disabled>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="param-q">Modulus (q):</label>
+                        <input type="text" id="param-q" value="2053" disabled>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="param-error">Error Parameter:</label>
+                        <input type="text" id="param-error" value="3" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button onclick="generateKeyPair()">Generate Key Pair</button>
+                <button class="secondary" onclick="copyKeyPair()">Copy Key Pair</button>
+            </div>
+
+            <div class="key-generation">
+                <div class="form-group">
+                    <label for="generated-secret-key">Secret Key:</label>
+                    <input type="text" id="generated-secret-key" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="public-key-a">Public Key Vector A:</label>
+                    <textarea id="public-key-a" readonly></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="public-key-b">Public Key Vector B:</label>
+                    <textarea id="public-key-b" readonly></textarea>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Простой алфавит A-Z
-        const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        // Security parameters
+        const DEFAULT_N = 256;
+        const DEFAULT_Q = 2053;
+        const DEFAULT_ERROR = 3;
         
-        // Преобразование текста в числовой вектор (A=0, B=1, ..., Z=25)
-        function textToVector(text) {
-            const cleaned = text.toUpperCase().replace(/[^A-Z]/g, '');
-            return cleaned.split('').map(char => ALPHABET.indexOf(char));
+        // Current parameters (can be modified for future extensibility)
+        let n = DEFAULT_N;
+        let q = DEFAULT_Q;
+        let error = DEFAULT_ERROR;
+
+        // Utility functions
+        function hexToInt(hex) {
+            if (!hex.match(/^[0-9a-fA-F]+$/)) {
+                throw new Error("Invalid hexadecimal key format");
+            }
+            return parseInt(hex, 16) % q;
         }
-        
-        // Преобразование вектора в текст
-        function vectorToText(vector) {
-            return vector.map(num => ALPHABET[num]).join('');
+
+        function intToHex(int) {
+            return int.toString(16).padStart(8, '0');
         }
-        
-        // Генерация решетки (циклический сдвиг)
-        function generateLattice(keyVector) {
-            const size = keyVector.length;
-            const lattice = [];
-            
-            for (let i = 0; i < size; i++) {
-                const row = [];
-                for (let j = 0; j < size; j++) {
-                    row.push(keyVector[(j + i) % size]);
-                }
-                lattice.push(row);
+
+        function validateKey(key) {
+            if (!key || !key.match(/^[0-9a-fA-F]+$/)) {
+                throw new Error("Secret key must be in hexadecimal format");
+            }
+            return true;
+        }
+
+        function validateCiphertext(u, v) {
+            if (!u || !v) {
+                throw new Error("Both ciphertext vectors u and v are required");
             }
             
-            return lattice;
-        }
-        
-        // Отображение решетки в HTML
-        function displayLattice(lattice) {
-            const container = document.getElementById('lattice');
-            container.innerHTML = '<h3>Lattice Matrix:</h3><pre>';
+            const uArray = u.split(',').map(x => parseInt(x.trim()));
+            const vArray = v.split(',').map(x => parseInt(x.trim()));
             
-            lattice.forEach(row => {
-                container.innerHTML += row.map(val => 
-                    val.toString().padStart(2, ' ')
-                ).join(' ') + '\n';
+            if (uArray.length !== n || vArray.length !== n) {
+                throw new Error(`Ciphertext vectors must have exactly ${n} elements`);
+            }
+            
+            if (uArray.some(isNaN) || vArray.some(isNaN)) {
+                throw new Error("Ciphertext vectors must contain only numbers");
+            }
+            
+            return { u: uArray, v: vArray };
+        }
+
+        // Text encoding/decoding
+        function textToBinary(text) {
+            if (typeof text !== 'string') {
+                throw new Error("Message must be a string");
+            }
+            
+            const bytes = new TextEncoder().encode(text);
+            const bits = [];
+            bytes.forEach(byte => {
+                for (let i = 0; i < 8; i++) {
+                    bits.push((byte >> (7-i)) & 1);
+                }
             });
             
-            container.innerHTML += '</pre>';
-        }
-        
-        // Шифрование: вектор * решетка
-        function latticeEncrypt(message, key) {
-            const msgVec = textToVector(message);
-            const keyVec = textToVector(key);
-            const lattice = generateLattice(keyVec);
-            
-            // Проверка длины
-            if (msgVec.length % keyVec.length !== 0) {
-                throw new Error("Message length must be multiple of key length");
+            // Pad with zeros to match lattice dimension
+            while (bits.length < n) {
+                bits.push(0);
             }
             
-            // Применение решетки
-            const result = [];
-            for (let i = 0; i < msgVec.length; i += keyVec.length) {
-                const block = msgVec.slice(i, i + keyVec.length);
-                for (let j = 0; j < keyVec.length; j++) {
-                    let sum = 0;
-                    for (let k = 0; k < keyVec.length; k++) {
-                        sum += block[k] * lattice[j][k];
+            return bits.slice(0, n);
+        }
+
+        function binaryToText(bits) {
+            const bytes = [];
+            for (let i = 0; i < bits.length; i += 8) {
+                let byte = 0;
+                for (let j = 0; j < 8; j++) {
+                    if (i+j < bits.length) {
+                        byte |= bits[i+j] << (7-j);
                     }
-                    result.push(sum % 26);
+                }
+                bytes.push(byte);
+            }
+            
+            // Remove trailing null bytes
+            while (bytes.length > 0 && bytes[bytes.length - 1] === 0) {
+                bytes.pop();
+            }
+            
+            return new TextDecoder().decode(new Uint8Array(bytes));
+        }
+
+        // LWE functions
+        function generatePublicKey(secretKey) {
+            const A = new Array(n);
+            const B = new Array(n);
+            
+            for (let i = 0; i < n; i++) {
+                A[i] = Math.floor(Math.random() * q);
+                const errorTerm = Math.floor(Math.random() * (2*error+1)) - error;
+                B[i] = (A[i] * secretKey + errorTerm) % q;
+            }
+            
+            return { A, B };
+        }
+
+        function encryptLWE(message, publicKey) {
+            const { A, B } = publicKey;
+            const msgBits = textToBinary(message);
+            const u = new Array(n).fill(0);
+            const v = new Array(n).fill(0);
+            
+            // Generate random vector r ∈ {0,1}^n
+            const r = new Array(n).fill(0).map(() => Math.round(Math.random()));
+            
+            // Compute u = A^T * r mod q
+            for (let i = 0; i < n; i++) {
+                u[i] = (u[i] + A[i] * r[i]) % q;
+            }
+            
+            // Compute v = B^T * r + m * q/2 mod q
+            for (let i = 0; i < n; i++) {
+                v[i] = (v[i] + B[i] * r[i]) % q;
+                if (i < msgBits.length) {
+                    v[i] = (v[i] + msgBits[i] * Math.floor(q/2)) % q;
                 }
             }
             
-            displayLattice(lattice);
-            return vectorToText(result);
+            return { u, v };
         }
-        
-        // Дешифрование: обратные операции
-        function latticeDecrypt(cipher, key) {
-            const cipherVec = textToVector(cipher);
-            const keyVec = textToVector(key);
-            const lattice = generateLattice(keyVec);
+
+        function decryptLWE(ciphertext, secretKey) {
+            const { u, v } = ciphertext;
+            const msgBits = new Array(n);
             
-            // Проверка длины
-            if (cipherVec.length % keyVec.length !== 0) {
-                throw new Error("Cipher length must be multiple of key length");
+            for (let i = 0; i < n; i++) {
+                const d = (v[i] - secretKey * u[i]) % q;
+                // Correct for negative modulo results
+                const correctedD = d < 0 ? d + q : d;
+                msgBits[i] = (correctedD < q/4 || correctedD > 3*q/4) ? 0 : 1;
             }
             
-            // Для дешифрования используем обратные операции
-            const result = [];
-            for (let i = 0; i < cipherVec.length; i += keyVec.length) {
-                const block = cipherVec.slice(i, i + keyVec.length);
-                for (let j = 0; j < keyVec.length; j++) {
-                    let val = block[j];
-                    for (let k = 0; k < j; k++) {
-                        val -= result[result.length - keyVec.length + k] * lattice[j][k];
-                    }
-                    val = (val % 26 + 26) % 26;
-                    result.push(val);
+            return binaryToText(msgBits);
+        }
+
+        // UI functions
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Activate corresponding tab button
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabId.split('-')[0])) {
+                    tab.classList.add('active');
                 }
-            }
-            
-            displayLattice(lattice);
-            return vectorToText(result);
+            });
         }
-        
-        // Общие функции для интерфейса
+
+        function showResult(elementId, message, isSuccess = true) {
+            const resultElement = document.getElementById(elementId);
+            resultElement.innerHTML = message;
+            resultElement.className = isSuccess ? 'result success' : 'result error';
+        }
+
+        function copyResult(elementId) {
+            const resultElement = document.getElementById(elementId);
+            navigator.clipboard.writeText(resultElement.textContent)
+                .then(() => {
+                    const originalText = resultElement.textContent;
+                    resultElement.textContent = "Copied to clipboard!";
+                    setTimeout(() => {
+                        resultElement.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    showResult(elementId, "Failed to copy: " + err, false);
+                });
+        }
+
+        function copyKeyPair() {
+            const secretKey = document.getElementById('generated-secret-key').value;
+            const publicKeyA = document.getElementById('public-key-a').value;
+            const publicKeyB = document.getElementById('public-key-b').value;
+            
+            const keyPair = `Secret Key: ${secretKey}\nPublic Key A: ${publicKeyA}\nPublic Key B: ${publicKeyB}`;
+            
+            navigator.clipboard.writeText(keyPair)
+                .then(() => {
+                    const originalText = document.getElementById('public-key-a').value;
+                    document.getElementById('public-key-a').value = "Copied to clipboard!";
+                    setTimeout(() => {
+                        document.getElementById('public-key-a').value = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    showResult('keygen-tab', "Failed to copy: " + err, false);
+                });
+        }
+
+        // Main operations
         function encrypt() {
             try {
-                const key = document.getElementById('key').value;
-                const message = document.getElementById('message').value;
+                const secretKeyHex = document.getElementById('encrypt-key').value;
+                validateKey(secretKeyHex);
                 
-                if (!key || !message) throw new Error("Key and message are required");
+                const secretKey = hexToInt(secretKeyHex);
+                const message = document.getElementById('encrypt-message').value;
                 
-                const result = latticeEncrypt(message, key);
-                document.getElementById('result').className = 'success';
-                document.getElementById('result').innerHTML = `
-                    <strong>Encrypted:</strong> ${result}
-                `;
+                if (!message) {
+                    throw new Error("Message cannot be empty");
+                }
+                
+                const publicKey = generatePublicKey(secretKey);
+                const ciphertext = encryptLWE(message, publicKey);
+                
+                const resultMessage = `Encrypted successfully!\n\nCiphertext vector u:\n${ciphertext.u.join(',')}\n\nCiphertext vector v:\n${ciphertext.v.join(',')}`;
+                showResult('encrypt-result', resultMessage);
+                
+                // Auto-populate decrypt fields for convenience
+                document.getElementById('decrypt-key').value = secretKeyHex;
+                document.getElementById('ciphertext-u').value = ciphertext.u.join(', ');
+                document.getElementById('ciphertext-v').value = ciphertext.v.join(', ');
+                
             } catch (e) {
-                document.getElementById('result').className = 'error';
-                document.getElementById('result').innerHTML = `<strong>Error:</strong> ${e.message}`;
+                showResult('encrypt-result', "Encryption error: " + e.message, false);
             }
         }
-        
+
         function decrypt() {
             try {
-                const key = document.getElementById('key').value;
-                const cipher = document.getElementById('message').value;
+                const secretKeyHex = document.getElementById('decrypt-key').value;
+                validateKey(secretKeyHex);
                 
-                if (!key || !cipher) throw new Error("Key and ciphertext are required");
+                const secretKey = hexToInt(secretKeyHex);
+                const u = document.getElementById('ciphertext-u').value;
+                const v = document.getElementById('ciphertext-v').value;
                 
-                const result = latticeDecrypt(cipher, key);
-                document.getElementById('result').className = 'success';
-                document.getElementById('result').innerHTML = `
-                    <strong>Decrypted:</strong> ${result}
-                `;
+                const ciphertext = validateCiphertext(u, v);
+                const plaintext = decryptLWE(ciphertext, secretKey);
+                
+                showResult('decrypt-result', `Decrypted successfully!\n\nMessage: ${plaintext}`);
+                
             } catch (e) {
-                document.getElementById('result').className = 'error';
-                document.getElementById('result').innerHTML = `<strong>Error:</strong> ${e.message}`;
+                showResult('decrypt-result', "Decryption error: " + e.message, false);
             }
         }
+
+        function generateKeyPair() {
+            try {
+                // Generate a random secret key
+                const secretKey = Math.floor(Math.random() * q);
+                const secretKeyHex = intToHex(secretKey);
+                
+                document.getElementById('generated-secret-key').value = secretKeyHex;
+                document.getElementById('encrypt-key').value = secretKeyHex;
+                document.getElementById('decrypt-key').value = secretKeyHex;
+                
+                // Generate public key
+                const publicKey = generatePublicKey(secretKey);
+                
+                document.getElementById('public-key-a').value = publicKey.A.join(', ');
+                document.getElementById('public-key-b').value = publicKey.B.join(', ');
+                
+                showResult('keygen-tab', "Key pair generated successfully!");
+                
+            } catch (e) {
+                showResult('keygen-tab', "Key generation error: " + e.message, false);
+            }
+        }
+
+        // Initialize with a generated key pair
+        window.onload = function() {
+            generateKeyPair();
+        };
     </script>
 </body>
 </html>
