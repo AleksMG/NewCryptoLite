@@ -59,16 +59,78 @@ class LatticeCrypto {
             return {
                 ciphertext: ciphertext,
                 grid: grid
-            };
+class LatticeCrypto {
+    constructor() {
+        this.gridSize = 5;
+    }
+
+    // Фиксим генерацию ключа
+    generateKeyStream(key, length) {
+        let keyStream = [];
+        for (let i = 0; i < length; i++) {
+            // Теперь ключ не повторяется тупо, а хэшируется
+            keyStream.push(key.charCodeAt(i % key.length) * (i + 1) % 256);
+        }
+        return keyStream;
+    }
+
+    // Фиксим построение сетки
+    buildGrid(text, key) {
+        let grid = [];
+        let paddedText = text.padEnd(this.gridSize * this.gridSize, ' ');
+        let keyStream = this.generateKeyStream(key, paddedText.length);
+
+        for (let i = 0; i < this.gridSize; i++) {
+            let row = [];
+            for (let j = 0; j < this.gridSize; j++) {
+                const idx = i * this.gridSize + j;
+                const charCode = paddedText.charCodeAt(idx) ^ keyStream[idx];
+                row.push(String.fromCharCode(charCode));
+            }
+            grid.push(row);
+        }
+        return grid;
+    }
+
+    // Фиксим спиральный обход (теперь не теряет символы)
+    spiralTraverse(grid) {
+        let result = '';
+        let [x, y, dx, dy] = [0, 0, 0, 1];
+        
+        for (let i = 0; i < this.gridSize * this.gridSize; i++) {
+            if (grid[x][y] !== null) {
+                result += grid[x][y];
+                grid[x][y] = null;
+            }
+
+            // Поворот, если вышли за границы или уже посещали
+            if (x + dx >= this.gridSize || y + dy >= this.gridSize || 
+                x + dx < 0 || y + dy < 0 || grid[x + dx][y + dy] === null) {
+                [dx, dy] = [dy, -dx];
+            }
+            
+            x += dx;
+            y += dy;
+        }
+        return result;
+    }
+
+    encrypt(plaintext, key) {
+        try {
+            if (!plaintext || !key) throw new Error("Нет текста или ключа");
+            const grid = this.buildGrid(plaintext, key);
+            const ciphertext = this.spiralTraverse(grid);
+            return { ciphertext, grid };
         } catch (error) {
             return { error: error.message };
         }
     }
 
-    // Decrypt function (reverse process)
     decrypt(ciphertext, key) {
         try {
-            // Reverse the spiral traversal
+            if (!ciphertext || !key) throw new Error("Нет шифртекста или ключа");
+            
+            // Обратная спираль
             let grid = Array(this.gridSize).fill().map(() => Array(this.gridSize).fill(null));
             let [x, y, dx, dy] = [0, 0, 0, 1];
             
@@ -84,7 +146,7 @@ class LatticeCrypto {
                 y += dy;
             }
             
-            // Rebuild original text
+            // Восстанавливаем текст
             let plaintext = '';
             let keyStream = this.generateKeyStream(key, this.gridSize * this.gridSize);
             
@@ -95,10 +157,7 @@ class LatticeCrypto {
                 }
             }
             
-            return {
-                plaintext: plaintext.trim(),
-                grid: grid
-            };
+            return { plaintext: plaintext.trim(), grid };
         } catch (error) {
             return { error: error.message };
         }
