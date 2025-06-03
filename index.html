@@ -3,239 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grid Encryption/Decryption</title>
+    <title>Lattice Encryption</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            color: #333;
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --error: #d63031;
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
         }
         .container {
+            max-width: 1000px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
         .panel {
-            background-color: #f9f9f9;
-            border-radius: 8px;
+            background: white;
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
         }
         textarea {
             width: 100%;
-            min-height: 150px;
+            min-height: 100px;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            font-family: monospace;
+            border: 2px solid var(--secondary);
+            border-radius: 5px;
+            font-family: 'Fira Code', monospace;
         }
-        input[type="text"], input[type="number"] {
+        input {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid var(--secondary);
+            border-radius: 5px;
         }
         button {
-            background-color: #3498db;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s;
+            transition: background 0.3s;
         }
         button:hover {
-            background-color: #2980b9;
+            background: #5649d2;
         }
         .status {
             margin-top: 15px;
             padding: 10px;
-            border-radius: 4px;
+            border-radius: 5px;
             display: none;
         }
         .success {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: rgba(0, 184, 148, 0.2);
+            color: var(--success);
             display: block;
         }
         .error {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: rgba(214, 48, 49, 0.2);
+            color: var(--error);
             display: block;
         }
-        .grid-visualization {
+        .grid {
             margin-top: 20px;
+            font-family: 'Fira Code', monospace;
+            white-space: pre;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
             overflow-x: auto;
-        }
-        table {
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        td {
-            border: 1px solid #ddd;
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .highlight {
-            background-color: #ffeeba;
         }
     </style>
 </head>
 <body>
-    <h1>Grid Encryption/Decryption System</h1>
+    <h1>🔒 Lattice-Based Encryption</h1>
     
     <div class="container">
+        <!-- Encryption Panel -->
         <div class="panel">
             <h2>Encryption</h2>
             <label for="plaintext">Plaintext:</label>
             <textarea id="plaintext" placeholder="Enter text to encrypt"></textarea>
             
-            <label for="encryptionKey">Encryption Key:</label>
-            <input type="text" id="encryptionKey" placeholder="Enter encryption key">
-            
-            <label for="gridSize">Grid Size (N x N):</label>
-            <input type="number" id="gridSize" min="2" max="20" value="5">
+            <label for="key">Key:</label>
+            <input type="text" id="key" placeholder="Secret key">
             
             <button id="encryptBtn">Encrypt</button>
             <div id="encryptStatus" class="status"></div>
             
-            <div class="grid-visualization">
-                <h3>Encryption Grid</h3>
-                <div id="encryptGrid"></div>
-            </div>
+            <div class="grid" id="encryptGrid"></div>
         </div>
-        
+
+        <!-- Decryption Panel -->
         <div class="panel">
             <h2>Decryption</h2>
             <label for="ciphertext">Ciphertext:</label>
             <textarea id="ciphertext" placeholder="Enter text to decrypt"></textarea>
             
-            <label for="decryptionKey">Decryption Key:</label>
-            <input type="text" id="decryptionKey" placeholder="Enter decryption key">
-            
-            <label for="decryptGridSize">Grid Size (N x N):</label>
-            <input type="number" id="decryptGridSize" min="2" max="20" value="5">
+            <label for="decryptKey">Key:</label>
+            <input type="text" id="decryptKey" placeholder="Secret key">
             
             <button id="decryptBtn">Decrypt</button>
             <div id="decryptStatus" class="status"></div>
             
-            <div class="grid-visualization">
-                <h3>Decryption Grid</h3>
-                <div id="decryptGrid"></div>
-            </div>
+            <div class="grid" id="decryptGrid"></div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Create workers
-            const encryptWorker = new Worker('encryptWorker.js');
-            const decryptWorker = new Worker('decryptWorker.js');
-            
-            // Encryption handler
-            document.getElementById('encryptBtn').addEventListener('click', function() {
-                const plaintext = document.getElementById('plaintext').value;
-                const key = document.getElementById('encryptionKey').value;
-                const gridSize = parseInt(document.getElementById('gridSize').value);
-                
-                if (!plaintext || !key) {
-                    showStatus('encryptStatus', 'Please enter both text and key', 'error');
-                    return;
-                }
-                
-                encryptWorker.postMessage({
-                    plaintext: plaintext,
-                    key: key,
-                    gridSize: gridSize
-                });
-            });
-            
-            // Decryption handler
-            document.getElementById('decryptBtn').addEventListener('click', function() {
-                const ciphertext = document.getElementById('ciphertext').value;
-                const key = document.getElementById('decryptionKey').value;
-                const gridSize = parseInt(document.getElementById('decryptGridSize').value);
-                
-                if (!ciphertext || !key) {
-                    showStatus('decryptStatus', 'Please enter both text and key', 'error');
-                    return;
-                }
-                
-                decryptWorker.postMessage({
-                    ciphertext: ciphertext,
-                    key: key,
-                    gridSize: gridSize
-                });
-            });
-            
-            // Worker message handlers
-            encryptWorker.onmessage = function(e) {
-                if (e.data.error) {
-                    showStatus('encryptStatus', e.data.error, 'error');
-                } else {
-                    document.getElementById('ciphertext').value = e.data.ciphertext;
-                    showStatus('encryptStatus', 'Encryption successful!', 'success');
-                    renderGrid('encryptGrid', e.data.grid, e.data.path);
-                }
-            };
-            
-            decryptWorker.onmessage = function(e) {
-                if (e.data.error) {
-                    showStatus('decryptStatus', e.data.error, 'error');
-                } else {
-                    document.getElementById('plaintext').value = e.data.plaintext;
-                    showStatus('decryptStatus', 'Decryption successful!', 'success');
-                    renderGrid('decryptGrid', e.data.grid, e.data.path);
-                }
-            };
-            
-            // Helper functions
-            function showStatus(elementId, message, type) {
-                const element = document.getElementById(elementId);
-                element.textContent = message;
-                element.className = 'status ' + type;
-            }
-            
-            function renderGrid(containerId, grid, path) {
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';
-                
-                const table = document.createElement('table');
-                
-                for (let i = 0; i < grid.length; i++) {
-                    const row = document.createElement('tr');
-                    
-                    for (let j = 0; j < grid[i].length; j++) {
-                        const cell = document.createElement('td');
-                        cell.textContent = grid[i][j] || '';
-                        
-                        // Highlight cells that are part of the path
-                        if (path.some(coord => coord[0] === i && coord[1] === j)) {
-                            cell.classList.add('highlight');
-                        }
-                        
-                        row.appendChild(cell);
-                    }
-                    
-                    table.appendChild(row);
-                }
-                
-                container.appendChild(table);
-            }
-        });
-    </script>
+    <script src="lattice.js"></script>
 </body>
 </html>
