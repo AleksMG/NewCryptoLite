@@ -1,173 +1,241 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>H-Cipher Math Implementation</title>
-  <script>
-    //////////////////////////////////////////////////////////////////
-    // ОСНОВНЫЕ МАТЕМАТИЧЕСКИЕ ФОРМУЛЫ ИЗ СПЕЦИФИКАЦИИ
-    //////////////////////////////////////////////////////////////////
-
-    // 1. Групповая операция: G = ⟨x, y, z | x² = y² = z² = 1, (xy)⁵ = (yz)⁷ = (xz)³ = 1⟩
-    class HyperbolicGroup {
-      static reduce(word) {
-        // Алгоритм Дехна для приведения к нормальной форме
-        const rules = [
-          { from: 'xx', to: '' },
-          { from: 'yy', to: '' },
-          { from: 'zz', to: '' },
-          { from: 'xyxyxyxyxy', to: '' },
-          { from: 'yzyzyzyzyzyzy', to: '' },
-          { from: 'xzxzxz', to: '' }
-        ];
-
-        let changed;
-        do {
-          changed = false;
-          for (const rule of rules) {
-            if (word.includes(rule.from)) {
-              word = word.replace(rule.from, rule.to);
-              changed = true;
-            }
-          }
-        } while (changed);
-
-        return word;
-      }
-    }
-
-    // 2. Формула шифрования: C = NF(m·K⁻¹)·K' mod p
-    class HCipher {
-      constructor() {
-        this.p = this.calculatePrime(); // p = 2³⁰⁷² - 2²⁵⁶ + 1
-      }
-
-      encrypt(m, K) {
-        // 1. Приведение к нормальной форме
-        const mNormalized = HyperbolicGroup.reduce(m);
-        
-        // 2. Вычисление m·K⁻¹
-        const mKInv = this.groupMultiply(mNormalized, this.groupInverse(K));
-        
-        // 3. Нормальная форма
-        const C = HyperbolicGroup.reduce(mKInv);
-        
-        // 4. Умножение на K'
-        const KPrime = this.deriveKey(K, this.hash(m));
-        return this.modularReduce(
-          this.groupMultiply(C, KPrime),
-          this.p
-        );
-      }
-
-      decrypt(C, K) {
-        // 1. Вычисление C·(K')⁻¹
-        const KPrime = this.deriveKey(K, this.hash(this.groupMultiply(C, K)));
-        const CKPrimeInv = this.groupMultiply(C, this.groupInverse(KPrime));
-        
-        // 2. Нормальная форма
-        const mKInv = HyperbolicGroup.reduce(CKPrimeInv);
-        
-        // 3. Умножение на K
-        return this.groupMultiply(mKInv, K);
-      }
-
-      //////////////////////////////////////////////////////////////////
-      // ВСПОМОГАТЕЛЬНЫЕ МАТЕМАТИЧЕСКИЕ ФУНКЦИИ
-      //////////////////////////////////////////////////////////////////
-
-      calculatePrime() {
-        // p = 2³⁰⁷² - 2²⁵⁶ + 1
-        return BigInt(2)**BigInt(3072) - BigInt(2)**BigInt(256) + BigInt(1);
-      }
-
-      groupMultiply(a, b) {
-        // Групповая операция в гиперболической группе
-        return HyperbolicGroup.reduce(a + b);
-      }
-
-      groupInverse(w) {
-        // Обратный элемент в группе
-        return w.split('').reverse().map(c => {
-          if (c === 'x') return 'x';
-          if (c === 'y') return 'y';
-          if (c === 'z') return 'z';
-          return '';
-        }).join('');
-      }
-
-      deriveKey(K, h) {
-        // K' = Derive(K, hash(m))
-        const Kh = this.groupMultiply(K, h);
-        return HyperbolicGroup.reduce(Kh);
-      }
-
-      hash(m) {
-        // Хеш-функция для группы
-        let result = '';
-        for (let i = 0; i < m.length; i++) {
-          const c = m.charCodeAt(i);
-          result += (c % 3 === 0) ? 'x' : (c % 3 === 1) ? 'y' : 'z';
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Encryption/Decryption</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
         }
-        return HyperbolicGroup.reduce(result);
-      }
-
-      modularReduce(value, mod) {
-        // Модулярная редукция
-        return (value % mod + mod) % mod;
-      }
-    }
-
-    //////////////////////////////////////////////////////////////////
-    // ИНТЕРФЕЙС ПОЛЬЗОВАТЕЛЯ
-    //////////////////////////////////////////////////////////////////
-    function encrypt() {
-      const hcipher = new HCipher();
-      const message = document.getElementById('message').value;
-      const key = document.getElementById('key').value || 'xyz'; // Стандартный ключ
-
-      // Преобразование сообщения в групповые элементы
-      const groupElements = message.split('').map(c => {
-        const code = c.charCodeAt(0);
-        return (code % 3 === 0) ? 'x' : (code % 3 === 1) ? 'y' : 'z';
-      }).join('');
-
-      const encrypted = hcipher.encrypt(groupElements, key);
-      document.getElementById('output').innerText = `Зашифровано: ${encrypted}`;
-    }
-
-    function decrypt() {
-      const hcipher = new HCipher();
-      const message = document.getElementById('message').value;
-      const key = document.getElementById('key').value || 'xyz'; // Стандартный ключ
-
-      const decrypted = hcipher.decrypt(message, key);
-      
-      // Обратное преобразование из групповых элементов
-      let result = '';
-      for (const c of decrypted) {
-        if (c === 'x') result += String.fromCharCode(65); // A
-        else if (c === 'y') result += String.fromCharCode(66); // B
-        else if (c === 'z') result += String.fromCharCode(67); // C
-      }
-      
-      document.getElementById('output').innerText = `Расшифровано: ${result}`;
-    }
-  </script>
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .grid-visualization {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        td {
+            border: 1px solid #ddd;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .highlight {
+            background-color: #ffeeba;
+        }
+    </style>
 </head>
 <body>
-  <h1>H-Cipher Mathematical Implementation</h1>
-  <textarea id="message" rows="4" cols="50"></textarea><br>
-  <input type="text" id="key" placeholder="Ключ (x, y или z)"><br>
-  <button onclick="encrypt()">Шифровать</button>
-  <button onclick="decrypt()">Дешифровать</button>
-  <div id="output"></div>
+    <h1>Grid Encryption/Decryption System</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Encryption</h2>
+            <label for="plaintext">Plaintext:</label>
+            <textarea id="plaintext" placeholder="Enter text to encrypt"></textarea>
+            
+            <label for="encryptionKey">Encryption Key:</label>
+            <input type="text" id="encryptionKey" placeholder="Enter encryption key">
+            
+            <label for="gridSize">Grid Size (N x N):</label>
+            <input type="number" id="gridSize" min="2" max="20" value="5">
+            
+            <button id="encryptBtn">Encrypt</button>
+            <div id="encryptStatus" class="status"></div>
+            
+            <div class="grid-visualization">
+                <h3>Encryption Grid</h3>
+                <div id="encryptGrid"></div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Decryption</h2>
+            <label for="ciphertext">Ciphertext:</label>
+            <textarea id="ciphertext" placeholder="Enter text to decrypt"></textarea>
+            
+            <label for="decryptionKey">Decryption Key:</label>
+            <input type="text" id="decryptionKey" placeholder="Enter decryption key">
+            
+            <label for="decryptGridSize">Grid Size (N x N):</label>
+            <input type="number" id="decryptGridSize" min="2" max="20" value="5">
+            
+            <button id="decryptBtn">Decrypt</button>
+            <div id="decryptStatus" class="status"></div>
+            
+            <div class="grid-visualization">
+                <h3>Decryption Grid</h3>
+                <div id="decryptGrid"></div>
+            </div>
+        </div>
+    </div>
 
-  <h2>Формулы реализации:</h2>
-  <ul>
-    <li>Группа: G = ⟨x, y, z | x² = y² = z² = 1, (xy)⁵ = (yz)⁷ = (xz)³ = 1⟩</li>
-    <li>Шифрование: C = NF(m·K⁻¹)·K' mod p</li>
-    <li>Простое число: p = 2<sup>3072</sup> - 2<sup>256</sup> + 1</li>
-    <li>Алгоритм Дехна для нормальной формы</li>
-  </ul>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create workers
+            const encryptWorker = new Worker('encryptWorker.js');
+            const decryptWorker = new Worker('decryptWorker.js');
+            
+            // Encryption handler
+            document.getElementById('encryptBtn').addEventListener('click', function() {
+                const plaintext = document.getElementById('plaintext').value;
+                const key = document.getElementById('encryptionKey').value;
+                const gridSize = parseInt(document.getElementById('gridSize').value);
+                
+                if (!plaintext || !key) {
+                    showStatus('encryptStatus', 'Please enter both text and key', 'error');
+                    return;
+                }
+                
+                encryptWorker.postMessage({
+                    plaintext: plaintext,
+                    key: key,
+                    gridSize: gridSize
+                });
+            });
+            
+            // Decryption handler
+            document.getElementById('decryptBtn').addEventListener('click', function() {
+                const ciphertext = document.getElementById('ciphertext').value;
+                const key = document.getElementById('decryptionKey').value;
+                const gridSize = parseInt(document.getElementById('decryptGridSize').value);
+                
+                if (!ciphertext || !key) {
+                    showStatus('decryptStatus', 'Please enter both text and key', 'error');
+                    return;
+                }
+                
+                decryptWorker.postMessage({
+                    ciphertext: ciphertext,
+                    key: key,
+                    gridSize: gridSize
+                });
+            });
+            
+            // Worker message handlers
+            encryptWorker.onmessage = function(e) {
+                if (e.data.error) {
+                    showStatus('encryptStatus', e.data.error, 'error');
+                } else {
+                    document.getElementById('ciphertext').value = e.data.ciphertext;
+                    showStatus('encryptStatus', 'Encryption successful!', 'success');
+                    renderGrid('encryptGrid', e.data.grid, e.data.path);
+                }
+            };
+            
+            decryptWorker.onmessage = function(e) {
+                if (e.data.error) {
+                    showStatus('decryptStatus', e.data.error, 'error');
+                } else {
+                    document.getElementById('plaintext').value = e.data.plaintext;
+                    showStatus('decryptStatus', 'Decryption successful!', 'success');
+                    renderGrid('decryptGrid', e.data.grid, e.data.path);
+                }
+            };
+            
+            // Helper functions
+            function showStatus(elementId, message, type) {
+                const element = document.getElementById(elementId);
+                element.textContent = message;
+                element.className = 'status ' + type;
+            }
+            
+            function renderGrid(containerId, grid, path) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                
+                const table = document.createElement('table');
+                
+                for (let i = 0; i < grid.length; i++) {
+                    const row = document.createElement('tr');
+                    
+                    for (let j = 0; j < grid[i].length; j++) {
+                        const cell = document.createElement('td');
+                        cell.textContent = grid[i][j] || '';
+                        
+                        // Highlight cells that are part of the path
+                        if (path.some(coord => coord[0] === i && coord[1] === j)) {
+                            cell.classList.add('highlight');
+                        }
+                        
+                        row.appendChild(cell);
+                    }
+                    
+                    table.appendChild(row);
+                }
+                
+                container.appendChild(table);
+            }
+        });
+    </script>
 </body>
 </html>
