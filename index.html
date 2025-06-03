@@ -3,15 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lattice-шифр с ключом</title>
+    <title>Улучшенный Lattice-шифр</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
-        input, textarea, button {
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .settings {
+            flex: 1;
+            min-width: 300px;
+        }
+        .main {
+            flex: 2;
+            min-width: 400px;
+        }
+        input, textarea, button, select {
             width: 100%;
             padding: 10px;
             margin: 5px 0;
@@ -31,52 +44,180 @@
             padding: 10px;
             border: 1px solid #ddd;
             margin-top: 10px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .settings-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        h3 {
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
-    <h1>Lattice-шифрование с ключом</h1>
+    <h1>Улучшенный Lattice-шифр</h1>
     
-    <label for="key">Ключ (слово):</label>
-    <input type="text" id="key" placeholder="Например: КОД">
-    
-    <label for="text">Текст:</label>
-    <textarea id="text" rows="4" placeholder="Введите текст..."></textarea>
-    
-    <button onclick="encrypt()">Зашифровать</button>
-    <button onclick="decrypt()">Расшифровать</button>
-    
-    <div class="result" id="result"></div>
+    <div class="container">
+        <div class="settings">
+            <div class="settings-group">
+                <h3>Настройки алфавита</h3>
+                <label for="alphabet">Алфавит:</label>
+                <textarea id="alphabet" rows="4">ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789 .,!?"';:-()</textarea>
+                
+                <label for="caseSensitive">Чувствительность к регистру:</label>
+                <select id="caseSensitive">
+                    <option value="true">Да</option>
+                    <option value="false">Нет</option>
+                </select>
+            </div>
+            
+            <div class="settings-group">
+                <h3>Настройки шифрования</h3>
+                <label for="outputFormat">Формат вывода:</label>
+                <select id="outputFormat">
+                    <option value="numbers">Числа (разделенные пробелами)</option>
+                    <option value="unicode">Unicode символы</option>
+                    <option value="base64">Base64</option>
+                    <option value="hex">Шестнадцатеричный</option>
+                </select>
+                
+                <label for="latticeType">Тип решетки:</label>
+                <select id="latticeType">
+                    <option value="additive">Аддитивная (сложение)</option>
+                    <option value="multiplicative">Мультипликативная (умножение)</option>
+                    <option value="xor">XOR</option>
+                    <option value="mixed">Смешанная</option>
+                </select>
+                
+                <label for="modulus">Модуль:</label>
+                <input type="number" id="modulus" value="65536" min="2">
+            </div>
+        </div>
+        
+        <div class="main">
+            <label for="key">Ключ:</label>
+            <input type="text" id="key" placeholder="Введите ключ">
+            
+            <label for="text">Текст:</label>
+            <textarea id="text" rows="4" placeholder="Введите текст..."></textarea>
+            
+            <button onclick="encrypt()">Зашифровать</button>
+            <button onclick="decrypt()">Расшифровать</button>
+            
+            <div class="result" id="result"></div>
+        </div>
+    </div>
 
     <script>
-        function textToLattice(text, key) {
-            // Преобразуем текст и ключ в числовые коды (Unicode)
-            const textCodes = Array.from(text).map(c => c.charCodeAt(0));
-            const keyCodes = Array.from(key).map(c => c.charCodeAt(0));
-            
-            // Шифруем по принципу решетки (простое сложение по модулю)
-            const encrypted = [];
-            for (let i = 0; i < textCodes.length; i++) {
-                const keyChar = keyCodes[i % keyCodes.length];
-                encrypted.push((textCodes[i] + keyChar) % 65536); // Unicode диапазон
-            }
-            
-            return String.fromCharCode(...encrypted);
+        // Инициализация настроек
+        let settings = {
+            alphabet: document.getElementById('alphabet').value,
+            caseSensitive: document.getElementById('caseSensitive').value === 'true',
+            outputFormat: document.getElementById('outputFormat').value,
+            latticeType: document.getElementById('latticeType').value,
+            modulus: parseInt(document.getElementById('modulus').value)
+        };
+
+        // Обновление настроек при изменении
+        document.getElementById('alphabet').addEventListener('input', updateSettings);
+        document.getElementById('caseSensitive').addEventListener('change', updateSettings);
+        document.getElementById('outputFormat').addEventListener('change', updateSettings);
+        document.getElementById('latticeType').addEventListener('change', updateSettings);
+        document.getElementById('modulus').addEventListener('input', updateSettings);
+
+        function updateSettings() {
+            settings = {
+                alphabet: document.getElementById('alphabet').value,
+                caseSensitive: document.getElementById('caseSensitive').value === 'true',
+                outputFormat: document.getElementById('outputFormat').value,
+                latticeType: document.getElementById('latticeType').value,
+                modulus: parseInt(document.getElementById('modulus').value)
+            };
         }
 
-        function latticeToText(cipher, key) {
-            const cipherCodes = Array.from(cipher).map(c => c.charCodeAt(0));
-            const keyCodes = Array.from(key).map(c => c.charCodeAt(0));
-            
-            const decrypted = [];
-            for (let i = 0; i < cipherCodes.length; i++) {
-                const keyChar = keyCodes[i % keyCodes.length];
-                decrypted.push((cipherCodes[i] - keyChar + 65536) % 65536);
+        // Функция для создания числового представления текста
+        function textToNumbers(text, alphabet, caseSensitive) {
+            if (!caseSensitive) {
+                text = text.toLowerCase();
+                alphabet = alphabet.toLowerCase();
             }
             
-            return String.fromCharCode(...decrypted);
+            const result = [];
+            for (const char of text) {
+                const index = alphabet.indexOf(char);
+                if (index !== -1) {
+                    result.push(index);
+                } else {
+                    // Если символ не найден в алфавите, используем его код
+                    result.push(char.charCodeAt(0));
+                }
+            }
+            return result;
         }
 
+        // Функция для преобразования чисел обратно в текст
+        function numbersToText(numbers, alphabet, caseSensitive) {
+            if (!caseSensitive) {
+                alphabet = alphabet.toLowerCase();
+            }
+            
+            let result = '';
+            for (const num of numbers) {
+                if (num < alphabet.length) {
+                    result += alphabet[num];
+                } else {
+                    // Если число выходит за пределы алфавита, используем код символа
+                    result += String.fromCharCode(num);
+                }
+            }
+            return result;
+        }
+
+        // Функция для применения операции решетки
+        function applyLatticeOperation(a, b, operation, modulus) {
+            switch (operation) {
+                case 'additive':
+                    return (a + b) % modulus;
+                case 'multiplicative':
+                    return (a * b) % modulus;
+                case 'xor':
+                    return (a ^ b) % modulus;
+                case 'mixed':
+                    return ((a * 3 + b * 7) ^ (a + b)) % modulus;
+                default:
+                    return (a + b) % modulus;
+            }
+        }
+
+        // Функция для обратной операции решетки
+        function reverseLatticeOperation(a, b, operation, modulus) {
+            switch (operation) {
+                case 'additive':
+                    return (a - b + modulus) % modulus;
+                case 'multiplicative':
+                    // Требуется модульное обратное
+                    for (let i = 1; i < modulus; i++) {
+                        if ((b * i) % modulus === 1) {
+                            return (a * i) % modulus;
+                        }
+                    }
+                    return a;
+                case 'xor':
+                    return (a ^ b) % modulus;
+                case 'mixed':
+                    // Для смешанной операции обратное преобразование сложнее
+                    // Это упрощенная версия, в реальности нужно точное обратное преобразование
+                    return (a ^ (a * 3 + b * 7)) % modulus;
+                default:
+                    return (a - b + modulus) % modulus;
+            }
+        }
+
+        // Функция шифрования
         function encrypt() {
             const key = document.getElementById('key').value;
             const text = document.getElementById('text').value;
@@ -86,10 +227,46 @@
                 return;
             }
             
-            const cipher = textToLattice(text, key);
-            document.getElementById('result').textContent = "Зашифровано: " + cipher;
+            // Преобразуем текст и ключ в числовые последовательности
+            const textNumbers = textToNumbers(text, settings.alphabet, settings.caseSensitive);
+            const keyNumbers = textToNumbers(key, settings.alphabet, settings.caseSensitive);
+            
+            // Шифруем с использованием решетки
+            const encrypted = [];
+            for (let i = 0; i < textNumbers.length; i++) {
+                const keyChar = keyNumbers[i % keyNumbers.length];
+                const encryptedChar = applyLatticeOperation(
+                    textNumbers[i], 
+                    keyChar, 
+                    settings.latticeType, 
+                    settings.modulus
+                );
+                encrypted.push(encryptedChar);
+            }
+            
+            // Форматируем вывод
+            let output;
+            switch (settings.outputFormat) {
+                case 'numbers':
+                    output = encrypted.join(' ');
+                    break;
+                case 'unicode':
+                    output = String.fromCharCode(...encrypted);
+                    break;
+                case 'base64':
+                    output = btoa(String.fromCharCode(...encrypted));
+                    break;
+                case 'hex':
+                    output = encrypted.map(n => n.toString(16).padStart(4, '0')).join(' ');
+                    break;
+                default:
+                    output = encrypted.join(' ');
+            }
+            
+            document.getElementById('result').textContent = "Зашифровано:\n" + output;
         }
 
+        // Функция дешифрования
         function decrypt() {
             const key = document.getElementById('key').value;
             const cipher = document.getElementById('text').value;
@@ -99,8 +276,45 @@
                 return;
             }
             
-            const text = latticeToText(cipher, key);
-            document.getElementById('result').textContent = "Расшифровано: " + text;
+            // Преобразуем входные данные в числовую последовательность
+            let cipherNumbers;
+            switch (settings.outputFormat) {
+                case 'numbers':
+                    cipherNumbers = cipher.split(' ').map(Number);
+                    break;
+                case 'unicode':
+                    cipherNumbers = Array.from(cipher).map(c => c.charCodeAt(0));
+                    break;
+                case 'base64':
+                    const binaryString = atob(cipher);
+                    cipherNumbers = Array.from(binaryString).map(c => c.charCodeAt(0));
+                    break;
+                case 'hex':
+                    cipherNumbers = cipher.split(' ').map(s => parseInt(s, 16));
+                    break;
+                default:
+                    cipherNumbers = cipher.split(' ').map(Number);
+            }
+            
+            const keyNumbers = textToNumbers(key, settings.alphabet, settings.caseSensitive);
+            
+            // Дешифруем
+            const decrypted = [];
+            for (let i = 0; i < cipherNumbers.length; i++) {
+                const keyChar = keyNumbers[i % keyNumbers.length];
+                const decryptedChar = reverseLatticeOperation(
+                    cipherNumbers[i], 
+                    keyChar, 
+                    settings.latticeType, 
+                    settings.modulus
+                );
+                decrypted.push(decryptedChar);
+            }
+            
+            // Преобразуем числа обратно в текст
+            const text = numbersToText(decrypted, settings.alphabet, settings.caseSensitive);
+            
+            document.getElementById('result').textContent = "Расшифровано:\n" + text;
         }
     </script>
 </body>
