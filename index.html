@@ -139,6 +139,15 @@
         
         .setting-group {
             margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .char-counter {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            font-size: 0.8em;
+            color: #666;
         }
         
         .highlight {
@@ -205,10 +214,12 @@
         <div class="setting-group">
             <label for="alphabet">Alphabet (must match cube size):</label>
             <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ/">
+            <div id="char-counter" class="char-counter">27/27</div>
             <small id="alphabet-info" class="highlight">27 characters required for 3×3×3 cube</small>
         </div>
         
         <button id="update-settings">Update Settings</button>
+        <button id="clean-alphabet" style="margin-left: 10px;">Clean Alphabet</button>
         
         <div id="status" class="status"></div>
         
@@ -224,15 +235,22 @@
             }
             
             setAlphabet(alphabet, key) {
+                // Clean the alphabet: remove duplicates, spaces, and make uppercase
+                let cleanAlphabet = this.cleanString(alphabet);
                 const requiredLength = this.cubeSize * this.cubeSize * this.cubeSize;
                 
-                if (alphabet.length !== requiredLength) {
-                    throw new Error(`Alphabet must contain exactly ${requiredLength} characters for ${this.cubeSize}×${this.cubeSize}×${this.cubeSize} cube`);
+                if (cleanAlphabet.length !== requiredLength) {
+                    throw new Error(`Alphabet must contain exactly ${requiredLength} unique characters for ${this.cubeSize}×${this.cubeSize}×${this.cubeSize} cube (got ${cleanAlphabet.length})`);
                 }
                 
-                this.alphabet = alphabet;
+                this.alphabet = cleanAlphabet;
                 this.key = key;
                 this.cube = this.generateCube();
+            }
+            
+            cleanString(str) {
+                // Remove all whitespace, convert to uppercase, and remove duplicates
+                return [...new Set(str.toUpperCase().replace(/\s/g, ''))].join('');
             }
             
             generateCube() {
@@ -253,11 +271,11 @@
             }
             
             applyKeyToAlphabet() {
+                const cleanKey = this.cleanString(this.key);
                 const keyChars = [];
-                const key = this.key.toUpperCase();
                 
                 // Add key characters first, removing duplicates
-                for (let char of key) {
+                for (let char of cleanKey) {
                     if (!keyChars.includes(char) && this.alphabet.includes(char)) {
                         keyChars.push(char);
                     }
@@ -430,6 +448,8 @@
             const keyInput = document.getElementById('key');
             const spaceCharInput = document.getElementById('space-char');
             const alphabetInfo = document.getElementById('alphabet-info');
+            const charCounter = document.getElementById('char-counter');
+            const cleanAlphabetBtn = document.getElementById('clean-alphabet');
             
             // Default alphabet for 3×3×3 cube
             const defaultAlphabet3x3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ/";
@@ -442,6 +462,28 @@
                 keyInput.value,
                 spaceCharInput.value
             );
+            
+            // Update character counter
+            function updateCharCounter() {
+                const currentLength = alphabetInput.value.length;
+                const requiredLength = Math.pow(parseInt(cubeSizeSelect.value), 3);
+                charCounter.textContent = `${currentLength}/${requiredLength}`;
+                
+                if (currentLength < requiredLength) {
+                    charCounter.style.color = 'var(--error-color)';
+                } else if (currentLength > requiredLength) {
+                    charCounter.style.color = 'var(--warning-color)';
+                } else {
+                    charCounter.style.color = 'var(--secondary-color)';
+                }
+            }
+            
+            // Clean alphabet input
+            function cleanAlphabet() {
+                const cleaned = [...new Set(alphabetInput.value.toUpperCase().replace(/\s/g, ''))].join('');
+                alphabetInput.value = cleaned;
+                updateCharCounter();
+            }
             
             // Update UI based on cube size selection
             function updateUIForCubeSize() {
@@ -456,6 +498,8 @@
                 } else {
                     alphabetInput.value = defaultAlphabet4x4.substring(0, requiredLength);
                 }
+                
+                updateCharCounter();
             }
             
             // Update cube display
@@ -483,6 +527,15 @@
             // Event listeners
             cubeSizeSelect.addEventListener('change', function() {
                 updateUIForCubeSize();
+            });
+            
+            alphabetInput.addEventListener('input', function() {
+                updateCharCounter();
+            });
+            
+            cleanAlphabetBtn.addEventListener('click', function() {
+                cleanAlphabet();
+                showStatus("Alphabet cleaned (removed duplicates and spaces)", "success");
             });
             
             document.getElementById('update-settings').addEventListener('click', function() {
@@ -522,6 +575,7 @@
             
             // Initialize UI
             updateUIForCubeSize();
+            updateCharCounter();
             updateCubeDisplay();
         });
     </script>
