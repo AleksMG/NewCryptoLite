@@ -3,81 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Трифид-шифр</title>
+    <title>Трифид-шифр (исправленный)</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 900px;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        h1, h2 {
-            color: #2c3e50;
         }
         .container {
             display: flex;
-            flex-wrap: wrap;
             gap: 20px;
+            flex-wrap: wrap;
         }
         .panel {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             flex: 1;
             min-width: 300px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
         }
         textarea {
             width: 100%;
             min-height: 100px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            font-family: monospace;
+            margin-bottom: 10px;
         }
         button {
-            background-color: #3498db;
+            background-color: #4CAF50;
             color: white;
             border: none;
             padding: 10px 15px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .settings {
-            margin-top: 20px;
-        }
-        .setting-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
         .cube-display {
             margin-top: 20px;
             font-family: monospace;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .cube-layer {
-            margin-bottom: 15px;
         }
         .status {
             margin-top: 10px;
@@ -85,74 +47,67 @@
             border-radius: 4px;
         }
         .success {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #dff0d8;
         }
         .error {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #f2dede;
         }
     </style>
 </head>
 <body>
-    <h1>Трифид-шифр</h1>
+    <h1>Трифид-шифр (исправленная версия)</h1>
     
     <div class="container">
         <div class="panel">
             <h2>Шифрование</h2>
-            <textarea id="plaintext" placeholder="Введите текст для шифрования..."></textarea>
+            <textarea id="plaintext" placeholder="Введите текст..."></textarea>
             <button id="encrypt-btn">Зашифровать</button>
-            <div id="encrypted-result" class="result"></div>
+            <div id="encrypted-result"></div>
         </div>
         
         <div class="panel">
             <h2>Дешифрование</h2>
-            <textarea id="ciphertext" placeholder="Введите текст для дешифрования..."></textarea>
+            <textarea id="ciphertext" placeholder="Введите текст..."></textarea>
             <button id="decrypt-btn">Дешифровать</button>
-            <div id="decrypted-result" class="result"></div>
+            <div id="decrypted-result"></div>
         </div>
     </div>
     
-    <div class="panel settings">
+    <div class="panel">
         <h2>Настройки</h2>
-        
-        <div class="setting-group">
+        <div>
             <label for="alphabet">Алфавит (27 символов):</label>
-            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ/">
-            <small>Последний символ будет использоваться для пробелов</small>
+            <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ/" style="width: 100%">
         </div>
-        
-        <div class="setting-group">
-            <label for="key">Ключ перестановки:</label>
-            <input type="text" id="key" value="SECRETKEY">
-            <small>Используется для перемешивания алфавита</small>
+        <div style="margin-top: 10px;">
+            <label for="key">Ключ:</label>
+            <input type="text" id="key" value="SECRETKEY" style="width: 100%">
         </div>
+        <button id="update-settings" style="margin-top: 10px;">Обновить</button>
         
-        <button id="update-settings">Обновить настройки</button>
-        
-        <div class="cube-display">
-            <h3>Текущий куб:</h3>
-            <div id="cube-display"></div>
-        </div>
-        
+        <div class="cube-display" id="cube-display"></div>
         <div id="status" class="status"></div>
     </div>
 
     <script>
         class TrifidCipher {
             constructor(alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ/", key = "") {
+                this.setAlphabet(alphabet, key);
+            }
+            
+            setAlphabet(alphabet, key) {
+                if (alphabet.length !== 27) {
+                    throw new Error("Алфавит должен содержать ровно 27 символов");
+                }
                 this.alphabet = alphabet;
                 this.key = key;
                 this.cube = this.generateCube();
             }
             
-            // Генерация куба на основе алфавита и ключа
             generateCube() {
-                // Применяем ключ для перестановки алфавита
                 let shuffledAlphabet = this.applyKeyToAlphabet();
+                let cube = [[], [], []];
                 
-                // Разбиваем на 3 слоя по 9 символов
-                let cube = [];
                 for (let layer = 0; layer < 3; layer++) {
                     cube[layer] = [];
                     for (let row = 0; row < 3; row++) {
@@ -166,34 +121,28 @@
                 return cube;
             }
             
-            // Применение ключа к алфавиту
             applyKeyToAlphabet() {
-                // Удаляем дубликаты из ключа
-                let uniqueKey = [];
+                const keyChars = [];
                 for (let char of this.key.toUpperCase()) {
-                    if (!uniqueKey.includes(char) && this.alphabet.includes(char)) {
-                        uniqueKey.push(char);
+                    if (!keyChars.includes(char) && this.alphabet.includes(char)) {
+                        keyChars.push(char);
                     }
                 }
                 
-                // Оставшиеся символы алфавита
-                let remainingChars = [];
+                const remainingChars = [];
                 for (let char of this.alphabet) {
-                    if (!uniqueKey.includes(char)) {
+                    if (!keyChars.includes(char)) {
                         remainingChars.push(char);
                     }
                 }
                 
-                // Объединяем уникальный ключ с оставшимися символами
-                return [...uniqueKey, ...remainingChars];
+                return [...keyChars, ...remainingChars];
             }
             
-            // Поиск координат символа в кубе
             findCharCoordinates(char) {
                 char = char.toUpperCase();
                 if (!this.alphabet.includes(char)) {
-                    // Если символ не найден, используем последний символ алфавита (обычно для пробела)
-                    char = this.alphabet[this.alphabet.length - 1];
+                    char = this.alphabet[26]; // Используем последний символ для неизвестных
                 }
                 
                 for (let layer = 0; layer < 3; layer++) {
@@ -205,108 +154,105 @@
                         }
                     }
                 }
-                return [3, 3, 3]; // Возвращаем последнюю позицию, если символ не найден
+                return [3, 3, 3];
             }
             
-            // Получение символа по координатам
             getCharFromCoordinates(layer, row, col) {
                 return this.cube[layer - 1][row - 1][col - 1];
             }
             
-            // Шифрование текста
             encrypt(text) {
-                // Подготовка текста: удаляем неалфавитные символы и разбиваем на триграммы
-                const preparedText = this.prepareText(text);
-                let encryptedText = "";
+                const prepared = this.prepareText(text);
+                let result = "";
                 
-                // Обработка по триграммам
-                for (let i = 0; i < preparedText.length; i += 3) {
-                    const trigram = preparedText.substr(i, 3);
-                    if (trigram.length === 0) continue;
+                for (let i = 0; i < prepared.length; i += 3) {
+                    const trigram = prepared.substr(i, 3);
+                    if (!trigram) continue;
                     
-                    // Получаем координаты для каждой буквы триграммы
+                    // Получаем координаты для всех букв триграммы
                     const coords = [];
                     for (let j = 0; j < trigram.length; j++) {
                         coords.push(...this.findCharCoordinates(trigram[j]));
                     }
                     
-                    // Перегруппировка координат
-                    const regrouped = this.regroupCoordinates(coords);
+                    // ПРАВИЛЬНАЯ перегруппировка для шифрования
+                    const regrouped = this.regroupForEncryption(coords);
                     
-                    // Преобразование обратно в буквы
+                    // Преобразуем обратно в буквы
                     for (let k = 0; k < regrouped.length; k += 3) {
                         const [l, r, c] = regrouped.slice(k, k + 3);
-                        encryptedText += this.getCharFromCoordinates(l, r, c);
+                        result += this.getCharFromCoordinates(l, r, c);
                     }
                 }
                 
-                return encryptedText;
+                return result;
             }
             
-            // Дешифрование текста
+            regroupForEncryption(coords) {
+                // Разделяем координаты на слои, строки и столбцы
+                const layers = [], rows = [], cols = [];
+                for (let i = 0; i < coords.length; i += 3) {
+                    layers.push(coords[i]);
+                    rows.push(coords[i + 1]);
+                    cols.push(coords[i + 2]);
+                }
+                
+                // Объединяем: сначала все слои, затем строки, затем столбцы
+                return [...layers, ...rows, ...cols];
+            }
+            
             decrypt(text) {
-                // Подготовка текста
-                const preparedText = this.prepareText(text);
-                let decryptedText = "";
+                const prepared = this.prepareText(text);
+                let result = "";
                 
-                // Обработка по триграммам
-                for (let i = 0; i < preparedText.length; i += 3) {
-                    const trigram = preparedText.substr(i, 3);
-                    if (trigram.length === 0) continue;
+                for (let i = 0; i < prepared.length; i += 3) {
+                    const trigram = prepared.substr(i, 3);
+                    if (!trigram) continue;
                     
-                    // Получаем координаты для каждой буквы триграммы
                     const coords = [];
                     for (let j = 0; j < trigram.length; j++) {
                         coords.push(...this.findCharCoordinates(trigram[j]));
                     }
                     
-                    // Обратная перегруппировка координат
-                    const regrouped = this.regroupCoordinates(coords, true);
+                    // Обратная перегруппировка для дешифрования
+                    const regrouped = this.regroupForDecryption(coords);
                     
-                    // Преобразование обратно в буквы
                     for (let k = 0; k < regrouped.length; k += 3) {
                         const [l, r, c] = regrouped.slice(k, k + 3);
-                        decryptedText += this.getCharFromCoordinates(l, r, c);
+                        result += this.getCharFromCoordinates(l, r, c);
                     }
                 }
                 
-                return decryptedText;
+                return result;
             }
             
-            // Подготовка текста: удаление неалфавитных символов и замена пробелов
+            regroupForDecryption(coords) {
+                const groupSize = coords.length / 3;
+                const result = [];
+                
+                for (let i = 0; i < groupSize; i++) {
+                    result.push(coords[i], coords[i + groupSize], coords[i + 2 * groupSize]);
+                }
+                
+                return result;
+            }
+            
             prepareText(text) {
                 let result = "";
                 for (let char of text.toUpperCase()) {
                     if (this.alphabet.includes(char)) {
                         result += char;
                     } else if (char === " ") {
-                        result += this.alphabet[this.alphabet.length - 1]; // Заменяем пробел последним символом алфавита
+                        result += this.alphabet[26]; // Заменяем пробел
                     }
                 }
                 return result;
             }
             
-            // Перегруппировка координат для шифрования/дешифрования
-            regroupCoordinates(coords, reverse = false) {
-                if (reverse) {
-                    // Для дешифрования: разбиваем на 3 группы и чередуем
-                    const groupSize = coords.length / 3;
-                    let result = [];
-                    for (let i = 0; i < groupSize; i++) {
-                        result.push(coords[i], coords[i + groupSize], coords[i + 2 * groupSize]);
-                    }
-                    return result;
-                } else {
-                    // Для шифрования: собираем все координаты и разбиваем на тройки
-                    return coords;
-                }
-            }
-            
-            // Визуализация куба в HTML
             renderCube() {
-                let html = "";
+                let html = "<h3>Текущий куб:</h3>";
                 for (let layer = 0; layer < 3; layer++) {
-                    html += `<div class="cube-layer"><strong>Слой ${layer + 1}:</strong><br>`;
+                    html += `<div><strong>Слой ${layer + 1}:</strong><br>`;
                     for (let row = 0; row < 3; row++) {
                         html += this.cube[layer][row].join(" ") + "<br>";
                     }
@@ -316,62 +262,55 @@
             }
         }
 
-        // Инициализация интерфейса
+        // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
-            let cipher = new TrifidCipher();
+            const cipher = new TrifidCipher();
             
-            // Обновление куба при изменении настроек
+            function updateCubeDisplay() {
+                document.getElementById('cube-display').innerHTML = cipher.renderCube();
+            }
+            
             document.getElementById('update-settings').addEventListener('click', function() {
-                const alphabet = document.getElementById('alphabet').value;
-                const key = document.getElementById('key').value;
-                
-                if (alphabet.length !== 27) {
-                    showStatus("Алфавит должен содержать ровно 27 символов", "error");
-                    return;
-                }
-                
                 try {
-                    cipher = new TrifidCipher(alphabet, key);
-                    document.getElementById('cube-display').innerHTML = cipher.renderCube();
-                    showStatus("Настройки успешно обновлены", "success");
+                    cipher.setAlphabet(
+                        document.getElementById('alphabet').value,
+                        document.getElementById('key').value
+                    );
+                    updateCubeDisplay();
+                    showStatus("Настройки обновлены", "success");
                 } catch (e) {
                     showStatus("Ошибка: " + e.message, "error");
                 }
             });
             
-            // Шифрование
             document.getElementById('encrypt-btn').addEventListener('click', function() {
-                const plaintext = document.getElementById('plaintext').value;
                 try {
-                    const encrypted = cipher.encrypt(plaintext);
-                    document.getElementById('encrypted-result').textContent = encrypted;
-                    showStatus("Текст успешно зашифрован", "success");
+                    const result = cipher.encrypt(document.getElementById('plaintext').value);
+                    document.getElementById('encrypted-result').textContent = result;
+                    showStatus("Текст зашифрован", "success");
                 } catch (e) {
                     showStatus("Ошибка шифрования: " + e.message, "error");
                 }
             });
             
-            // Дешифрование
             document.getElementById('decrypt-btn').addEventListener('click', function() {
-                const ciphertext = document.getElementById('ciphertext').value;
                 try {
-                    const decrypted = cipher.decrypt(ciphertext);
-                    document.getElementById('decrypted-result').textContent = decrypted;
-                    showStatus("Текст успешно дешифрован", "success");
+                    const result = cipher.decrypt(document.getElementById('ciphertext').value);
+                    document.getElementById('decrypted-result').textContent = result;
+                    showStatus("Текст дешифрован", "success");
                 } catch (e) {
                     showStatus("Ошибка дешифрования: " + e.message, "error");
                 }
             });
             
-            // Инициализация начального куба
-            document.getElementById('cube-display').innerHTML = cipher.renderCube();
-            
-            // Функция отображения статуса
             function showStatus(message, type) {
-                const statusEl = document.getElementById('status');
-                statusEl.textContent = message;
-                statusEl.className = "status " + type;
+                const el = document.getElementById('status');
+                el.textContent = message;
+                el.className = "status " + type;
             }
+            
+            // Первоначальная отрисовка
+            updateCubeDisplay();
         });
     </script>
 </body>
