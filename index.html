@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optimized Homophonic Cipher</title>
+    <title>Homophonic Cipher - Manual Input</title>
     <style>
         :root {
             --primary: #1a1a2e;
@@ -338,13 +338,31 @@
             visibility: visible;
             opacity: 1;
         }
+        
+        .param-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .param-valid {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .param-invalid {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--error);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Homophonic Cipher</h1>
-            <p class="subtitle">Optimized implementation with balanced performance and security</p>
+            <p class="subtitle">Supports both manual parameter input and automatic generation</p>
         </header>
         
         <div class="key-settings">
@@ -353,34 +371,29 @@
                 <div class="form-group">
                     <label for="alphabet">Character Set <span class="tooltip">ℹ️<span class="tooltiptext">Define all characters that will be used in encryption</span></span></label>
                     <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
-                </div>
-                <div class="form-group">
-                    <label for="prime-bitlength">Prime Bit Length</label>
-                    <select id="prime-bitlength">
-                        <option value="16">16 bits (testing)</option>
-                        <option value="32" selected>32 bits (balanced)</option>
-                        <option value="64">64 bits (secure)</option>
-                    </select>
+                    <div class="param-status" id="alphabet-status"></div>
                 </div>
                 <div class="form-group">
                     <label for="prime">Prime Modulus (p) <span class="tooltip">ℹ️<span class="tooltiptext">Large prime number for modular arithmetic</span></span></label>
                     <div class="flex-row">
-                        <input type="text" id="prime" placeholder="Click generate to create prime">
+                        <input type="text" id="prime" placeholder="Enter prime number or generate" value="1009">
                         <button id="generate-prime">Generate</button>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-bar-inner" id="prime-progress"></div>
                     </div>
+                    <div class="param-status" id="prime-status"></div>
                 </div>
                 <div class="form-group">
                     <label for="generator">Generator (g) <span class="tooltip">ℹ️<span class="tooltiptext">Primitive root modulo p</span></span></label>
                     <div class="flex-row">
-                        <input type="text" id="generator" placeholder="Find generator after prime">
+                        <input type="text" id="generator" placeholder="Enter generator or find" value="11">
                         <button id="find-generator">Find</button>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-bar-inner" id="generator-progress"></div>
                     </div>
+                    <div class="param-status" id="generator-status"></div>
                 </div>
             </div>
             <div class="form-group">
@@ -465,6 +478,9 @@
             </div>
             <div class="math-expression">
                 <strong>Why this works:</strong> a<sup>m</sup> ≡ (g<sup>k</sup>)<sup>m</sup> ≡ g<sup>k×m</sup> mod p, and b = m × g<sup>m×k</sup> mod p, so b ≡ m × a<sup>m</sup> mod p
+            </div>
+            <div class="math-expression">
+                <strong>Important:</strong> To decrypt on another device, you need the same Alphabet, Prime (p), and Generator (g) values used for encryption.
             </div>
         </div>
     </div>
@@ -555,21 +571,74 @@
             return result;
         }
         
+        // Check if g is a generator modulo p
+        function isGenerator(g, p) {
+            const phi = p - 1n;
+            const factors = factorize(phi);
+            
+            for (const factor of factors) {
+                const exponent = phi / factor;
+                if (modExp(g, exponent, p) === 1n) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // Factorize a number
+        function factorize(n) {
+            const factors = new Set();
+            let remaining = n;
+            
+            // Factor out 2s
+            while (remaining % 2n === 0n) {
+                factors.add(2n);
+                remaining /= 2n;
+            }
+            
+            // Factor out odd numbers
+            let factor = 3n;
+            while (factor * factor <= remaining) {
+                if (remaining % factor === 0n) {
+                    factors.add(factor);
+                    remaining /= factor;
+                } else {
+                    factor += 2n;
+                }
+            }
+            
+            if (remaining > 1n) {
+                factors.add(remaining);
+            }
+            
+            return Array.from(factors);
+        }
+        
         // Homophonic Cipher implementation
         class HomophonicCipher {
             constructor() {
                 this.p = null;
                 this.g = null;
                 this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                this.isGenerating = false;
             }
             
             setPrime(p) {
-                this.p = BigInt(p);
+                try {
+                    this.p = BigInt(p);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
             }
             
             setGenerator(g) {
-                this.g = BigInt(g);
+                try {
+                    this.g = BigInt(g);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
             }
             
             setAlphabet(alphabet) {
@@ -577,22 +646,17 @@
             }
             
             isReady() {
-                return this.p !== null && this.g !== null;
+                return this.p !== null && this.g !== null && this.p > 1n && this.g > 1n;
             }
             
             async generateLargePrime(bitLength, progressCallback = null) {
-                if (this.isGenerating) {
-                    throw new Error("Generation already in progress");
-                }
-                
-                this.isGenerating = true;
                 const bits = parseInt(bitLength);
                 const min = 2n ** BigInt(bits - 1);
                 const max = 2n ** BigInt(bits) - 1n;
                 
                 let prime;
                 let attempts = 0;
-                const maxAttempts = 1000;
+                const maxAttempts = 500;
                 const startTime = performance.now();
                 
                 try {
@@ -619,11 +683,11 @@
                     
                     return {
                         prime: prime,
-                        time: endTime - performance.now(),
+                        time: endTime - startTime,
                         attempts: attempts
                     };
-                } finally {
-                    this.isGenerating = false;
+                } catch (error) {
+                    throw error;
                 }
             }
             
@@ -636,18 +700,19 @@
                 const phi = pVal - 1n;
                 
                 // Factorize phi
-                const factors = this.factorize(phi);
+                const factors = factorize(phi);
                 let attempts = 0;
                 const maxAttempts = 1000;
                 
+                // Try candidate generators
                 for (let g = 2n; g < pVal; g++) {
                     attempts++;
-                    let isGenerator = true;
+                    let isGen = true;
                     
                     for (const factor of factors) {
                         const exponent = phi / factor;
                         if (modExp(g, exponent, pVal) === 1n) {
-                            isGenerator = false;
+                            isGen = false;
                             break;
                         }
                     }
@@ -662,7 +727,7 @@
                         throw new Error("Generator not found after " + maxAttempts + " attempts");
                     }
                     
-                    if (isGenerator) {
+                    if (isGen) {
                         if (progressCallback) {
                             progressCallback(100);
                         }
@@ -673,37 +738,9 @@
                 throw new Error("Generator not found");
             }
             
-            factorize(n) {
-                const factors = new Set();
-                let remaining = n;
-                
-                // Factor out 2s
-                while (remaining % 2n === 0n) {
-                    factors.add(2n);
-                    remaining /= 2n;
-                }
-                
-                // Factor out odd numbers
-                let factor = 3n;
-                while (factor * factor <= remaining) {
-                    if (remaining % factor === 0n) {
-                        factors.add(factor);
-                        remaining /= factor;
-                    } else {
-                        factor += 2n;
-                    }
-                }
-                
-                if (remaining > 1n) {
-                    factors.add(remaining);
-                }
-                
-                return Array.from(factors);
-            }
-            
             encrypt(plaintext) {
                 if (!this.isReady()) {
-                    throw new Error("Cipher not initialized with prime and generator");
+                    throw new Error("Cipher not initialized with valid prime and generator");
                 }
                 
                 const pVal = this.p;
@@ -740,7 +777,7 @@
             
             decrypt(ciphertext) {
                 if (!this.isReady()) {
-                    throw new Error("Cipher not initialized with prime and generator");
+                    throw new Error("Cipher not initialized with valid prime and generator");
                 }
                 
                 const pVal = this.p;
@@ -786,6 +823,7 @@
         const cipher = new HomophonicCipher();
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Set up event listeners
             document.getElementById('generate-prime').addEventListener('click', generatePrime);
             document.getElementById('find-generator').addEventListener('click', findGenerator);
             document.getElementById('encrypt-btn').addEventListener('click', encrypt);
@@ -804,11 +842,60 @@
             document.getElementById('copy-decrypted').addEventListener('click', () => {
                 copyToClipboard('decrypted');
             });
-            document.getElementById('alphabet').addEventListener('input', updateAlphabetMapping);
+            
+            // Set up input validation
+            document.getElementById('alphabet').addEventListener('input', validateParameters);
+            document.getElementById('prime').addEventListener('input', validateParameters);
+            document.getElementById('generator').addEventListener('input', validateParameters);
+            
+            // Initialize with default values
+            validateParameters();
+            updateAlphabetMapping();
+            showStatus('info', 'Enter parameters or generate them, then encrypt/decrypt', 'encrypt-status');
+        });
+        
+        function validateParameters() {
+            // Validate alphabet
+            const alphabet = document.getElementById('alphabet').value;
+            const alphabetStatus = document.getElementById('alphabet-status');
+            if (alphabet.length > 0) {
+                cipher.setAlphabet(alphabet);
+                alphabetStatus.textContent = 'Valid (' + alphabet.length + ' characters)';
+                alphabetStatus.className = 'param-status param-valid';
+            } else {
+                alphabetStatus.textContent = 'Invalid (empty)';
+                alphabetStatus.className = 'param-status param-invalid';
+            }
+            
+            // Validate prime
+            const primeInput = document.getElementById('prime').value;
+            const primeStatus = document.getElementById('prime-status');
+            if (primeInput && cipher.setPrime(primeInput) && cipher.p > 1n) {
+                primeStatus.textContent = 'Valid prime';
+                primeStatus.className = 'param-status param-valid';
+            } else {
+                primeStatus.textContent = 'Invalid prime';
+                primeStatus.className = 'param-status param-invalid';
+            }
+            
+            // Validate generator
+            const generatorInput = document.getElementById('generator').value;
+            const generatorStatus = document.getElementById('generator-status');
+            if (generatorInput && cipher.setGenerator(generatorInput) && cipher.g > 1n) {
+                if (cipher.p && isGenerator(cipher.g, cipher.p)) {
+                    generatorStatus.textContent = 'Valid generator';
+                    generatorStatus.className = 'param-status param-valid';
+                } else {
+                    generatorStatus.textContent = 'May not be a generator for this prime';
+                    generatorStatus.className = 'param-status param-invalid';
+                }
+            } else {
+                generatorStatus.textContent = 'Invalid generator';
+                generatorStatus.className = 'param-status param-invalid';
+            }
             
             updateAlphabetMapping();
-            showStatus('info', 'Click "Generate" to create a prime number', 'encrypt-status');
-        });
+        }
         
         function updateAlphabetMapping() {
             const alphabet = document.getElementById('alphabet').value;
@@ -823,17 +910,14 @@
             }
             
             document.getElementById('alphabet-mapping').textContent = mapping;
-            cipher.setAlphabet(alphabet);
         }
         
         async function generatePrime() {
             try {
-                const bitLength = document.getElementById('prime-bitlength').value;
+                const bitLength = document.getElementById('prime-bitlength')?.value || '32';
                 const generateBtn = document.getElementById('generate-prime');
-                const findBtn = document.getElementById('find-generator');
                 
                 generateBtn.classList.add('loading');
-                findBtn.classList.add('loading');
                 
                 showStatus('progress', 'Generating large prime...', 'encrypt-status');
                 
@@ -842,19 +926,15 @@
                 });
                 
                 cipher.setPrime(result.prime);
-                
                 document.getElementById('prime').value = result.prime.toString();
-                showStatus('success', `Generated ${bitLength}-bit prime in ${Math.abs(result.time).toFixed(2)}ms (${result.attempts} attempts)`, 'encrypt-status');
                 
-                // Сбросить генератор при создании нового простого числа
-                document.getElementById('generator').value = '';
-                cipher.setGenerator(null);
+                validateParameters();
+                showStatus('success', `Generated ${bitLength}-bit prime in ${result.time.toFixed(2)}ms (${result.attempts} attempts)`, 'encrypt-status');
                 
             } catch (error) {
                 showStatus('error', 'Error: ' + error.message, 'encrypt-status');
             } finally {
                 document.getElementById('generate-prime').classList.remove('loading');
-                document.getElementById('find-generator').classList.remove('loading');
                 document.getElementById('prime-progress').style.width = '0%';
             }
         }
@@ -880,6 +960,7 @@
                 cipher.setGenerator(generator);
                 document.getElementById('generator').value = generator.toString();
                 
+                validateParameters();
                 showStatus('success', `Found generator in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status');
             } catch (error) {
                 showStatus('error', 'Error: ' + error.message, 'encrypt-status');
@@ -894,7 +975,7 @@
                 const plaintext = document.getElementById('plaintext').value;
                 
                 if (!cipher.isReady()) {
-                    showStatus('error', 'Initialize prime and generator first', 'encrypt-status');
+                    showStatus('error', 'Please enter valid prime and generator values first', 'encrypt-status');
                     return;
                 }
                 
@@ -914,7 +995,7 @@
                 const ciphertext = document.getElementById('input-ciphertext').value;
                 
                 if (!cipher.isReady()) {
-                    showStatus('error', 'Initialize prime and generator first', 'decrypt-status');
+                    showStatus('error', 'Please enter valid prime and generator values first', 'decrypt-status');
                     return;
                 }
                 
