@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Homophonic Cipher Implementation</title>
+    <title>Professional Homophonic Cipher - Byte Level Implementation</title>
     <style>
         :root {
             --primary: #1a1a2e;
@@ -357,6 +357,16 @@
             color: var(--error);
         }
         
+        .byte-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .byte-controls button {
+            padding: 10px 15px;
+        }
+        
         .byte-view {
             font-family: monospace;
             background: rgba(0, 0, 0, 0.3);
@@ -366,6 +376,13 @@
             font-size: 0.8rem;
             max-height: 100px;
             overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .byte-highlight {
+            background-color: rgba(52, 152, 219, 0.3);
+            padding: 2px;
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -373,17 +390,12 @@
     <div class="container">
         <header>
             <h1>Professional Homophonic Cipher</h1>
-            <p class="subtitle">Byte-level implementation with advanced cryptographic parameters</p>
+            <p class="subtitle">Byte-level implementation - Works with any binary data</p>
         </header>
         
         <div class="key-settings">
             <h2><span class="icon">⚙️</span> Cryptographic Parameters</h2>
             <div class="settings-grid">
-                <div class="form-group">
-                    <label for="alphabet">Character Set <span class="tooltip">ℹ️<span class="tooltiptext">Define all characters that will be used in encryption</span></span></label>
-                    <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
-                    <div class="param-status" id="alphabet-status"></div>
-                </div>
                 <div class="form-group">
                     <label for="prime">Prime Modulus (p) <span class="tooltip">ℹ️<span class="tooltiptext">Large prime number for modular arithmetic</span></span></label>
                     <div class="flex-row">
@@ -408,8 +420,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Character Mapping</label>
-                <div class="key-display" id="alphabet-mapping">A=1, B=2, C=3, D=4, E=5, F=6, G=7, H=8, I=9, J=10, K=11, L=12, M=13, N=14, O=15, P=16, Q=17, R=18, S=19, T=20, U=21, V=22, W=23, X=24, Y=25, Z=26</div>
+                <label>Byte Value Range</label>
+                <div class="key-display" id="byte-range">0 to 255 (all byte values)</div>
             </div>
         </div>
         
@@ -417,8 +429,14 @@
             <div class="panel">
                 <h2><span class="icon">🔒</span> Encryption</h2>
                 <div class="form-group">
-                    <label for="plaintext">Plaintext</label>
-                    <textarea id="plaintext" placeholder="Enter text to encrypt">PROFESSIONAL HOMOPHONIC CIPHER IMPLEMENTATION</textarea>
+                    <label for="plaintext">Input Data (Text or Hex Bytes)</label>
+                    <textarea id="plaintext" placeholder="Enter text or hex bytes (e.g., 48 65 6C 6C 6F)">Professional Homophonic Cipher</textarea>
+                </div>
+                <div class="byte-controls">
+                    <button id="view-bytes">View Bytes</button>
+                    <button id="view-text">View Text</button>
+                    <button id="load-file">Load File</button>
+                    <input type="file" id="file-input" style="display: none;">
                 </div>
                 <div class="form-group">
                     <label>Byte Representation</label>
@@ -431,13 +449,9 @@
                 <div class="form-group">
                     <label for="ciphertext">Ciphertext (Pairs)</label>
                     <div class="output-group">
-                        <textarea id="ciphertext" placeholder="Encrypted text will appear here" readonly></textarea>
+                        <textarea id="ciphertext" placeholder="Encrypted data will appear here" readonly></textarea>
                         <button class="copy-btn" id="copy-ciphertext">Copy</button>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Byte Representation</label>
-                    <div class="byte-view" id="ciphertext-bytes"></div>
                 </div>
                 <div id="encrypt-status" class="status"></div>
             </div>
@@ -448,18 +462,14 @@
                     <label for="input-ciphertext">Ciphertext (Pairs)</label>
                     <textarea id="input-ciphertext" placeholder="Paste ciphertext pairs here"></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Byte Representation</label>
-                    <div class="byte-view" id="input-ciphertext-bytes"></div>
-                </div>
                 <div class="action-buttons">
                     <button class="btn-decrypt" id="decrypt-btn"><span class="icon">▶️</span> Decrypt</button>
                     <button id="clear-decrypt">Clear</button>
                 </div>
                 <div class="form-group">
-                    <label for="decrypted">Decrypted Text</label>
+                    <label for="decrypted">Decrypted Data</label>
                     <div class="output-group">
-                        <textarea id="decrypted" placeholder="Decrypted text will appear here" readonly></textarea>
+                        <textarea id="decrypted" placeholder="Decrypted data will appear here" readonly></textarea>
                         <button class="copy-btn" id="copy-decrypted">Copy</button>
                     </div>
                 </div>
@@ -476,9 +486,9 @@
             <div class="explanation-content">
                 <div>
                     <h3>Encryption Process</h3>
-                    <p>For each character in the plaintext:</p>
+                    <p>For each byte value in the input:</p>
                     <ol>
-                        <li>Convert character to numerical value m (position in alphabet)</li>
+                        <li>Treat byte as numerical value m (0-255)</li>
                         <li>Generate a cryptographically secure random number k</li>
                         <li>Compute a = g<sup>k</sup> mod p</li>
                         <li>Compute b = m × g<sup>m×k</sup> mod p</li>
@@ -492,22 +502,22 @@
                     <h3>Decryption Process</h3>
                     <p>For each ciphertext pair (a, b):</p>
                     <ol>
-                        <li>For each possible character value m in alphabet:</li>
+                        <li>For each possible byte value m (0-255):</li>
                         <li>Compute a<sup>m</sup> mod p</li>
                         <li>Check if b ≡ m × a<sup>m</sup> mod p</li>
-                        <li>When match is found, convert m back to character</li>
+                        <li>When match is found, output byte value m</li>
                     </ol>
                     <div class="math-expression">
-                        For each m in alphabet: check if b ≡ m × a<sup>m</sup> mod p
+                        For each m in 0-255: check if b ≡ m × a<sup>m</sup> mod p
                     </div>
-                    <p>The decryption requires trying all possible m values, which is efficient for standard alphabets.</p>
+                    <p>The decryption requires trying all possible m values (0-255), which is efficient.</p>
                 </div>
             </div>
             <div class="math-expression">
                 <strong>Why this works:</strong> a<sup>m</sup> ≡ (g<sup>k</sup>)<sup>m</sup> ≡ g<sup>k×m</sup> mod p, and b = m × g<sup>m×k</sup> mod p, so b ≡ m × a<sup>m</sup> mod p
             </div>
             <div class="math-expression">
-                <strong>Important:</strong> To decrypt on another device, you need the same Alphabet, Prime (p), and Generator (g) values used for encryption.
+                <strong>Important:</strong> To decrypt, you need the same Prime (p) and Generator (g) values used for encryption.
             </div>
         </div>
     </div>
@@ -567,13 +577,6 @@
             }
             
             return result;
-        }
-        
-        // Get cryptographically secure random values
-        function getCryptoRandom() {
-            const array = new Uint32Array(1);
-            window.crypto.getRandomValues(array);
-            return array[0] / (0xFFFFFFFF + 1);
         }
         
         // Generate a random bigint in range [min, max)
@@ -642,11 +645,60 @@
             return Array.from(factors);
         }
         
-        // Convert text to byte representation
+        // Convert text to byte array
         function textToBytes(text) {
             const encoder = new TextEncoder();
-            const bytes = encoder.encode(text);
+            return Array.from(encoder.encode(text));
+        }
+        
+        // Convert byte array to text
+        function bytesToText(bytes) {
+            const decoder = new TextDecoder();
+            return decoder.decode(new Uint8Array(bytes));
+        }
+        
+        // Convert hex string to byte array
+        function hexToBytes(hex) {
+            const bytes = [];
+            for (let i = 0; i < hex.length; i += 2) {
+                if (hex.substr(i, 2).trim() !== '') {
+                    bytes.push(parseInt(hex.substr(i, 2), 16));
+                }
+            }
+            return bytes;
+        }
+        
+        // Convert byte array to hex string
+        function bytesToHex(bytes) {
             return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+        }
+        
+        // Format bytes for display with highlighting
+        function formatBytesForDisplay(bytes, highlightIndex = -1) {
+            let result = '';
+            for (let i = 0; i < bytes.length; i++) {
+                if (i === highlightIndex) {
+                    result += `<span class="byte-highlight">${bytes[i].toString(16).padStart(2, '0')}</span> `;
+                } else {
+                    result += bytes[i].toString(16).padStart(2, '0') + ' ';
+                }
+                
+                if ((i + 1) % 16 === 0) result += '\n';
+            }
+            return result;
+        }
+        
+        // Parse input (could be text or hex bytes)
+        function parseInput(input) {
+            // Check if input looks like hex bytes (pairs of hex digits separated by spaces)
+            const hexRegex = /^([0-9a-fA-F]{2}\s*)+$/;
+            const cleanInput = input.replace(/\s+/g, ' ').trim();
+            
+            if (hexRegex.test(cleanInput.replace(/\s/g, ''))) {
+                return hexToBytes(cleanInput.replace(/\s/g, ''));
+            } else {
+                return textToBytes(input);
+            }
         }
         
         // Homophonic Cipher implementation
@@ -654,7 +706,6 @@
             constructor() {
                 this.p = null;
                 this.g = null;
-                this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             }
             
             setPrime(p) {
@@ -673,10 +724,6 @@
                 } catch (e) {
                     return false;
                 }
-            }
-            
-            setAlphabet(alphabet) {
-                this.alphabet = alphabet;
             }
             
             isReady() {
@@ -772,7 +819,7 @@
                 throw new Error("Generator not found");
             }
             
-            encrypt(plaintext) {
+            encrypt(data) {
                 if (!this.isReady()) {
                     throw new Error("Cipher not initialized with valid prime and generator");
                 }
@@ -781,16 +828,8 @@
                 const gVal = this.g;
                 let ciphertext = "";
                 
-                for (let i = 0; i < plaintext.length; i++) {
-                    const char = plaintext[i].toUpperCase();
-                    const index = this.alphabet.indexOf(char);
-                    
-                    if (index === -1) {
-                        ciphertext += char + " ";
-                        continue;
-                    }
-                    
-                    const m = BigInt(index + 1);
+                for (let i = 0; i < data.length; i++) {
+                    const m = BigInt(data[i]);
                     
                     // Generate random k where 1 < k < p-1
                     const k = randomBigInt(2n, pVal - 1n);
@@ -816,12 +855,12 @@
                 
                 const pVal = this.p;
                 const pairs = ciphertext.match(/\(\d+,\d+\)/g) || [];
-                let decrypted = "";
+                const decryptedBytes = [];
                 
                 for (const pair of pairs) {
                     const match = pair.match(/\((\d+),(\d+)\)/);
                     if (!match) {
-                        decrypted += "?";
+                        decryptedBytes.push(0);
                         continue;
                     }
                     
@@ -829,7 +868,8 @@
                     const b = BigInt(match[2]);
                     
                     let found = false;
-                    for (let m = 1; m <= this.alphabet.length; m++) {
+                    // Try all possible byte values (0-255)
+                    for (let m = 0; m <= 255; m++) {
                         const mBig = BigInt(m);
                         
                         // Compute a^m mod p
@@ -839,18 +879,18 @@
                         const check = (mBig * am) % pVal;
                         
                         if (b === check) {
-                            decrypted += this.alphabet[m - 1];
+                            decryptedBytes.push(m);
                             found = true;
                             break;
                         }
                     }
                     
                     if (!found) {
-                        decrypted += "?";
+                        decryptedBytes.push(0);
                     }
                 }
                 
-                return decrypted;
+                return decryptedBytes;
             }
         }
 
@@ -865,14 +905,12 @@
             document.getElementById('clear-encrypt').addEventListener('click', () => {
                 document.getElementById('plaintext').value = '';
                 document.getElementById('ciphertext').value = '';
-                document.getElementById('plaintext-bytes').textContent = '';
-                document.getElementById('ciphertext-bytes').textContent = '';
+                document.getElementById('plaintext-bytes').innerHTML = '';
             });
             document.getElementById('clear-decrypt').addEventListener('click', () => {
                 document.getElementById('input-ciphertext').value = '';
                 document.getElementById('decrypted').value = '';
-                document.getElementById('input-ciphertext-bytes').textContent = '';
-                document.getElementById('decrypted-bytes').textContent = '';
+                document.getElementById('decrypted-bytes').innerHTML = '';
             });
             document.getElementById('copy-ciphertext').addEventListener('click', () => {
                 copyToClipboard('ciphertext');
@@ -881,53 +919,44 @@
                 copyToClipboard('decrypted');
             });
             
+            document.getElementById('view-bytes').addEventListener('click', () => {
+                const input = document.getElementById('plaintext').value;
+                const bytes = parseInput(input);
+                document.getElementById('plaintext').value = bytesToHex(bytes);
+                updateByteDisplay();
+            });
+            
+            document.getElementById('view-text').addEventListener('click', () => {
+                const input = document.getElementById('plaintext').value;
+                const bytes = parseInput(input);
+                document.getElementById('plaintext').value = bytesToText(bytes);
+                updateByteDisplay();
+            });
+            
+            document.getElementById('load-file').addEventListener('click', () => {
+                document.getElementById('file-input').click();
+            });
+            
+            document.getElementById('file-input').addEventListener('change', handleFileSelect);
+            
             // Set up input validation
-            document.getElementById('alphabet').addEventListener('input', validateParameters);
             document.getElementById('prime').addEventListener('input', validateParameters);
             document.getElementById('generator').addEventListener('input', validateParameters);
-            
-            // Set up byte representation updates
-            document.getElementById('plaintext').addEventListener('input', updateByteRepresentations);
-            document.getElementById('input-ciphertext').addEventListener('input', updateByteRepresentations);
+            document.getElementById('plaintext').addEventListener('input', updateByteDisplay);
             
             // Initialize with default values
             validateParameters();
-            updateAlphabetMapping();
-            updateByteRepresentations();
+            updateByteDisplay();
             showStatus('info', 'Enter parameters or generate them, then encrypt/decrypt', 'encrypt-status');
         });
         
-        function updateByteRepresentations() {
-            // Update plaintext bytes
-            const plaintext = document.getElementById('plaintext').value;
-            document.getElementById('plaintext-bytes').textContent = textToBytes(plaintext);
-            
-            // Update ciphertext bytes
-            const ciphertext = document.getElementById('ciphertext').value;
-            document.getElementById('ciphertext-bytes').textContent = textToBytes(ciphertext);
-            
-            // Update input ciphertext bytes
-            const inputCiphertext = document.getElementById('input-ciphertext').value;
-            document.getElementById('input-ciphertext-bytes').textContent = textToBytes(inputCiphertext);
-            
-            // Update decrypted bytes
-            const decrypted = document.getElementById('decrypted').value;
-            document.getElementById('decrypted-bytes').textContent = textToBytes(decrypted);
+        function updateByteDisplay() {
+            const input = document.getElementById('plaintext').value;
+            const bytes = parseInput(input);
+            document.getElementById('plaintext-bytes').innerHTML = formatBytesForDisplay(bytes);
         }
         
         function validateParameters() {
-            // Validate alphabet
-            const alphabet = document.getElementById('alphabet').value;
-            const alphabetStatus = document.getElementById('alphabet-status');
-            if (alphabet.length > 0) {
-                cipher.setAlphabet(alphabet);
-                alphabetStatus.textContent = 'Valid (' + alphabet.length + ' characters)';
-                alphabetStatus.className = 'param-status param-valid';
-            } else {
-                alphabetStatus.textContent = 'Invalid (empty)';
-                alphabetStatus.className = 'param-status param-invalid';
-            }
-            
             // Validate prime
             const primeInput = document.getElementById('prime').value;
             const primeStatus = document.getElementById('prime-status');
@@ -954,28 +983,11 @@
                 generatorStatus.textContent = 'Invalid generator';
                 generatorStatus.className = 'param-status param-invalid';
             }
-            
-            updateAlphabetMapping();
-        }
-        
-        function updateAlphabetMapping() {
-            const alphabet = document.getElementById('alphabet').value;
-            let mapping = '';
-            
-            for (let i = 0; i < alphabet.length; i++) {
-                const char = alphabet[i];
-                const value = i + 1;
-                mapping += `${char}=${value}`;
-                if (i < alphabet.length - 1) mapping += ', ';
-                if (i > 0 && i % 10 === 0) mapping += '\n';
-            }
-            
-            document.getElementById('alphabet-mapping').textContent = mapping;
         }
         
         async function generatePrime() {
             try {
-                const bitLength = document.getElementById('prime-bitlength')?.value || '32';
+                const bitLength = '16'; // Using 16-bit primes for better performance with bytes
                 const generateBtn = document.getElementById('generate-prime');
                 
                 generateBtn.classList.add('loading');
@@ -1033,7 +1045,8 @@
         
         function encrypt() {
             try {
-                const plaintext = document.getElementById('plaintext').value;
+                const input = document.getElementById('plaintext').value;
+                const data = parseInput(input);
                 
                 if (!cipher.isReady()) {
                     showStatus('error', 'Please enter valid prime and generator values first', 'encrypt-status');
@@ -1041,12 +1054,11 @@
                 }
                 
                 const startTime = performance.now();
-                const encrypted = cipher.encrypt(plaintext);
+                const encrypted = cipher.encrypt(data);
                 const endTime = performance.now();
                 
                 document.getElementById('ciphertext').value = encrypted;
-                updateByteRepresentations();
-                showStatus('success', `Encrypted in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status');
+                showStatus('success', `Encrypted ${data.length} bytes in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status');
             } catch (error) {
                 showStatus('error', 'Error: ' + error.message, 'encrypt-status');
             }
@@ -1062,15 +1074,41 @@
                 }
                 
                 const startTime = performance.now();
-                const decrypted = cipher.decrypt(ciphertext);
+                const decryptedBytes = cipher.decrypt(ciphertext);
                 const endTime = performance.now();
                 
-                document.getElementById('decrypted').value = decrypted;
-                updateByteRepresentations();
-                showStatus('success', `Decrypted in ${(endTime - startTime).toFixed(2)}ms`, 'decrypt-status');
+                // Try to display as text, but fall back to hex if not valid text
+                try {
+                    const text = bytesToText(decryptedBytes);
+                    if (text.length > 0 && !/[^\x20-\x7E]/.test(text)) {
+                        document.getElementById('decrypted').value = text;
+                    } else {
+                        document.getElementById('decrypted').value = bytesToHex(decryptedBytes);
+                    }
+                } catch (e) {
+                    document.getElementById('decrypted').value = bytesToHex(decryptedBytes);
+                }
+                
+                document.getElementById('decrypted-bytes').innerHTML = formatBytesForDisplay(decryptedBytes);
+                showStatus('success', `Decrypted ${decryptedBytes.length} bytes in ${(endTime - startTime).toFixed(2)}ms`, 'decrypt-status');
             } catch (error) {
                 showStatus('error', 'Error: ' + error.message, 'decrypt-status');
             }
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                const bytes = new Uint8Array(arrayBuffer);
+                document.getElementById('plaintext').value = bytesToHex(bytes);
+                updateByteDisplay();
+                showStatus('success', `Loaded file: ${file.name} (${bytes.length} bytes)`, 'encrypt-status');
+            };
+            reader.readAsArrayBuffer(file);
         }
         
         function showStatus(type, message, elementId) {
@@ -1097,4 +1135,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
