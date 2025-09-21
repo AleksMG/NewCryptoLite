@@ -336,6 +336,55 @@
             margin: 15px 0;
             line-height: 1.8;
         }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted #3498db;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #2c3e50;
+            color: var(--light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .param-status {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .param-valid {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+        
+        .param-invalid {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--error);
+        }
     </style>
 </head>
 <body>
@@ -349,9 +398,9 @@
             <h2><span class="icon">⚙️</span> Cipher Configuration</h2>
             <div class="settings-grid">
                 <div class="form-group">
-                    <label for="prime">Prime Modulus (p)</label>
+                    <label for="prime">Prime Modulus (p) <span class="tooltip">ℹ️<span class="tooltiptext">Large prime number for modular arithmetic</span></span></label>
                     <div class="flex-row">
-                        <input type="text" id="prime" placeholder="Enter large prime number" value="32416190039">
+                        <input type="text" id="prime" placeholder="Enter prime number" value="32416190039">
                         <button id="generate-prime">Generate</button>
                     </div>
                     <div class="progress-bar">
@@ -361,7 +410,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="generator">Generator (g)</label>
+                    <label for="generator">Generator (g) <span class="tooltip">ℹ️<span class="tooltiptext">Primitive root modulo p</span></span></label>
                     <div class="flex-row">
                         <input type="text" id="generator" placeholder="Enter generator" value="5">
                         <button id="find-generator">Find</button>
@@ -373,8 +422,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="password">Encryption Password</label>
-                    <input type="password" id="password" value="secure_military_password_2024" placeholder="Password for mapping generation">
+                    <label for="password">Encryption Password <span class="tooltip">ℹ️<span class="tooltiptext">Password for key derivation and mapping generation</span></span></label>
+                    <input type="password" id="password" value="secure_military_password_2024">
                 </div>
             </div>
             
@@ -446,7 +495,7 @@
             <div class="mapping-visualization">
                 <div class="mapping-header">
                     <span>Byte → Mapped Value</span>
-                    <span>Value → Byte</span>
+                    <span>Mapped Value → Byte</span>
                 </div>
                 <div id="mapping-display"></div>
             </div>
@@ -623,6 +672,7 @@
                 const ciphertext = [];
                 
                 for (const byte of bytes) {
+                    // Get mapped value from byte mapping
                     const m = this.byteMapping.get(byte);
                     const k = this.getRandomK();
                     
@@ -849,4 +899,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
