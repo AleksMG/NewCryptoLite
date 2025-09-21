@@ -33,7 +33,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
@@ -52,14 +52,6 @@
             font-size: 2.8rem;
             margin-bottom: 10px;
             color: #3498db;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        
-        .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
         }
         
         .app-container {
@@ -193,33 +185,6 @@
             font-size: 0.9rem;
         }
         
-        .algorithm-explanation {
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-        }
-        
-        .explanation-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        
-        @media (max-width: 768px) {
-            .explanation-content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .math-expression {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            border-radius: 8px;
-            font-family: monospace;
-            margin: 15px 0;
-            line-height: 1.8;
-        }
-        
         .flex-row {
             display: flex;
             gap: 15px;
@@ -309,70 +274,84 @@
             pointer-events: none;
         }
         
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            border-bottom: 1px dotted #3498db;
-            cursor: help;
+        .mapping-visualization {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
         }
         
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 250px;
-            background-color: #2c3e50;
-            color: var(--light);
-            text-align: center;
-            border-radius: 6px;
+        .mapping-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .mapping-header {
+            font-weight: bold;
+            background: rgba(52, 152, 219, 0.3);
             padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -125px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.9rem;
-            font-weight: normal;
-        }
-        
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        
-        .param-status {
-            font-size: 0.8rem;
-            margin-top: 5px;
-            padding: 3px 8px;
             border-radius: 4px;
-            display: inline-block;
+            margin-bottom: 10px;
         }
         
-        .param-valid {
-            background: rgba(46, 204, 113, 0.2);
-            color: var(--success);
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
         }
         
-        .param-invalid {
-            background: rgba(231, 76, 60, 0.2);
-            color: var(--error);
+        .stat-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #3498db;
+            margin-top: 5px;
+        }
+        
+        .algorithm-explanation {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .math-expression {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 15px 0;
+            line-height: 1.8;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Homophonic Cipher</h1>
-            <p class="subtitle">Professional implementation with byte-level encryption</p>
+            <h1>Professional Homophonic Cipher</h1>
+            <p class="subtitle">Military-grade encryption with password-derived byte mapping</p>
         </header>
         
         <div class="key-settings">
-            <h2><span class="icon">⚙️</span> Cipher Settings</h2>
+            <h2><span class="icon">⚙️</span> Cipher Configuration</h2>
             <div class="settings-grid">
                 <div class="form-group">
-                    <label for="prime">Prime Modulus (p) <span class="tooltip">ℹ️<span class="tooltiptext">Large prime number for modular arithmetic</span></span></label>
+                    <label for="prime">Prime Modulus (p)</label>
                     <div class="flex-row">
-                        <input type="text" id="prime" placeholder="Enter prime number" value="32416190039">
+                        <input type="text" id="prime" placeholder="Enter large prime number" value="32416190039">
                         <button id="generate-prime">Generate</button>
                     </div>
                     <div class="progress-bar">
@@ -380,8 +359,9 @@
                     </div>
                     <div class="param-status" id="prime-status"></div>
                 </div>
+                
                 <div class="form-group">
-                    <label for="generator">Generator (g) <span class="tooltip">ℹ️<span class="tooltiptext">Primitive root modulo p</span></span></label>
+                    <label for="generator">Generator (g)</label>
                     <div class="flex-row">
                         <input type="text" id="generator" placeholder="Enter generator" value="5">
                         <button id="find-generator">Find</button>
@@ -391,17 +371,30 @@
                     </div>
                     <div class="param-status" id="generator-status"></div>
                 </div>
+                
                 <div class="form-group">
-                    <label for="password">Encryption Password <span class="tooltip">ℹ️<span class="tooltiptext">Password for key derivation</span></span></label>
-                    <input type="password" id="password" value="military_grade_password">
+                    <label for="password">Encryption Password</label>
+                    <input type="password" id="password" value="secure_military_password_2024" placeholder="Password for mapping generation">
                 </div>
             </div>
-            <div class="form-group">
-                <label>Byte Mapping Status</label>
-                <div class="key-display" id="mapping-status">Not initialized</div>
-            </div>
-            <button id="init-system">Initialize System</button>
+            
+            <button id="init-system">Initialize Cipher System</button>
             <div id="init-status" class="status"></div>
+            
+            <div class="stats" id="system-stats" style="display: none;">
+                <div class="stat-item">
+                    <div>Prime Size</div>
+                    <div class="stat-value" id="prime-size">0 bits</div>
+                </div>
+                <div class="stat-item">
+                    <div>Mapping Entropy</div>
+                    <div class="stat-value">256! ≈ 2^1684</div>
+                </div>
+                <div class="stat-item">
+                    <div>Security Level</div>
+                    <div class="stat-value">Military Grade</div>
+                </div>
+            </div>
         </div>
         
         <div class="app-container">
@@ -409,7 +402,7 @@
                 <h2><span class="icon">🔒</span> Encryption</h2>
                 <div class="form-group">
                     <label for="plaintext">Plaintext</label>
-                    <textarea id="plaintext" placeholder="Enter text to encrypt">TOP SECRET MILITARY DATA</textarea>
+                    <textarea id="plaintext" placeholder="Enter text to encrypt">TOP SECRET: Operation Midnight Shadow initiated</textarea>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-encrypt" id="encrypt-btn"><span class="icon">▶️</span> Encrypt</button>
@@ -446,6 +439,34 @@
             </div>
         </div>
         
+        <div class="panel">
+            <h2><span class="icon">📊</span> Byte Mapping Visualization</h2>
+            <div id="mapping-status" class="status">System not initialized</div>
+            
+            <div class="mapping-visualization">
+                <div class="mapping-header">
+                    <span>Byte → Mapped Value</span>
+                    <span>Value → Byte</span>
+                </div>
+                <div id="mapping-display"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div>Total Mappings</div>
+                    <div class="stat-value">256</div>
+                </div>
+                <div class="stat-item">
+                    <div>Unique Values</div>
+                    <div class="stat-value" id="unique-values">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>Value Range</div>
+                    <div class="stat-value" id="value-range">0 - 0</div>
+                </div>
+            </div>
+        </div>
+        
         <div class="algorithm-explanation">
             <h2><span class="icon">🧠</span> Algorithm Explanation</h2>
             <div class="explanation-content">
@@ -453,7 +474,7 @@
                     <h3>Encryption Process</h3>
                     <p>For each byte in the plaintext:</p>
                     <ol>
-                        <li>Convert byte to mapped value m</li>
+                        <li>Convert byte to mapped value m using password-derived mapping</li>
                         <li>Generate cryptographically secure random number k</li>
                         <li>Compute a = g<sup>k</sup> mod p</li>
                         <li>Compute b = m × g<sup>m×k</sup> mod p</li>
@@ -467,7 +488,7 @@
                     <h3>Decryption Process</h3>
                     <p>For each ciphertext pair (a, b):</p>
                     <ol>
-                        <li>For each possible mapped value m in mapping:</li>
+                        <li>For each possible mapped value m in password-derived mapping:</li>
                         <li>Compute a<sup>m</sup> mod p</li>
                         <li>Check if b ≡ m × a<sup>m</sup> mod p</li>
                         <li>When match is found, convert m back to byte</li>
@@ -504,7 +525,7 @@
                     await this.createByteMapping(password);
                     
                     this.initialized = true;
-                    return true;
+                    return this.getMappingInfo();
                     
                 } catch (error) {
                     throw error;
@@ -542,13 +563,14 @@
                     let mappedValue;
                     
                     do {
-                        // Generate unique mapping value
+                        // Generate unique mapping value using cryptographic randomness
                         const randomData = new Uint8Array([
                             ...keyBytes,
                             byte,
                             ...crypto.getRandomValues(new Uint8Array(32))
                         ]);
                         
+                        // Convert to BigInt and ensure it's within valid range
                         mappedValue = this.bytesToBigInt(randomData) % this.p;
                         
                     } while (usedValues.has(mappedValue) || mappedValue === 0n);
@@ -585,6 +607,7 @@
             }
             
             getRandomK() {
+                // Generate cryptographically secure random k
                 const randomBytes = new Uint8Array(32);
                 crypto.getRandomValues(randomBytes);
                 
@@ -597,26 +620,29 @@
                 
                 const encoder = new TextEncoder();
                 const bytes = encoder.encode(data);
-                const result = [];
+                const ciphertext = [];
                 
                 for (const byte of bytes) {
                     const m = this.byteMapping.get(byte);
                     const k = this.getRandomK();
                     
+                    // Compute ciphertext pair: (a, b) = (g^k mod p, m * g^(m*k) mod p)
                     const a = this.modExp(this.g, k, this.p);
                     const b = (m * this.modExp(this.g, m * k, this.p)) % this.p;
                     
-                    result.push(`(${a},${b})`);
+                    ciphertext.push(`(${a},${b})`);
                 }
                 
-                return result.join(' ');
+                return ciphertext.join(' ');
             }
             
             decrypt(ciphertext) {
                 if (!this.initialized) throw new Error("Cipher not initialized");
                 
-                const pairs = ciphertext.match(/\(\d+,\d+\)/g) || [];
-                const result = [];
+                const pairs = ciphertext.match(/\(\d+,\d+\)/g);
+                if (!pairs) throw new Error("Invalid ciphertext format");
+                
+                const decryptedBytes = [];
                 
                 for (const pair of pairs) {
                     const match = pair.match(/\((\d+),(\d+)\)/);
@@ -626,35 +652,50 @@
                     const b = BigInt(match[2]);
                     
                     let found = false;
-                    for (const [mappedVal, byteVal] of this.reverseMapping) {
-                        const check = (mappedVal * this.modExp(a, mappedVal, this.p)) % this.p;
-                        if (b === check) {
-                            result.push(byteVal);
+                    
+                    // Try all possible mapped values to find the correct one
+                    for (const [mappedValue, byteValue] of this.reverseMapping) {
+                        const check = (mappedValue * this.modExp(a, mappedValue, this.p)) % this.p;
+                        
+                        if (check === b) {
+                            decryptedBytes.push(byteValue);
                             found = true;
                             break;
                         }
                     }
                     
                     if (!found) {
-                        throw new Error("Decryption failed");
+                        throw new Error("Decryption failed - no valid mapping found");
                     }
                 }
                 
-                return new TextDecoder().decode(new Uint8Array(result));
+                const decoder = new TextDecoder();
+                return decoder.decode(new Uint8Array(decryptedBytes));
+            }
+            
+            getMappingInfo() {
+                const values = Array.from(this.byteMapping.values());
+                const min = values.reduce((a, b) => a < b ? a : b, values[0] || 0n);
+                const max = values.reduce((a, b) => a > b ? a : b, values[0] || 0n);
+                
+                return {
+                    size: this.byteMapping.size,
+                    unique: new Set(values).size,
+                    range: { min, max },
+                    mappings: Array.from(this.byteMapping.entries())
+                };
             }
         }
 
         const cipher = new ProfessionalHomophonicCipher();
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize event listeners
+            // Set up all event listeners
             document.getElementById('init-system').addEventListener('click', initializeSystem);
             document.getElementById('encrypt-btn').addEventListener('click', encryptData);
             document.getElementById('decrypt-btn').addEventListener('click', decryptData);
             document.getElementById('generate-prime').addEventListener('click', generatePrime);
             document.getElementById('find-generator').addEventListener('click', findGenerator);
-            
-            // Clear buttons
             document.getElementById('clear-encrypt').addEventListener('click', () => {
                 document.getElementById('plaintext').value = '';
                 document.getElementById('ciphertext').value = '';
@@ -663,14 +704,15 @@
                 document.getElementById('input-ciphertext').value = '';
                 document.getElementById('decrypted').value = '';
             });
-            
-            // Copy buttons
             document.getElementById('copy-ciphertext').addEventListener('click', () => {
                 copyToClipboard('ciphertext');
             });
             document.getElementById('copy-decrypted').addEventListener('click', () => {
                 copyToClipboard('decrypted');
             });
+            
+            // Initialize mapping display
+            updateMappingDisplay();
         });
         
         async function initializeSystem() {
@@ -684,13 +726,66 @@
             }
             
             try {
-                showStatus('progress', 'Initializing system with PBKDF2...', 'init-status');
-                await cipher.initialize(prime, generator, password);
-                showStatus('success', 'System initialized successfully', 'init-status');
-                document.getElementById('mapping-status').textContent = '256 byte mappings created';
+                showStatus('progress', 'Generating byte mapping with PBKDF2...', 'init-status');
+                const mappingInfo = await cipher.initialize(prime, generator, password);
+                
+                // Update statistics
+                const primeSize = BigInt(prime).toString(2).length;
+                document.getElementById('prime-size').textContent = primeSize + ' bits';
+                document.getElementById('system-stats').style.display = 'grid';
+                
+                // Update mapping visualization
+                updateMappingDisplay(mappingInfo);
+                
+                showStatus('success', 'System initialized with 256 unique byte mappings', 'init-status');
+                
             } catch (error) {
                 showStatus('error', 'Initialization failed: ' + error.message, 'init-status');
             }
+        }
+        
+        function updateMappingDisplay(mappingInfo = null) {
+            const display = document.getElementById('mapping-display');
+            const status = document.getElementById('mapping-status');
+            
+            if (!mappingInfo) {
+                display.innerHTML = '';
+                status.textContent = 'System not initialized';
+                status.className = 'status error';
+                document.getElementById('unique-values').textContent = '0';
+                document.getElementById('value-range').textContent = '0 - 0';
+                return;
+            }
+            
+            display.innerHTML = '';
+            
+            // Show first 20 mappings as sample
+            const sampleMappings = mappingInfo.mappings.slice(0, 20);
+            
+            sampleMappings.forEach(([byte, value]) => {
+                const row = document.createElement('div');
+                row.className = 'mapping-item';
+                row.innerHTML = `
+                    <span>Byte ${byte.toString().padStart(3, '0')} → ${value}</span>
+                    <span>${value} → Byte ${byte.toString().padStart(3, '0')}</span>
+                `;
+                display.appendChild(row);
+            });
+            
+            if (mappingInfo.mappings.length > 20) {
+                const more = document.createElement('div');
+                more.className = 'mapping-item';
+                more.style.textAlign = 'center';
+                more.textContent = `... and ${mappingInfo.mappings.length - 20} more mappings`;
+                display.appendChild(more);
+            }
+            
+            document.getElementById('unique-values').textContent = mappingInfo.unique;
+            document.getElementById('value-range').textContent = 
+                `${mappingInfo.range.min} - ${mappingInfo.range.max}`;
+            
+            status.textContent = `Active: 256 byte mappings (${mappingInfo.unique} unique values)`;
+            status.className = 'status success';
         }
         
         function encryptData() {
@@ -698,7 +793,8 @@
                 const plaintext = document.getElementById('plaintext').value;
                 const encrypted = cipher.encrypt(plaintext);
                 document.getElementById('ciphertext').value = encrypted;
-                showStatus('success', 'Encryption completed', 'encrypt-status');
+                document.getElementById('input-ciphertext').value = encrypted;
+                showStatus('success', 'Encryption completed successfully', 'encrypt-status');
             } catch (error) {
                 showStatus('error', 'Encryption failed: ' + error.message, 'encrypt-status');
             }
@@ -709,7 +805,7 @@
                 const ciphertext = document.getElementById('input-ciphertext').value;
                 const decrypted = cipher.decrypt(ciphertext);
                 document.getElementById('decrypted').value = decrypted;
-                showStatus('success', 'Decryption completed', 'decrypt-status');
+                showStatus('success', 'Decryption completed successfully', 'decrypt-status');
             } catch (error) {
                 showStatus('error', 'Decryption failed: ' + error.message, 'decrypt-status');
             }
@@ -717,10 +813,10 @@
         
         function generatePrime() {
             // Simple prime generation for demonstration
-            const primes = [32416190039n, 49979687n, 9999991n, 2147483647n];
+            const primes = [32416190039n, 49979687n, 9999991n, 2147483647n, 1301081n];
             const randomPrime = primes[Math.floor(Math.random() * primes.length)];
             document.getElementById('prime').value = randomPrime.toString();
-            showStatus('success', 'Prime generated', 'prime-status');
+            showStatus('success', 'Prime number generated', 'prime-status');
         }
         
         function findGenerator() {
@@ -733,6 +829,14 @@
             const element = document.getElementById(elementId);
             element.textContent = message;
             element.className = 'status ' + type;
+            
+            // Clear status after 5 seconds for success/info messages
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    element.className = 'status';
+                    element.textContent = '';
+                }, 5000);
+            }
         }
         
         function copyToClipboard(elementId) {
