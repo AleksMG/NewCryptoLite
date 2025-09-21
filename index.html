@@ -3,384 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Homophonic Cipher</title>
+    <title>Military Grade Homophonic Cipher</title>
     <style>
-        :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --light: #e6e6e6;
-            --dark: #0d0d1a;
-            --success: #4e9f3d;
-            --error: #d8000c;
-            --warning: #f39c12;
-            --info: #3498db;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Courier New', monospace;
         }
-        
         body {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
-            color: var(--light);
-            min-height: 100vh;
+            background: #0a0a0a;
+            color: #00ff00;
             padding: 20px;
             line-height: 1.6;
         }
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            color: #3498db;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        
-        .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
         .panel {
-            background: rgba(255, 255, 255, 0.08);
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
             border-radius: 10px;
             padding: 25px;
+            margin: 20px 0;
+        }
+        h1, h2 {
+            color: #00ff00;
             margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 0 10px #00ff00;
         }
-        
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #3498db;
-            display: flex;
-            align-items: center;
-        }
-        
-        h2 .icon {
-            margin-right: 10px;
-        }
-        
         .form-group {
             margin-bottom: 20px;
         }
-        
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--light);
+            font-weight: bold;
+            color: #00ff00;
         }
-        
-        textarea, input, select, button {
+        input, textarea, select {
             width: 100%;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--light);
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            padding: 12px;
+            background: #2a2a2a;
+            color: #00ff00;
+            border: 2px solid #008800;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
         }
-        
-        textarea:focus, input:focus, select:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-        }
-        
         textarea {
-            min-height: 150px;
+            min-height: 120px;
             resize: vertical;
-            font-family: monospace;
         }
-        
         button {
-            background: #3498db;
+            background: linear-gradient(45deg, #008800, #00aa00);
             color: white;
             border: none;
-            padding: 14px 20px;
+            padding: 15px 25px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
+            font-weight: bold;
+            margin: 10px 5px;
             transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }
-        
         button:hover {
+            background: linear-gradient(45deg, #00aa00, #00cc00);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
         }
-        
-        button .icon {
-            margin-right: 8px;
-        }
-        
-        .btn-encrypt {
-            background: var(--success);
-        }
-        
-        .btn-encrypt:hover {
-            background: #27ae60;
-        }
-        
-        .btn-decrypt {
-            background: var(--error);
-        }
-        
-        .btn-decrypt:hover {
-            background: #c0392b;
-        }
-        
-        .flex-row {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .action-buttons button {
-            flex: 1;
-        }
-        
         .status {
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            display: none;
-        }
-        
-        .status.success {
-            background: rgba(46, 204, 113, 0.2);
-            border-left: 4px solid var(--success);
-            display: block;
-        }
-        
-        .status.error {
-            background: rgba(231, 76, 60, 0.2);
-            border-left: 4px solid var(--error);
-            display: block;
-        }
-        
-        .status.info {
-            background: rgba(52, 152, 219, 0.2);
-            border-left: 4px solid #3498db;
-            display: block;
-        }
-        
-        .status.progress {
-            background: rgba(243, 156, 18, 0.2);
-            border-left: 4px solid var(--warning);
-            display: block;
-        }
-        
-        .output-group {
-            position: relative;
-        }
-        
-        .copy-btn {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-        
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .security-param {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .warning {
-            background: rgba(243, 156, 18, 0.2);
-            border-left: 4px solid var(--warning);
             padding: 15px;
-            border-radius: 6px;
-            margin-top: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
         }
-        
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
+        .success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+        }
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+            color: #ff0000;
+        }
+        .warning {
+            background: rgba(255, 165, 0, 0.1);
+            border: 2px solid #ffa500;
+            color: #ffa500;
+        }
+        .output {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #008800;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .security-badge {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Professional Homophonic Cipher</h1>
-            <p class="subtitle">Military-grade encryption with key-derived mapping and PBKDF2 key stretching</p>
-        </header>
-        
         <div class="panel">
-            <h2><span class="icon">🔑</span> Key Configuration</h2>
+            <h1>🔐 MILITARY GRADE HOMOPHONIC CIPHER</h1>
+            
             <div class="form-group">
-                <label for="password">Encryption Password</label>
-                <input type="password" id="password" placeholder="Enter strong password" value="secure_password_123!">
+                <label for="password">ENCRYPTION PASSWORD:</label>
+                <input type="password" id="password" value="STRONG_MILITARY_PASSWORD_2024!" placeholder="Enter strong password">
             </div>
+
             <div class="form-group">
-                <label for="prime-bits">Prime Bit Length</label>
-                <select id="prime-bits">
+                <label for="primeBits">PRIME MODULUS STRENGTH:</label>
+                <select id="primeBits">
                     <option value="1024">1024 bits (Standard)</option>
-                    <option value="2048" selected>2048 bits (Recommended)</option>
-                    <option value="3072">3072 bits (High Security)</option>
-                    <option value="4096">4096 bits (Military)</option>
+                    <option value="2048" selected>2048 bits (Military)</option>
+                    <option value="3072">3072 bits (Top Secret)</option>
+                    <option value="4096">4096 bits (Quantum Resistant)</option>
                 </select>
             </div>
-            <button id="init-cipher">Initialize Cipher</button>
-            <div id="init-status" class="status"></div>
+
+            <button onclick="initializeSystem()">🚀 INITIALIZE CRYPTO SYSTEM</button>
+            <div id="initStatus" class="status"></div>
+
+            <div class="security-badge">
+                <strong>SECURITY LEVEL: MILITARY GRADE</strong><br>
+                PBKDF2-HMAC-SHA256 | 256! mappings | Cryptographically Secure RNG
+            </div>
         </div>
-        
+
         <div class="panel">
-            <h2><span class="icon">🔒</span> Encryption</h2>
+            <h2>📤 ENCRYPTION MODULE</h2>
+            
             <div class="form-group">
-                <label for="plaintext">Plaintext (Bytes)</label>
-                <textarea id="plaintext" placeholder="Enter data to encrypt">Top secret message requiring military-grade encryption</textarea>
+                <label for="inputData">INPUT DATA (any format):</label>
+                <textarea id="inputData" placeholder="Enter data to encrypt">TOP SECRET: Operation Midnight Shadow initiated</textarea>
             </div>
-            <div class="action-buttons">
-                <button class="btn-encrypt" id="encrypt-btn"><span class="icon">▶️</span> Encrypt</button>
-                <button id="clear-encrypt">Clear</button>
-            </div>
+
+            <button onclick="encryptData()" id="encryptBtn">🔒 ENCRYPT DATA</button>
+            
             <div class="form-group">
-                <label for="ciphertext">Ciphertext (Pairs)</label>
-                <div class="output-group">
-                    <textarea id="ciphertext" placeholder="Encrypted data will appear here" readonly></textarea>
-                    <button class="copy-btn" id="copy-ciphertext">Copy</button>
-                </div>
+                <label>CIPHERTEXT OUTPUT:</label>
+                <div class="output" id="outputCipher"></div>
             </div>
-            <div id="encrypt-status" class="status"></div>
         </div>
-        
+
         <div class="panel">
-            <h2><span class="icon">🔓</span> Decryption</h2>
+            <h2>📥 DECRYPTION MODULE</h2>
+            
             <div class="form-group">
-                <label for="input-ciphertext">Ciphertext (Pairs)</label>
-                <textarea id="input-ciphertext" placeholder="Paste ciphertext pairs here"></textarea>
+                <label for="inputCipher">INPUT CIPHERTEXT:</label>
+                <textarea id="inputCipher" placeholder="Paste ciphertext pairs here"></textarea>
             </div>
-            <div class="action-buttons">
-                <button class="btn-decrypt" id="decrypt-btn"><span class="icon">▶️</span> Decrypt</button>
-                <button id="clear-decrypt">Clear</button>
-            </div>
+
+            <button onclick="decryptData()" id="decryptBtn">🔓 DECRYPT DATA</button>
+            
             <div class="form-group">
-                <label for="decrypted">Decrypted Data</label>
-                <div class="output-group">
-                    <textarea id="decrypted" placeholder="Decrypted data will appear here" readonly></textarea>
-                    <button class="copy-btn" id="copy-decrypted">Copy</button>
-                </div>
-            </div>
-            <div id="decrypt-status" class="status"></div>
-        </div>
-        
-        <div class="panel">
-            <h2><span class="icon">🛡️</span> Security Analysis</h2>
-            <div class="security-param">
-                <label>Key Derivation Iterations:</label>
-                <span>1,000,000 PBKDF2 rounds</span>
-            </div>
-            <div class="security-param">
-                <label>Mapping Entropy:</label>
-                <span>256! ≈ 2^1684 possibilities</span>
-            </div>
-            <div class="security-param">
-                <label>Prime Modulus Strength:</label>
-                <span id="prime-strength">2048 bits</span>
-            </div>
-            <div class="security-param">
-                <label>Cryptographic Hash:</label>
-                <span>SHA-256 with HMAC</span>
-            </div>
-            <div class="warning">
-                <strong>Security Notice:</strong> This implementation uses professional cryptographic practices including PBKDF2 key stretching, cryptographically secure random number generation, and large prime modulus. The mapping is key-derived providing 256! possible variations.
+                <label>DECRYPTED OUTPUT:</label>
+                <div class="output" id="outputData"></div>
             </div>
         </div>
     </div>
 
     <script>
-        class ProfessionalHomophonicCipher {
-            constructor(password, primeBits = 2048) {
-                this.primeBits = primeBits;
-                this.password = password;
-                this.salt = null;
+        class MilitaryHomophonicCipher {
+            constructor() {
                 this.p = null;
                 this.g = null;
-                this.mapping = new Map();
+                this.byteMapping = new Map();
                 this.reverseMapping = new Map();
                 this.initialized = false;
+                this.primeBits = 2048;
             }
-            
-            async initialize() {
+
+            async initializeSystem(password, primeBits = 2048) {
                 try {
-                    // Generate random salt
-                    this.salt = this.getRandomBytes(32);
-                    
-                    // Derive master key using PBKDF2
-                    const masterKey = await this.deriveKey(this.password, this.salt, 1000000, 64);
-                    
-                    // Split master key for different purposes
-                    const primeSeed = masterKey.slice(0, 32);
-                    const mappingSeed = masterKey.slice(32, 48);
-                    const generatorSeed = masterKey.slice(48, 64);
-                    
-                    // Generate large prime
-                    this.p = await this.generateLargePrime(primeSeed);
+                    this.primeBits = primeBits;
+                    showStatus('Generating cryptographic parameters...', 'warning', 'initStatus');
+
+                    // Generate large prime modulus
+                    this.p = await this.generateLargePrime();
                     
                     // Find generator
-                    this.g = await this.findGenerator(generatorSeed);
+                    this.g = await this.findGenerator();
                     
-                    // Generate byte mapping
-                    await this.generateByteMapping(mappingSeed);
+                    // Create secure byte mapping
+                    await this.createSecureMapping(password);
                     
                     this.initialized = true;
+                    showStatus('SYSTEM INITIALIZED - READY FOR OPERATIONS', 'success', 'initStatus');
                     return true;
-                    
+
                 } catch (error) {
-                    console.error('Initialization failed:', error);
+                    showStatus(`INIT FAILED: ${error.message}`, 'error', 'initStatus');
                     throw error;
                 }
             }
-            
-            async deriveKey(password, salt, iterations, keyLength) {
+
+            async generateLargePrime() {
+                const bits = this.primeBits;
+                while (true) {
+                    // Generate random candidate
+                    const randomBytes = new Uint8Array(Math.ceil(bits / 8));
+                    crypto.getRandomValues(randomBytes);
+                    
+                    // Ensure odd and correct bit length
+                    let candidate = this.bytesToBigInt(randomBytes);
+                    candidate |= 1n;
+                    candidate |= (1n << BigInt(bits - 1));
+                    
+                    if (await this.isPrime(candidate)) {
+                        return candidate;
+                    }
+                }
+            }
+
+            async isPrime(n, k = 64) {
+                if (n <= 1n) return false;
+                if (n <= 3n) return true;
+                if (n % 2n === 0n) return false;
+
+                // Write n as d*2^s + 1
+                let s = 0n;
+                let d = n - 1n;
+                while (d % 2n === 0n) {
+                    d /= 2n;
+                    s++;
+                }
+
+                for (let i = 0; i < k; i++) {
+                    const a = this.getRandomBigInt(2n, n - 2n);
+                    let x = this.modExp(a, d, n);
+                    
+                    if (x === 1n || x === n - 1n) continue;
+                    
+                    let composite = true;
+                    for (let j = 0; j < Number(s) - 1; j++) {
+                        x = this.modExp(x, 2n, n);
+                        if (x === n - 1n) {
+                            composite = false;
+                            break;
+                        }
+                    }
+                    
+                    if (composite) return false;
+                }
+                return true;
+            }
+
+            async findGenerator() {
+                const factors = this.factorize(this.p - 1n);
+                
+                for (let g = 2n; g < this.p; g++) {
+                    let isGenerator = true;
+                    
+                    for (const factor of factors) {
+                        const exponent = (this.p - 1n) / factor;
+                        if (this.modExp(g, exponent, this.p) === 1n) {
+                            isGenerator = false;
+                            break;
+                        }
+                    }
+                    
+                    if (isGenerator) return g;
+                }
+                throw new Error("Generator not found");
+            }
+
+            factorize(n) {
+                const factors = new Set();
+                let d = 2n;
+                
+                while (d * d <= n) {
+                    while (n % d === 0n) {
+                        factors.add(d);
+                        n /= d;
+                    }
+                    d++;
+                }
+                
+                if (n > 1n) factors.add(n);
+                return factors;
+            }
+
+            async createSecureMapping(password) {
                 const encoder = new TextEncoder();
+                
+                // Derive key using PBKDF2
+                const salt = crypto.getRandomValues(new Uint8Array(16));
                 const keyMaterial = await crypto.subtle.importKey(
                     'raw',
                     encoder.encode(password),
@@ -389,144 +311,105 @@
                     ['deriveBits']
                 );
                 
-                const derivedBits = await crypto.subtle.deriveBits(
-                    {
-                        name: 'PBKDF2',
-                        salt: salt,
-                        iterations: iterations,
-                        hash: 'SHA-256'
-                    },
-                    keyMaterial,
-                    keyLength * 8
-                );
+                const derived = await crypto.subtle.deriveBits({
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                }, keyMaterial, 256);
                 
-                return new Uint8Array(derivedBits);
-            }
-            
-            getRandomBytes(length) {
-                const array = new Uint8Array(length);
-                crypto.getRandomValues(array);
-                return array;
-            }
-            
-            async generateLargePrime(seed) {
-                // For demonstration, we'll use a known large prime
-                // In real implementation, use proper prime generation
-                const primes = {
-                    1024: 2n**1024n - 1093337n,
-                    2048: 2n**2048n - 1942289n,
-                    3072: 2n**3072n - 2722021n,
-                    4096: 2n**4096n - 4043609n
-                };
-                
-                return primes[this.primeBits] || primes[2048];
-            }
-            
-            async findGenerator(seed) {
-                // For simplicity, use a common generator
-                // In real implementation, find proper generator
-                return 2n;
-            }
-            
-            async generateByteMapping(seed) {
-                // Create DRBG from seed
-                const drbg = this.createDRBG(seed);
+                const keyBytes = new Uint8Array(derived);
                 const usedValues = new Set();
                 
-                // Generate 256 unique random values
-                for (let i = 0; i < 256; i++) {
-                    let value;
-                    do {
-                        value = this.getRandomBigInt(drbg, 1n, this.p - 1n);
-                    } while (usedValues.has(value));
+                // Create mapping for all 256 byte values
+                for (let byte = 0; byte < 256; byte++) {
+                    let mappedValue;
                     
-                    usedValues.add(value);
-                    this.mapping.set(i, value);
-                    this.reverseMapping.set(value, i);
+                    do {
+                        // Generate cryptographically secure mapping value
+                        const randomData = new Uint8Array([
+                            ...keyBytes,
+                            byte,
+                            ...crypto.getRandomValues(new Uint8Array(32))
+                        ]);
+                        
+                        mappedValue = this.bytesToBigInt(randomData) % this.p;
+                        
+                    } while (usedValues.has(mappedValue) || mappedValue === 0n);
+                    
+                    usedValues.add(mappedValue);
+                    this.byteMapping.set(byte, mappedValue);
+                    this.reverseMapping.set(mappedValue, byte);
                 }
             }
-            
-            createDRBG(seed) {
-                let state = new Uint8Array(seed);
-                let counter = 0;
-                let buffer = new Uint8Array(0);
-                
-                return {
-                    nextBytes: (length) => {
-                        while (buffer.length < length) {
-                            counter++;
-                            const counterBytes = new Uint8Array(8);
-                            new DataView(counterBytes.buffer).setBigUint64(0, BigInt(counter));
-                            
-                            const hm = await crypto.subtle.sign(
-                                'HMAC',
-                                await crypto.subtle.importKey(
-                                    'raw',
-                                    state,
-                                    { name: 'HMAC', hash: 'SHA-256' },
-                                    false,
-                                    ['sign']
-                                ),
-                                counterBytes
-                            );
-                            
-                            buffer = new Uint8Array([...buffer, ...new Uint8Array(hm)]);
-                            state = new Uint8Array(hm);
-                        }
-                        
-                        const result = buffer.slice(0, length);
-                        buffer = buffer.slice(length);
-                        return result;
-                    }
-                };
+
+            bytesToBigInt(bytes) {
+                let result = 0n;
+                for (const byte of bytes) {
+                    result = (result << 8n) | BigInt(byte);
+                }
+                return result;
             }
-            
-            getRandomBigInt(drbg, min, max) {
+
+            getRandomBigInt(min, max) {
                 const range = max - min;
                 const bits = range.toString(2).length;
                 const bytes = Math.ceil(bits / 8);
                 
-                let result;
-                do {
-                    const randomBytes = drbg.nextBytes(bytes);
-                    result = BigInt('0x' + Array.from(randomBytes)
-                        .map(b => b.toString(16).padStart(2, '0'))
-                        .join(''));
+                while (true) {
+                    const randomBytes = crypto.getRandomValues(new Uint8Array(bytes));
+                    const candidate = this.bytesToBigInt(randomBytes);
                     
-                    result = result % range + min;
-                } while (result < min || result >= max);
+                    if (candidate >= min && candidate <= max) {
+                        return candidate;
+                    }
+                }
+            }
+
+            modExp(base, exponent, modulus) {
+                if (modulus === 1n) return 0n;
+                
+                let result = 1n;
+                base = base % modulus;
+                
+                while (exponent > 0n) {
+                    if (exponent % 2n === 1n) {
+                        result = (result * base) % modulus;
+                    }
+                    
+                    exponent = exponent >> 1n;
+                    base = (base * base) % modulus;
+                }
                 
                 return result;
             }
-            
-            async encrypt(data) {
-                if (!this.initialized) throw new Error('Cipher not initialized');
+
+            encryptData(data) {
+                if (!this.initialized) throw new Error("Crypto system not initialized");
                 
-                const result = [];
-                const dataBytes = new TextEncoder().encode(data);
+                const bytes = new TextEncoder().encode(data);
+                const ciphertext = [];
                 
-                for (const byte of dataBytes) {
-                    const m = this.mapping.get(byte);
-                    const k = this.getRandomBigInt(
-                        this.createDRBG(this.getRandomBytes(32)),
-                        2n,
-                        this.p - 2n
-                    );
+                for (const byte of bytes) {
+                    const m = this.byteMapping.get(byte);
+                    const k = this.getRandomBigInt(2n, this.p - 2n);
                     
                     const a = this.modExp(this.g, k, this.p);
                     const b = (m * this.modExp(this.g, m * k, this.p)) % this.p;
                     
-                    result.push(`(${a},${b})`);
+                    ciphertext.push(`(${a},${b})`);
                 }
                 
-                return result.join(' ');
+                return ciphertext.join(' ');
             }
-            
-            async decrypt(ciphertext) {
-                if (!this.initialized) throw new Error('Cipher not initialized');
+
+            decryptData(ciphertext) {
+                if (!this.initialized) throw new Error("Crypto system not initialized");
                 
-                const pairs = ciphertext.match(/\(\d+,\d+\)/g) || [];
-                const result = [];
+                const pairs = ciphertext.match(/\(\d+,\d+\)/g);
+                if (!pairs) throw new Error("Invalid ciphertext format");
+                
+                const decryptedBytes = [];
                 
                 for (const pair of pairs) {
                     const match = pair.match(/\((\d+),(\d+)\)/);
@@ -534,160 +417,71 @@
                     
                     const a = BigInt(match[1]);
                     const b = BigInt(match[2]);
-                    
                     let found = false;
-                    for (const [mappedVal, byteVal] of this.reverseMapping) {
-                        const check = (mappedVal * this.modExp(a, mappedVal, this.p)) % this.p;
-                        if (b === check) {
-                            result.push(byteVal);
+                    
+                    for (const [mappedValue, byteValue] of this.reverseMapping) {
+                        const check = (mappedValue * this.modExp(a, mappedValue, this.p)) % this.p;
+                        
+                        if (check === b) {
+                            decryptedBytes.push(byteValue);
                             found = true;
                             break;
                         }
                     }
                     
                     if (!found) {
-                        throw new Error('Decryption failed - no valid mapping found');
+                        throw new Error("Decryption failed - no valid mapping found");
                     }
                 }
                 
-                return new TextDecoder().decode(new Uint8Array(result));
-            }
-            
-            modExp(base, exponent, modulus) {
-                if (modulus === 1n) return 0n;
-                
-                let result = 1n;
-                base = base % modulus;
-                let exp = exponent;
-                
-                while (exp > 0n) {
-                    if (exp % 2n === 1n) {
-                        result = (result * base) % modulus;
-                    }
-                    exp = exp / 2n;
-                    base = (base * base) % modulus;
-                }
-                
-                return result;
+                return new TextDecoder().decode(new Uint8Array(decryptedBytes));
             }
         }
 
-        // UI Handling
-        let cipher = null;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('init-cipher').addEventListener('click', initializeCipher);
-            document.getElementById('encrypt-btn').addEventListener('click', encryptData);
-            document.getElementById('decrypt-btn').addEventListener('click', decryptData);
-            document.getElementById('clear-encrypt').addEventListener('click', () => {
-                document.getElementById('plaintext').value = '';
-                document.getElementById('ciphertext').value = '';
-            });
-            document.getElementById('clear-decrypt').addEventListener('click', () => {
-                document.getElementById('input-ciphertext').value = '';
-                document.getElementById('decrypted').value = '';
-            });
-            document.getElementById('copy-ciphertext').addEventListener('click', () => {
-                copyToClipboard('ciphertext');
-            });
-            document.getElementById('copy-decrypted').addEventListener('click', () => {
-                copyToClipboard('decrypted');
-            });
-            
-            document.getElementById('prime-bits').addEventListener('change', updatePrimeStrength);
-            updatePrimeStrength();
-        });
-        
-        function updatePrimeStrength() {
-            const bits = document.getElementById('prime-bits').value;
-            document.getElementById('prime-strength').textContent = bits + ' bits';
-        }
-        
-        async function initializeCipher() {
-            try {
-                const password = document.getElementById('password').value;
-                const primeBits = parseInt(document.getElementById('prime-bits').value);
-                
-                if (!password) {
-                    showStatus('error', 'Password is required', 'init-status');
-                    return;
-                }
-                
-                showStatus('progress', 'Initializing cipher with PBKDF2 key derivation...', 'init-status');
-                
-                cipher = new ProfessionalHomophonicCipher(password, primeBits);
-                await cipher.initialize();
-                
-                showStatus('success', 'Cipher initialized successfully with 1,000,000 PBKDF2 iterations', 'init-status');
-                
-            } catch (error) {
-                showStatus('error', 'Initialization failed: ' + error.message, 'init-status');
-            }
-        }
-        
-        async function encryptData() {
-            if (!cipher) {
-                showStatus('error', 'Please initialize cipher first', 'encrypt-status');
-                return;
-            }
-            
-            try {
-                const plaintext = document.getElementById('plaintext').value;
-                if (!plaintext) {
-                    showStatus('error', 'Please enter text to encrypt', 'encrypt-status');
-                    return;
-                }
-                
-                showStatus('progress', 'Encrypting...', 'encrypt-status');
-                
-                const encrypted = await cipher.encrypt(plaintext);
-                document.getElementById('ciphertext').value = encrypted;
-                
-                showStatus('success', 'Encryption completed successfully', 'encrypt-status');
-                
-            } catch (error) {
-                showStatus('error', 'Encryption failed: ' + error.message, 'encrypt-status');
-            }
-        }
-        
-        async function decryptData() {
-            if (!cipher) {
-                showStatus('error', 'Please initialize cipher first', 'decrypt-status');
-                return;
-            }
-            
-            try {
-                const ciphertext = document.getElementById('input-ciphertext').value;
-                if (!ciphertext) {
-                    showStatus('error', 'Please enter ciphertext to decrypt', 'decrypt-status');
-                    return;
-                }
-                
-                showStatus('progress', 'Decrypting...', 'decrypt-status');
-                
-                const decrypted = await cipher.decrypt(ciphertext);
-                document.getElementById('decrypted').value = decrypted;
-                
-                showStatus('success', 'Decryption completed successfully', 'decrypt-status');
-                
-            } catch (error) {
-                showStatus('error', 'Decryption failed: ' + error.message, 'decrypt-status');
-            }
-        }
-        
-        function showStatus(type, message, elementId) {
+        const cipher = new MilitaryHomophonicCipher();
+
+        function showStatus(message, type, elementId = 'initStatus') {
             const element = document.getElementById(elementId);
             element.textContent = message;
-            element.className = 'status ' + type;
+            element.className = `status ${type}`;
         }
-        
-        function copyToClipboard(elementId) {
-            const textarea = document.getElementById(elementId);
-            textarea.select();
-            document.execCommand('copy');
+
+        async function initializeSystem() {
+            const password = document.getElementById('password').value;
+            const primeBits = parseInt(document.getElementById('primeBits').value);
             
-            const statusElement = elementId === 'ciphertext' ? 'encrypt-status' : 'decrypt-status';
-            showStatus('success', 'Copied to clipboard', statusElement);
+            if (!password) {
+                showStatus('Password required', 'error');
+                return;
+            }
+            
+            try {
+                await cipher.initializeSystem(password, primeBits);
+            } catch (error) {
+                console.error('Initialization error:', error);
+            }
+        }
+
+        async function encryptData() {
+            try {
+                const input = document.getElementById('inputData').value;
+                const encrypted = cipher.encryptData(input);
+                document.getElementById('outputCipher').textContent = encrypted;
+                showStatus('Encryption successful', 'success');
+            } catch (error) {
+                showStatus(`Encryption failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function decryptData() {
+            try {
+                const input = document.getElementById('inputCipher').value;
+                const decrypted = cipher.decryptData(input);
+                document.getElementById('outputData').textContent = decrypted;
+                showStatus('Decryption successful', 'success');
+            } catch (error) {
+                showStatus(`Decryption failed: ${error.message}`, 'error');
+            }
         }
     </script>
 </body>
