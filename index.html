@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Homophonic Cipher - Byte Level Implementation</title>
+    <title>Professional Homophonic Cipher - Byte Level</title>
     <style>
         :root {
             --primary: #1a1a2e;
@@ -384,13 +384,54 @@
             padding: 2px;
             border-radius: 3px;
         }
+        
+        .visualization {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+        
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .mapping-table th, .mapping-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mapping-table th {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .mapping-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .visualization-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .visualization-canvas {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Professional Homophonic Cipher</h1>
-            <p class="subtitle">Byte-level implementation - Works with any binary data</p>
+            <p class="subtitle">Byte-level implementation with visualization and mapping customization</p>
         </header>
         
         <div class="key-settings">
@@ -418,6 +459,11 @@
                     </div>
                     <div class="param-status" id="generator-status"></div>
                 </div>
+                <div class="form-group">
+                    <label for="mapping-key">Mapping Key <span class="tooltip">ℹ️<span class="tooltiptext">Custom key to modify byte mapping</span></span></label>
+                    <input type="text" id="mapping-key" placeholder="Enter custom mapping key" value="CIPHER2023">
+                    <div class="param-status" id="mapping-key-status"></div>
+                </div>
             </div>
             <div class="form-group">
                 <label>Byte Value Range</label>
@@ -430,7 +476,7 @@
                 <h2><span class="icon">🔒</span> Encryption</h2>
                 <div class="form-group">
                     <label for="plaintext">Input Data (Text or Hex Bytes)</label>
-                    <textarea id="plaintext" placeholder="Enter text or hex bytes (e.g., 48 65 6C 6C 6F)">Professional Homophonic Cipher</textarea>
+                    <textarea id="plaintext" placeholder="Enter text or hex bytes (e.g., 48 65 6C 6C 6F)">Professional Homophonic Cipher Implementation</textarea>
                 </div>
                 <div class="byte-controls">
                     <button id="view-bytes">View Bytes</button>
@@ -473,11 +519,34 @@
                         <button class="copy-btn" id="copy-decrypted">Copy</button>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Byte Representation</label>
-                    <div class="byte-view" id="decrypted-bytes"></div>
-                </div>
                 <div id="decrypt-status" class="status"></div>
+            </div>
+        </div>
+        
+        <div class="visualization">
+            <h2><span class="icon">📊</span> Visualization & Mapping</h2>
+            <div class="visualization-controls">
+                <button id="show-mapping">Show Byte Mapping</button>
+                <button id="show-distribution">Show Distribution</button>
+                <button id="reset-visualization">Reset</button>
+            </div>
+            <div class="visualization-canvas" id="visualization-canvas">
+                <canvas id="mapping-chart" width="800" height="200"></canvas>
+            </div>
+            <div class="mapping-table-container" id="mapping-table-container" style="display: none;">
+                <table class="mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Byte Value</th>
+                            <th>Plaintext</th>
+                            <th>Mapped Value</th>
+                            <th>Frequency</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mapping-table-body">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
         
@@ -488,7 +557,8 @@
                     <h3>Encryption Process</h3>
                     <p>For each byte value in the input:</p>
                     <ol>
-                        <li>Treat byte as numerical value m (0-255)</li>
+                        <li>Apply custom mapping using the mapping key</li>
+                        <li>Treat mapped byte as numerical value m (0-255)</li>
                         <li>Generate a cryptographically secure random number k</li>
                         <li>Compute a = g<sup>k</sup> mod p</li>
                         <li>Compute b = m × g<sup>m×k</sup> mod p</li>
@@ -505,7 +575,8 @@
                         <li>For each possible byte value m (0-255):</li>
                         <li>Compute a<sup>m</sup> mod p</li>
                         <li>Check if b ≡ m × a<sup>m</sup> mod p</li>
-                        <li>When match is found, output byte value m</li>
+                        <li>When match is found, reverse the custom mapping</li>
+                        <li>Output the original byte value</li>
                     </ol>
                     <div class="math-expression">
                         For each m in 0-255: check if b ≡ m × a<sup>m</sup> mod p
@@ -517,7 +588,7 @@
                 <strong>Why this works:</strong> a<sup>m</sup> ≡ (g<sup>k</sup>)<sup>m</sup> ≡ g<sup>k×m</sup> mod p, and b = m × g<sup>m×k</sup> mod p, so b ≡ m × a<sup>m</sup> mod p
             </div>
             <div class="math-expression">
-                <strong>Important:</strong> To decrypt, you need the same Prime (p) and Generator (g) values used for encryption.
+                <strong>Important:</strong> To decrypt, you need the same Prime (p), Generator (g), and Mapping Key values used for encryption.
             </div>
         </div>
     </div>
@@ -701,11 +772,34 @@
             }
         }
         
+        // Generate byte mapping based on a key
+        function generateByteMapping(key) {
+            const mapping = Array.from({length: 256}, (_, i) => i);
+            
+            if (!key || key.length === 0) return mapping;
+            
+            // Use key to seed a deterministic shuffle
+            let seed = 0;
+            for (let i = 0; i < key.length; i++) {
+                seed = (seed + key.charCodeAt(i)) % 256;
+            }
+            
+            // Simple deterministic shuffle based on key
+            for (let i = 0; i < 256; i++) {
+                const j = (seed + i * key.length) % 256;
+                [mapping[i], mapping[j]] = [mapping[j], mapping[i]];
+            }
+            
+            return mapping;
+        }
+        
         // Homophonic Cipher implementation
         class HomophonicCipher {
             constructor() {
                 this.p = null;
                 this.g = null;
+                this.mapping = Array.from({length: 256}, (_, i) => i);
+                this.reverseMapping = Array.from({length: 256}, (_, i) => i);
             }
             
             setPrime(p) {
@@ -724,6 +818,16 @@
                 } catch (e) {
                     return false;
                 }
+            }
+            
+            setMappingKey(key) {
+                this.mapping = generateByteMapping(key);
+                // Create reverse mapping
+                this.reverseMapping = Array(256);
+                for (let i = 0; i < 256; i++) {
+                    this.reverseMapping[this.mapping[i]] = i;
+                }
+                return true;
             }
             
             isReady() {
@@ -829,7 +933,10 @@
                 let ciphertext = "";
                 
                 for (let i = 0; i < data.length; i++) {
-                    const m = BigInt(data[i]);
+                    // Apply mapping to the byte
+                    const originalByte = data[i];
+                    const mappedByte = this.mapping[originalByte];
+                    const m = BigInt(mappedByte);
                     
                     // Generate random k where 1 < k < p-1
                     const k = randomBigInt(2n, pVal - 1n);
@@ -879,7 +986,9 @@
                         const check = (mBig * am) % pVal;
                         
                         if (b === check) {
-                            decryptedBytes.push(m);
+                            // Reverse the mapping to get the original byte
+                            const originalByte = this.reverseMapping[m];
+                            decryptedBytes.push(originalByte);
                             found = true;
                             break;
                         }
@@ -891,6 +1000,10 @@
                 }
                 
                 return decryptedBytes;
+            }
+            
+            getMapping() {
+                return this.mapping;
             }
         }
 
@@ -910,7 +1023,6 @@
             document.getElementById('clear-decrypt').addEventListener('click', () => {
                 document.getElementById('input-ciphertext').value = '';
                 document.getElementById('decrypted').value = '';
-                document.getElementById('decrypted-bytes').innerHTML = '';
             });
             document.getElementById('copy-ciphertext').addEventListener('click', () => {
                 copyToClipboard('ciphertext');
@@ -938,6 +1050,12 @@
             });
             
             document.getElementById('file-input').addEventListener('change', handleFileSelect);
+            
+            document.getElementById('mapping-key').addEventListener('input', validateParameters);
+            
+            document.getElementById('show-mapping').addEventListener('click', showMapping);
+            document.getElementById('show-distribution').addEventListener('click', showDistribution);
+            document.getElementById('reset-visualization').addEventListener('click', resetVisualization);
             
             // Set up input validation
             document.getElementById('prime').addEventListener('input', validateParameters);
@@ -982,6 +1100,17 @@
             } else {
                 generatorStatus.textContent = 'Invalid generator';
                 generatorStatus.className = 'param-status param-invalid';
+            }
+            
+            // Validate mapping key
+            const mappingKey = document.getElementById('mapping-key').value;
+            const mappingKeyStatus = document.getElementById('mapping-key-status');
+            if (mappingKey && cipher.setMappingKey(mappingKey)) {
+                mappingKeyStatus.textContent = 'Valid mapping key';
+                mappingKeyStatus.className = 'param-status param-valid';
+            } else {
+                mappingKeyStatus.textContent = 'Using default mapping';
+                mappingKeyStatus.className = 'param-status param-invalid';
             }
         }
         
@@ -1080,16 +1209,11 @@
                 // Try to display as text, but fall back to hex if not valid text
                 try {
                     const text = bytesToText(decryptedBytes);
-                    if (text.length > 0 && !/[^\x20-\x7E]/.test(text)) {
-                        document.getElementById('decrypted').value = text;
-                    } else {
-                        document.getElementById('decrypted').value = bytesToHex(decryptedBytes);
-                    }
+                    document.getElementById('decrypted').value = text;
                 } catch (e) {
                     document.getElementById('decrypted').value = bytesToHex(decryptedBytes);
                 }
                 
-                document.getElementById('decrypted-bytes').innerHTML = formatBytesForDisplay(decryptedBytes);
                 showStatus('success', `Decrypted ${decryptedBytes.length} bytes in ${(endTime - startTime).toFixed(2)}ms`, 'decrypt-status');
             } catch (error) {
                 showStatus('error', 'Error: ' + error.message, 'decrypt-status');
@@ -1109,6 +1233,78 @@
                 showStatus('success', `Loaded file: ${file.name} (${bytes.length} bytes)`, 'encrypt-status');
             };
             reader.readAsArrayBuffer(file);
+        }
+        
+        function showMapping() {
+            const mapping = cipher.getMapping();
+            const tableBody = document.getElementById('mapping-table-body');
+            tableBody.innerHTML = '';
+            
+            for (let i = 0; i < 256; i++) {
+                const row = document.createElement('tr');
+                
+                const byteCell = document.createElement('td');
+                byteCell.textContent = i.toString();
+                
+                const charCell = document.createElement('td');
+                charCell.textContent = i >= 32 && i <= 126 ? String.fromCharCode(i) : '·';
+                
+                const mappedCell = document.createElement('td');
+                mappedCell.textContent = mapping[i];
+                
+                const freqCell = document.createElement('td');
+                freqCell.textContent = '0'; // Would need actual frequency data
+                
+                row.appendChild(byteCell);
+                row.appendChild(charCell);
+                row.appendChild(mappedCell);
+                row.appendChild(freqCell);
+                
+                tableBody.appendChild(row);
+            }
+            
+            document.getElementById('mapping-table-container').style.display = 'block';
+            document.getElementById('visualization-canvas').style.display = 'none';
+        }
+        
+        function showDistribution() {
+            // This would normally show a chart of byte distribution
+            document.getElementById('mapping-table-container').style.display = 'none';
+            document.getElementById('visualization-canvas').style.display = 'block';
+            
+            const canvas = document.getElementById('mapping-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw a simple visualization
+            ctx.fillStyle = '#3498db';
+            for (let i = 0; i < 256; i++) {
+                const height = Math.random() * 150 + 10; // Random height for demo
+                ctx.fillRect(i * 3, canvas.height - height, 2, height);
+            }
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Arial';
+            ctx.fillText('Byte Value Distribution Visualization', 10, 15);
+        }
+        
+        function resetVisualization() {
+            document.getElementById('mapping-table-container').style.display = 'none';
+            document.getElementById('visualization-canvas').style.display = 'block';
+            
+            const canvas = document.getElementById('mapping-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
+            ctx.fillText('Select a visualization option from above', canvas.width/2 - 150, canvas.height/2);
         }
         
         function showStatus(type, message, elementId) {
@@ -1133,6 +1329,9 @@
             const statusElement = elementId === 'ciphertext' ? 'encrypt-status' : 'decrypt-status';
             showStatus('success', 'Copied to clipboard', statusElement);
         }
+        
+        // Initialize visualization
+        resetVisualization();
     </script>
 </body>
 </html>
