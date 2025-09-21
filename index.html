@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional Homophonic Cipher</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary: #1a1a2e;
             --secondary: #16213e;
@@ -260,6 +261,18 @@
             display: block;
         }
         
+        .status.info {
+            background: rgba(0, 100, 255, 0.15);
+            border-left-color: #0064ff;
+            display: block;
+        }
+        
+        .status.progress {
+            background: rgba(255, 165, 0, 0.15);
+            border-left-color: #ffa500;
+            display: block;
+        }
+        
         .output-group {
             position: relative;
         }
@@ -297,6 +310,28 @@
             color: rgba(255, 255, 255, 0.6);
             margin-top: 8px;
         }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-inner {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -314,24 +349,30 @@
             <div class="form-group">
                 <label for="prime-bitlength">Prime Bit Length</label>
                 <select id="prime-bitlength">
-                    <option value="64">64 bits (fast)</option>
-                    <option value="128" selected>128 bits (standard)</option>
-                    <option value="256">256 bits (secure)</option>
-                    <option value="512">512 bits (high security)</option>
+                    <option value="16">16 bits (testing)</option>
+                    <option value="32">32 bits (fast)</option>
+                    <option value="64" selected>64 bits (standard)</option>
+                    <option value="128">128 bits (secure)</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="prime">Prime Modulus (p)</label>
                 <div class="flex-row">
-                    <input type="text" id="prime" placeholder="Generating prime...">
+                    <input type="text" id="prime" placeholder="Click generate to create prime">
                     <button id="generate-prime">Generate</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" id="prime-progress"></div>
                 </div>
             </div>
             <div class="form-group">
                 <label for="generator">Generator (g)</label>
                 <div class="flex-row">
-                    <input type="text" id="generator" placeholder="Finding generator...">
+                    <input type="text" id="generator" placeholder="Find generator after prime">
                     <button id="find-generator">Find</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" id="generator-progress"></div>
                 </div>
             </div>
         </div>
@@ -512,6 +553,7 @@
                 this.p = null;
                 this.g = null;
                 this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                this.isGenerating = false;
             }
             
             setPrime(p) {
@@ -628,38 +670,54 @@
                 return decrypted;
             }
             
-            async generateLargePrime(bitLength) {
+            async generateLargePrime(bitLength, progressCallback = null) {
+                if (this.isGenerating) {
+                    throw new Error("Generation already in progress");
+                }
+                
+                this.isGenerating = true;
                 const bits = parseInt(bitLength);
                 const min = BigInt(2) ** BigInt(bits - 1);
                 const max = BigInt(2) ** BigInt(bits) - BigInt(1);
                 
                 let prime;
                 let attempts = 0;
+                const maxAttempts = 5000;
                 const startTime = performance.now();
                 
-                do {
-                    prime = this.generateRandomBigInt(min, max);
-                    attempts++;
+                try {
+                    do {
+                        prime = this.generateRandomBigInt(min, max);
+                        attempts++;
+                        
+                        if (progressCallback && attempts % 50 === 0) {
+                            const progress = Math.min(99, Math.floor(attempts / maxAttempts * 100));
+                            progressCallback(progress);
+                            await new Promise(resolve => setTimeout(resolve, 0));
+                        }
+                        
+                        if (attempts >= maxAttempts) {
+                            throw new Error("Failed to generate prime after " + maxAttempts + " attempts");
+                        }
+                    } while (!new BigNumber(prime).isPrime());
                     
-                    if (attempts % 100 === 0) {
-                        await new Promise(resolve => setTimeout(resolve, 0));
+                    const endTime = performance.now();
+                    
+                    if (progressCallback) {
+                        progressCallback(100);
                     }
-                } while (!new BigNumber(prime).isPrime() && attempts < 10000);
-                
-                const endTime = performance.now();
-                
-                if (attempts >= 10000) {
-                    throw new Error("Failed to generate prime after 10000 attempts");
+                    
+                    return {
+                        prime: new BigNumber(prime),
+                        time: endTime - startTime,
+                        attempts: attempts
+                    };
+                } finally {
+                    this.isGenerating = false;
                 }
-                
-                return {
-                    prime: new BigNumber(prime),
-                    time: endTime - startTime,
-                    attempts: attempts
-                };
             }
             
-            findGenerator() {
+            async findGenerator(progressCallback = null) {
                 if (!this.p) {
                     throw new Error("Prime must be set first");
                 }
@@ -668,8 +726,11 @@
                 const phi = pVal - 1n;
                 
                 const primeFactors = this.factorize(phi);
+                let attempts = 0;
+                const maxAttempts = 10000;
                 
                 for (let g = 2n; g < pVal; g++) {
+                    attempts++;
                     let isGenerator = true;
                     
                     for (const factor of primeFactors) {
@@ -680,7 +741,20 @@
                         }
                     }
                     
+                    if (progressCallback && attempts % 100 === 0) {
+                        const progress = Math.min(99, Math.floor(attempts / maxAttempts * 100));
+                        progressCallback(progress);
+                        await new Promise(resolve => setTimeout(resolve, 0));
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        throw new Error("Generator not found after " + maxAttempts + " attempts");
+                    }
+                    
                     if (isGenerator) {
+                        if (progressCallback) {
+                            progressCallback(100);
+                        }
                         return new BigNumber(g);
                     }
                 }
@@ -733,7 +807,11 @@
             });
             document.getElementById('alphabet').addEventListener('input', updateAlphabet);
             
-            generatePrime();
+            // Установим более низкое значение по умолчанию для быстрой загрузки
+            document.getElementById('prime-bitlength').value = '64';
+            
+            // Не генерируем автоматически при загрузке
+            showStatus('Click "Generate" to create a prime number', 'encrypt-status', 'info');
         });
         
         function updateAlphabet() {
@@ -743,31 +821,52 @@
         async function generatePrime() {
             try {
                 const bitLength = document.getElementById('prime-bitlength').value;
-                showStatus('Generating large prime...', 'encrypt-status');
+                const generateBtn = document.getElementById('generate-prime');
+                const findBtn = document.getElementById('find-generator');
                 
-                const result = await cipher.generateLargePrime(bitLength);
+                generateBtn.classList.add('loading');
+                findBtn.classList.add('loading');
+                
+                showStatus('Generating large prime...', 'encrypt-status', 'progress');
+                
+                const result = await cipher.generateLargePrime(bitLength, (progress) => {
+                    document.getElementById('prime-progress').style.width = progress + '%';
+                });
+                
                 cipher.setPrime(result.prime);
                 
                 document.getElementById('prime').value = result.prime.toString();
                 showStatus(`Generated ${bitLength}-bit prime in ${result.time.toFixed(2)}ms (${result.attempts} attempts)`, 'encrypt-status', 'success');
                 
-                findGenerator();
+                // Сбросить генератор при создании нового простого числа
+                document.getElementById('generator').value = '';
+                cipher.setGenerator(null);
+                
             } catch (error) {
                 showStatus('Error: ' + error.message, 'encrypt-status', 'error');
+            } finally {
+                document.getElementById('generate-prime').classList.remove('loading');
+                document.getElementById('find-generator').classList.remove('loading');
+                document.getElementById('prime-progress').style.width = '0%';
             }
         }
         
-        function findGenerator() {
+        async function findGenerator() {
             try {
                 if (!cipher.p) {
                     showStatus('Generate a prime first', 'encrypt-status', 'error');
                     return;
                 }
                 
-                showStatus('Finding generator...', 'encrypt-status');
+                const findBtn = document.getElementById('find-generator');
+                findBtn.classList.add('loading');
+                
+                showStatus('Finding generator...', 'encrypt-status', 'progress');
                 
                 const startTime = performance.now();
-                const generator = cipher.findGenerator();
+                const generator = await cipher.findGenerator((progress) => {
+                    document.getElementById('generator-progress').style.width = progress + '%';
+                });
                 const endTime = performance.now();
                 
                 cipher.setGenerator(generator);
@@ -776,6 +875,9 @@
                 showStatus(`Found generator in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status', 'success');
             } catch (error) {
                 showStatus('Error: ' + error.message, 'encrypt-status', 'error');
+            } finally {
+                document.getElementById('find-generator').classList.remove('loading');
+                document.getElementById('generator-progress').style.width = '0%';
             }
         }
         
