@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Homophonic Cipher</title>
+    <title>Professional Homophonic Cipher Implementation</title>
     <style>
         :root {
             --primary: #1a1a2e;
@@ -14,7 +14,6 @@
             --success: #4e9f3d;
             --error: #d8000c;
             --warning: #f39c12;
-            --info: #3498db;
         }
         
         * {
@@ -33,7 +32,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
@@ -52,6 +51,14 @@
             font-size: 2.8rem;
             margin-bottom: 10px;
             color: #3498db;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .app-container {
@@ -185,6 +192,33 @@
             font-size: 0.9rem;
         }
         
+        .algorithm-explanation {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+        
+        .explanation-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .explanation-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .math-expression {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+        
         .flex-row {
             display: flex;
             gap: 15px;
@@ -274,69 +308,6 @@
             pointer-events: none;
         }
         
-        .mapping-visualization {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .mapping-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-family: monospace;
-            font-size: 12px;
-        }
-        
-        .mapping-header {
-            font-weight: bold;
-            background: rgba(52, 152, 219, 0.3);
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .stat-item {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #3498db;
-            margin-top: 5px;
-        }
-        
-        .algorithm-explanation {
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            margin-top: 30px;
-        }
-        
-        .math-expression {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            border-radius: 8px;
-            font-family: monospace;
-            margin: 15px 0;
-            line-height: 1.8;
-        }
-        
         .tooltip {
             position: relative;
             display: inline-block;
@@ -385,22 +356,38 @@
             background: rgba(231, 76, 60, 0.2);
             color: var(--error);
         }
+        
+        .byte-view {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Professional Homophonic Cipher</h1>
-            <p class="subtitle">Military-grade encryption with password-derived byte mapping</p>
+            <p class="subtitle">Byte-level implementation with advanced cryptographic parameters</p>
         </header>
         
         <div class="key-settings">
-            <h2><span class="icon">⚙️</span> Cipher Configuration</h2>
+            <h2><span class="icon">⚙️</span> Cryptographic Parameters</h2>
             <div class="settings-grid">
+                <div class="form-group">
+                    <label for="alphabet">Character Set <span class="tooltip">ℹ️<span class="tooltiptext">Define all characters that will be used in encryption</span></span></label>
+                    <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
+                    <div class="param-status" id="alphabet-status"></div>
+                </div>
                 <div class="form-group">
                     <label for="prime">Prime Modulus (p) <span class="tooltip">ℹ️<span class="tooltiptext">Large prime number for modular arithmetic</span></span></label>
                     <div class="flex-row">
-                        <input type="text" id="prime" placeholder="Enter prime number" value="32416190039">
+                        <input type="text" id="prime" placeholder="Enter prime number or generate" value="1009">
                         <button id="generate-prime">Generate</button>
                     </div>
                     <div class="progress-bar">
@@ -408,11 +395,10 @@
                     </div>
                     <div class="param-status" id="prime-status"></div>
                 </div>
-                
                 <div class="form-group">
                     <label for="generator">Generator (g) <span class="tooltip">ℹ️<span class="tooltiptext">Primitive root modulo p</span></span></label>
                     <div class="flex-row">
-                        <input type="text" id="generator" placeholder="Enter generator" value="5">
+                        <input type="text" id="generator" placeholder="Enter generator or find" value="11">
                         <button id="find-generator">Find</button>
                     </div>
                     <div class="progress-bar">
@@ -420,29 +406,10 @@
                     </div>
                     <div class="param-status" id="generator-status"></div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="password">Encryption Password <span class="tooltip">ℹ️<span class="tooltiptext">Password for key derivation and mapping generation</span></span></label>
-                    <input type="password" id="password" value="secure_military_password_2024">
-                </div>
             </div>
-            
-            <button id="init-system">Initialize Cipher System</button>
-            <div id="init-status" class="status"></div>
-            
-            <div class="stats" id="system-stats" style="display: none;">
-                <div class="stat-item">
-                    <div>Prime Size</div>
-                    <div class="stat-value" id="prime-size">0 bits</div>
-                </div>
-                <div class="stat-item">
-                    <div>Mapping Entropy</div>
-                    <div class="stat-value">256! ≈ 2^1684</div>
-                </div>
-                <div class="stat-item">
-                    <div>Security Level</div>
-                    <div class="stat-value">Military Grade</div>
-                </div>
+            <div class="form-group">
+                <label>Character Mapping</label>
+                <div class="key-display" id="alphabet-mapping">A=1, B=2, C=3, D=4, E=5, F=6, G=7, H=8, I=9, J=10, K=11, L=12, M=13, N=14, O=15, P=16, Q=17, R=18, S=19, T=20, U=21, V=22, W=23, X=24, Y=25, Z=26</div>
             </div>
         </div>
         
@@ -451,7 +418,11 @@
                 <h2><span class="icon">🔒</span> Encryption</h2>
                 <div class="form-group">
                     <label for="plaintext">Plaintext</label>
-                    <textarea id="plaintext" placeholder="Enter text to encrypt">TOP SECRET: Operation Midnight Shadow initiated</textarea>
+                    <textarea id="plaintext" placeholder="Enter text to encrypt">PROFESSIONAL HOMOPHONIC CIPHER IMPLEMENTATION</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Byte Representation</label>
+                    <div class="byte-view" id="plaintext-bytes"></div>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-encrypt" id="encrypt-btn"><span class="icon">▶️</span> Encrypt</button>
@@ -464,6 +435,10 @@
                         <button class="copy-btn" id="copy-ciphertext">Copy</button>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Byte Representation</label>
+                    <div class="byte-view" id="ciphertext-bytes"></div>
+                </div>
                 <div id="encrypt-status" class="status"></div>
             </div>
             
@@ -472,6 +447,10 @@
                 <div class="form-group">
                     <label for="input-ciphertext">Ciphertext (Pairs)</label>
                     <textarea id="input-ciphertext" placeholder="Paste ciphertext pairs here"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Byte Representation</label>
+                    <div class="byte-view" id="input-ciphertext-bytes"></div>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-decrypt" id="decrypt-btn"><span class="icon">▶️</span> Decrypt</button>
@@ -484,35 +463,11 @@
                         <button class="copy-btn" id="copy-decrypted">Copy</button>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Byte Representation</label>
+                    <div class="byte-view" id="decrypted-bytes"></div>
+                </div>
                 <div id="decrypt-status" class="status"></div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <h2><span class="icon">📊</span> Byte Mapping Visualization</h2>
-            <div id="mapping-status" class="status">System not initialized</div>
-            
-            <div class="mapping-visualization">
-                <div class="mapping-header">
-                    <span>Byte → Mapped Value</span>
-                    <span>Mapped Value → Byte</span>
-                </div>
-                <div id="mapping-display"></div>
-            </div>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <div>Total Mappings</div>
-                    <div class="stat-value">256</div>
-                </div>
-                <div class="stat-item">
-                    <div>Unique Values</div>
-                    <div class="stat-value" id="unique-values">0</div>
-                </div>
-                <div class="stat-item">
-                    <div>Value Range</div>
-                    <div class="stat-value" id="value-range">0 - 0</div>
-                </div>
             </div>
         </div>
         
@@ -521,10 +476,10 @@
             <div class="explanation-content">
                 <div>
                     <h3>Encryption Process</h3>
-                    <p>For each byte in the plaintext:</p>
+                    <p>For each character in the plaintext:</p>
                     <ol>
-                        <li>Convert byte to mapped value m using password-derived mapping</li>
-                        <li>Generate cryptographically secure random number k</li>
+                        <li>Convert character to numerical value m (position in alphabet)</li>
+                        <li>Generate a cryptographically secure random number k</li>
                         <li>Compute a = g<sup>k</sup> mod p</li>
                         <li>Compute b = m × g<sup>m×k</sup> mod p</li>
                         <li>The ciphertext is the pair (a, b)</li>
@@ -537,222 +492,387 @@
                     <h3>Decryption Process</h3>
                     <p>For each ciphertext pair (a, b):</p>
                     <ol>
-                        <li>For each possible mapped value m in password-derived mapping:</li>
+                        <li>For each possible character value m in alphabet:</li>
                         <li>Compute a<sup>m</sup> mod p</li>
                         <li>Check if b ≡ m × a<sup>m</sup> mod p</li>
-                        <li>When match is found, convert m back to byte</li>
+                        <li>When match is found, convert m back to character</li>
                     </ol>
                     <div class="math-expression">
-                        For each m in mapping: check if b ≡ m × a<sup>m</sup> mod p
+                        For each m in alphabet: check if b ≡ m × a<sup>m</sup> mod p
                     </div>
+                    <p>The decryption requires trying all possible m values, which is efficient for standard alphabets.</p>
                 </div>
+            </div>
+            <div class="math-expression">
+                <strong>Why this works:</strong> a<sup>m</sup> ≡ (g<sup>k</sup>)<sup>m</sup> ≡ g<sup>k×m</sup> mod p, and b = m × g<sup>m×k</sup> mod p, so b ≡ m × a<sup>m</sup> mod p
+            </div>
+            <div class="math-expression">
+                <strong>Important:</strong> To decrypt on another device, you need the same Alphabet, Prime (p), and Generator (g) values used for encryption.
             </div>
         </div>
     </div>
 
     <script>
-        class ProfessionalHomophonicCipher {
+        // Miller-Rabin primality test for better performance
+        function isPrime(n, k = 5) {
+            if (n <= 1n) return false;
+            if (n <= 3n) return true;
+            if (n % 2n === 0n) return false;
+            
+            // Write n as 2^s * d + 1
+            let s = 0;
+            let d = n - 1n;
+            while (d % 2n === 0n) {
+                s++;
+                d /= 2n;
+            }
+            
+            // Witness loop
+            for (let i = 0; i < k; i++) {
+                const a = 2n + BigInt(Math.floor(Math.random() * Number(n - 3n)));
+                let x = modExp(a, d, n);
+                
+                if (x === 1n || x === n - 1n) continue;
+                
+                let continueLoop = false;
+                for (let j = 0; j < s - 1; j++) {
+                    x = modExp(x, 2n, n);
+                    if (x === n - 1n) {
+                        continueLoop = true;
+                        break;
+                    }
+                }
+                
+                if (continueLoop) continue;
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Fast modular exponentiation
+        function modExp(base, exponent, modulus) {
+            if (modulus === 1n) return 0n;
+            
+            let result = 1n;
+            base = base % modulus;
+            let exp = exponent;
+            
+            while (exp > 0n) {
+                if (exp % 2n === 1n) {
+                    result = (result * base) % modulus;
+                }
+                exp = exp / 2n;
+                base = (base * base) % modulus;
+            }
+            
+            return result;
+        }
+        
+        // Get cryptographically secure random values
+        function getCryptoRandom() {
+            const array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            return array[0] / (0xFFFFFFFF + 1);
+        }
+        
+        // Generate a random bigint in range [min, max)
+        function randomBigInt(min, max) {
+            const range = max - min;
+            const bits = range.toString(2).length;
+            let result;
+            
+            do {
+                const bytes = Math.ceil(bits / 8);
+                const array = new Uint8Array(bytes);
+                window.crypto.getRandomValues(array);
+                
+                result = 0n;
+                for (let i = 0; i < bytes; i++) {
+                    result = (result << 8n) + BigInt(array[i]);
+                }
+                
+                result = result % range + min;
+            } while (result < min || result >= max);
+            
+            return result;
+        }
+        
+        // Check if g is a generator modulo p
+        function isGenerator(g, p) {
+            const phi = p - 1n;
+            const factors = factorize(phi);
+            
+            for (const factor of factors) {
+                const exponent = phi / factor;
+                if (modExp(g, exponent, p) === 1n) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // Factorize a number
+        function factorize(n) {
+            const factors = new Set();
+            let remaining = n;
+            
+            // Factor out 2s
+            while (remaining % 2n === 0n) {
+                factors.add(2n);
+                remaining /= 2n;
+            }
+            
+            // Factor out odd numbers
+            let factor = 3n;
+            while (factor * factor <= remaining) {
+                if (remaining % factor === 0n) {
+                    factors.add(factor);
+                    remaining /= factor;
+                } else {
+                    factor += 2n;
+                }
+            }
+            
+            if (remaining > 1n) {
+                factors.add(remaining);
+            }
+            
+            return Array.from(factors);
+        }
+        
+        // Convert text to byte representation
+        function textToBytes(text) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(text);
+            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+        }
+        
+        // Homophonic Cipher implementation
+        class HomophonicCipher {
             constructor() {
                 this.p = null;
                 this.g = null;
-                this.byteMapping = new Map();
-                this.reverseMapping = new Map();
-                this.initialized = false;
+                this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             }
             
-            async initialize(prime, generator, password) {
+            setPrime(p) {
                 try {
-                    this.p = BigInt(prime);
-                    this.g = BigInt(generator);
+                    this.p = BigInt(p);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            
+            setGenerator(g) {
+                try {
+                    this.g = BigInt(g);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            
+            setAlphabet(alphabet) {
+                this.alphabet = alphabet;
+            }
+            
+            isReady() {
+                return this.p !== null && this.g !== null && this.p > 1n && this.g > 1n;
+            }
+            
+            async generateLargePrime(bitLength, progressCallback = null) {
+                const bits = parseInt(bitLength);
+                const min = 2n ** BigInt(bits - 1);
+                const max = 2n ** BigInt(bits) - 1n;
+                
+                let prime;
+                let attempts = 0;
+                const maxAttempts = 500;
+                const startTime = performance.now();
+                
+                try {
+                    do {
+                        prime = randomBigInt(min, max);
+                        attempts++;
+                        
+                        if (progressCallback && attempts % 10 === 0) {
+                            const progress = Math.min(99, Math.floor(attempts / maxAttempts * 100));
+                            progressCallback(progress);
+                            await new Promise(resolve => setTimeout(resolve, 0));
+                        }
+                        
+                        if (attempts >= maxAttempts) {
+                            throw new Error("Failed to generate prime after " + maxAttempts + " attempts");
+                        }
+                    } while (!isPrime(prime, 5));
                     
-                    // Validate parameters
-                    if (this.p <= 1n) throw new Error("Prime must be greater than 1");
-                    if (this.g <= 1n) throw new Error("Generator must be greater than 1");
-                    if (this.g >= this.p) throw new Error("Generator must be less than prime");
+                    const endTime = performance.now();
                     
-                    // Create byte mapping using password
-                    await this.createByteMapping(password);
+                    if (progressCallback) {
+                        progressCallback(100);
+                    }
                     
-                    this.initialized = true;
-                    return this.getMappingInfo();
-                    
+                    return {
+                        prime: prime,
+                        time: endTime - startTime,
+                        attempts: attempts
+                    };
                 } catch (error) {
                     throw error;
                 }
             }
             
-            async createByteMapping(password) {
-                const encoder = new TextEncoder();
-                const passwordBytes = encoder.encode(password);
-                
-                // Use PBKDF2 for key derivation
-                const salt = new Uint8Array(16);
-                crypto.getRandomValues(salt);
-                
-                const keyMaterial = await crypto.subtle.importKey(
-                    'raw',
-                    passwordBytes,
-                    'PBKDF2',
-                    false,
-                    ['deriveBits']
-                );
-                
-                const derivedKey = await crypto.subtle.deriveBits({
-                    name: 'PBKDF2',
-                    salt: salt,
-                    iterations: 100000,
-                    hash: 'SHA-256'
-                }, keyMaterial, 256);
-                
-                const keyBytes = new Uint8Array(derivedKey);
-                const usedValues = new Set();
-                
-                // Create mapping for all 256 byte values
-                for (let byte = 0; byte < 256; byte++) {
-                    let mappedValue;
-                    
-                    do {
-                        // Generate unique mapping value using cryptographic randomness
-                        const randomData = new Uint8Array([
-                            ...keyBytes,
-                            byte,
-                            ...crypto.getRandomValues(new Uint8Array(32))
-                        ]);
-                        
-                        // Convert to BigInt and ensure it's within valid range
-                        mappedValue = this.bytesToBigInt(randomData) % this.p;
-                        
-                    } while (usedValues.has(mappedValue) || mappedValue === 0n);
-                    
-                    usedValues.add(mappedValue);
-                    this.byteMapping.set(byte, mappedValue);
-                    this.reverseMapping.set(mappedValue, byte);
+            async findGenerator(progressCallback = null) {
+                if (!this.p) {
+                    throw new Error("Prime must be set first");
                 }
-            }
-            
-            bytesToBigInt(bytes) {
-                let result = 0n;
-                for (const byte of bytes) {
-                    result = (result << 8n) | BigInt(byte);
-                }
-                return result;
-            }
-            
-            modExp(base, exponent, modulus) {
-                if (modulus === 1n) return 0n;
                 
-                let result = 1n;
-                base = base % modulus;
+                const pVal = this.p;
+                const phi = pVal - 1n;
                 
-                while (exponent > 0n) {
-                    if (exponent % 2n === 1n) {
-                        result = (result * base) % modulus;
+                // Factorize phi
+                const factors = factorize(phi);
+                let attempts = 0;
+                const maxAttempts = 1000;
+                
+                // Try candidate generators
+                for (let g = 2n; g < pVal; g++) {
+                    attempts++;
+                    let isGen = true;
+                    
+                    for (const factor of factors) {
+                        const exponent = phi / factor;
+                        if (modExp(g, exponent, pVal) === 1n) {
+                            isGen = false;
+                            break;
+                        }
                     }
-                    exponent = exponent >> 1n;
-                    base = (base * base) % modulus;
+                    
+                    if (progressCallback && attempts % 10 === 0) {
+                        const progress = Math.min(99, Math.floor(attempts / maxAttempts * 100));
+                        progressCallback(progress);
+                        await new Promise(resolve => setTimeout(resolve, 0));
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        throw new Error("Generator not found after " + maxAttempts + " attempts");
+                    }
+                    
+                    if (isGen) {
+                        if (progressCallback) {
+                            progressCallback(100);
+                        }
+                        return g;
+                    }
                 }
                 
-                return result;
+                throw new Error("Generator not found");
             }
             
-            getRandomK() {
-                // Generate cryptographically secure random k
-                const randomBytes = new Uint8Array(32);
-                crypto.getRandomValues(randomBytes);
-                
-                let k = this.bytesToBigInt(randomBytes) % (this.p - 2n);
-                return k + 2n; // Ensure k is between 2 and p-2
-            }
-            
-            encrypt(data) {
-                if (!this.initialized) throw new Error("Cipher not initialized");
-                
-                const encoder = new TextEncoder();
-                const bytes = encoder.encode(data);
-                const ciphertext = [];
-                
-                for (const byte of bytes) {
-                    // Get mapped value from byte mapping
-                    const m = this.byteMapping.get(byte);
-                    const k = this.getRandomK();
-                    
-                    // Compute ciphertext pair: (a, b) = (g^k mod p, m * g^(m*k) mod p)
-                    const a = this.modExp(this.g, k, this.p);
-                    const b = (m * this.modExp(this.g, m * k, this.p)) % this.p;
-                    
-                    ciphertext.push(`(${a},${b})`);
+            encrypt(plaintext) {
+                if (!this.isReady()) {
+                    throw new Error("Cipher not initialized with valid prime and generator");
                 }
                 
-                return ciphertext.join(' ');
+                const pVal = this.p;
+                const gVal = this.g;
+                let ciphertext = "";
+                
+                for (let i = 0; i < plaintext.length; i++) {
+                    const char = plaintext[i].toUpperCase();
+                    const index = this.alphabet.indexOf(char);
+                    
+                    if (index === -1) {
+                        ciphertext += char + " ";
+                        continue;
+                    }
+                    
+                    const m = BigInt(index + 1);
+                    
+                    // Generate random k where 1 < k < p-1
+                    const k = randomBigInt(2n, pVal - 1n);
+                    
+                    // Compute a = g^k mod p
+                    const a = modExp(gVal, k, pVal);
+                    
+                    // Compute b = m * g^(m*k) mod p
+                    const exponent = m * k;
+                    const gmk = modExp(gVal, exponent, pVal);
+                    const b = (m * gmk) % pVal;
+                    
+                    ciphertext += `(${a},${b}) `;
+                }
+                
+                return ciphertext.trim();
             }
             
             decrypt(ciphertext) {
-                if (!this.initialized) throw new Error("Cipher not initialized");
+                if (!this.isReady()) {
+                    throw new Error("Cipher not initialized with valid prime and generator");
+                }
                 
-                const pairs = ciphertext.match(/\(\d+,\d+\)/g);
-                if (!pairs) throw new Error("Invalid ciphertext format");
-                
-                const decryptedBytes = [];
+                const pVal = this.p;
+                const pairs = ciphertext.match(/\(\d+,\d+\)/g) || [];
+                let decrypted = "";
                 
                 for (const pair of pairs) {
                     const match = pair.match(/\((\d+),(\d+)\)/);
-                    if (!match) continue;
+                    if (!match) {
+                        decrypted += "?";
+                        continue;
+                    }
                     
                     const a = BigInt(match[1]);
                     const b = BigInt(match[2]);
                     
                     let found = false;
-                    
-                    // Try all possible mapped values to find the correct one
-                    for (const [mappedValue, byteValue] of this.reverseMapping) {
-                        const check = (mappedValue * this.modExp(a, mappedValue, this.p)) % this.p;
+                    for (let m = 1; m <= this.alphabet.length; m++) {
+                        const mBig = BigInt(m);
                         
-                        if (check === b) {
-                            decryptedBytes.push(byteValue);
+                        // Compute a^m mod p
+                        const am = modExp(a, mBig, pVal);
+                        
+                        // Check if b ≡ m * a^m mod p
+                        const check = (mBig * am) % pVal;
+                        
+                        if (b === check) {
+                            decrypted += this.alphabet[m - 1];
                             found = true;
                             break;
                         }
                     }
                     
                     if (!found) {
-                        throw new Error("Decryption failed - no valid mapping found");
+                        decrypted += "?";
                     }
                 }
                 
-                const decoder = new TextDecoder();
-                return decoder.decode(new Uint8Array(decryptedBytes));
-            }
-            
-            getMappingInfo() {
-                const values = Array.from(this.byteMapping.values());
-                const min = values.reduce((a, b) => a < b ? a : b, values[0] || 0n);
-                const max = values.reduce((a, b) => a > b ? a : b, values[0] || 0n);
-                
-                return {
-                    size: this.byteMapping.size,
-                    unique: new Set(values).size,
-                    range: { min, max },
-                    mappings: Array.from(this.byteMapping.entries())
-                };
+                return decrypted;
             }
         }
 
-        const cipher = new ProfessionalHomophonicCipher();
+        const cipher = new HomophonicCipher();
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Set up all event listeners
-            document.getElementById('init-system').addEventListener('click', initializeSystem);
-            document.getElementById('encrypt-btn').addEventListener('click', encryptData);
-            document.getElementById('decrypt-btn').addEventListener('click', decryptData);
+            // Set up event listeners
             document.getElementById('generate-prime').addEventListener('click', generatePrime);
             document.getElementById('find-generator').addEventListener('click', findGenerator);
+            document.getElementById('encrypt-btn').addEventListener('click', encrypt);
+            document.getElementById('decrypt-btn').addEventListener('click', decrypt);
             document.getElementById('clear-encrypt').addEventListener('click', () => {
                 document.getElementById('plaintext').value = '';
                 document.getElementById('ciphertext').value = '';
+                document.getElementById('plaintext-bytes').textContent = '';
+                document.getElementById('ciphertext-bytes').textContent = '';
             });
             document.getElementById('clear-decrypt').addEventListener('click', () => {
                 document.getElementById('input-ciphertext').value = '';
                 document.getElementById('decrypted').value = '';
+                document.getElementById('input-ciphertext-bytes').textContent = '';
+                document.getElementById('decrypted-bytes').textContent = '';
             });
             document.getElementById('copy-ciphertext').addEventListener('click', () => {
                 copyToClipboard('ciphertext');
@@ -761,118 +881,196 @@
                 copyToClipboard('decrypted');
             });
             
-            // Initialize mapping display
-            updateMappingDisplay();
+            // Set up input validation
+            document.getElementById('alphabet').addEventListener('input', validateParameters);
+            document.getElementById('prime').addEventListener('input', validateParameters);
+            document.getElementById('generator').addEventListener('input', validateParameters);
+            
+            // Set up byte representation updates
+            document.getElementById('plaintext').addEventListener('input', updateByteRepresentations);
+            document.getElementById('input-ciphertext').addEventListener('input', updateByteRepresentations);
+            
+            // Initialize with default values
+            validateParameters();
+            updateAlphabetMapping();
+            updateByteRepresentations();
+            showStatus('info', 'Enter parameters or generate them, then encrypt/decrypt', 'encrypt-status');
         });
         
-        async function initializeSystem() {
-            const prime = document.getElementById('prime').value;
-            const generator = document.getElementById('generator').value;
-            const password = document.getElementById('password').value;
+        function updateByteRepresentations() {
+            // Update plaintext bytes
+            const plaintext = document.getElementById('plaintext').value;
+            document.getElementById('plaintext-bytes').textContent = textToBytes(plaintext);
             
-            if (!prime || !generator || !password) {
-                showStatus('error', 'All fields are required', 'init-status');
-                return;
+            // Update ciphertext bytes
+            const ciphertext = document.getElementById('ciphertext').value;
+            document.getElementById('ciphertext-bytes').textContent = textToBytes(ciphertext);
+            
+            // Update input ciphertext bytes
+            const inputCiphertext = document.getElementById('input-ciphertext').value;
+            document.getElementById('input-ciphertext-bytes').textContent = textToBytes(inputCiphertext);
+            
+            // Update decrypted bytes
+            const decrypted = document.getElementById('decrypted').value;
+            document.getElementById('decrypted-bytes').textContent = textToBytes(decrypted);
+        }
+        
+        function validateParameters() {
+            // Validate alphabet
+            const alphabet = document.getElementById('alphabet').value;
+            const alphabetStatus = document.getElementById('alphabet-status');
+            if (alphabet.length > 0) {
+                cipher.setAlphabet(alphabet);
+                alphabetStatus.textContent = 'Valid (' + alphabet.length + ' characters)';
+                alphabetStatus.className = 'param-status param-valid';
+            } else {
+                alphabetStatus.textContent = 'Invalid (empty)';
+                alphabetStatus.className = 'param-status param-invalid';
             }
             
+            // Validate prime
+            const primeInput = document.getElementById('prime').value;
+            const primeStatus = document.getElementById('prime-status');
+            if (primeInput && cipher.setPrime(primeInput) && cipher.p > 1n) {
+                primeStatus.textContent = 'Valid prime';
+                primeStatus.className = 'param-status param-valid';
+            } else {
+                primeStatus.textContent = 'Invalid prime';
+                primeStatus.className = 'param-status param-invalid';
+            }
+            
+            // Validate generator
+            const generatorInput = document.getElementById('generator').value;
+            const generatorStatus = document.getElementById('generator-status');
+            if (generatorInput && cipher.setGenerator(generatorInput) && cipher.g > 1n) {
+                if (cipher.p && isGenerator(cipher.g, cipher.p)) {
+                    generatorStatus.textContent = 'Valid generator';
+                    generatorStatus.className = 'param-status param-valid';
+                } else {
+                    generatorStatus.textContent = 'May not be a generator for this prime';
+                    generatorStatus.className = 'param-status param-invalid';
+                }
+            } else {
+                generatorStatus.textContent = 'Invalid generator';
+                generatorStatus.className = 'param-status param-invalid';
+            }
+            
+            updateAlphabetMapping();
+        }
+        
+        function updateAlphabetMapping() {
+            const alphabet = document.getElementById('alphabet').value;
+            let mapping = '';
+            
+            for (let i = 0; i < alphabet.length; i++) {
+                const char = alphabet[i];
+                const value = i + 1;
+                mapping += `${char}=${value}`;
+                if (i < alphabet.length - 1) mapping += ', ';
+                if (i > 0 && i % 10 === 0) mapping += '\n';
+            }
+            
+            document.getElementById('alphabet-mapping').textContent = mapping;
+        }
+        
+        async function generatePrime() {
             try {
-                showStatus('progress', 'Generating byte mapping with PBKDF2...', 'init-status');
-                const mappingInfo = await cipher.initialize(prime, generator, password);
+                const bitLength = document.getElementById('prime-bitlength')?.value || '32';
+                const generateBtn = document.getElementById('generate-prime');
                 
-                // Update statistics
-                const primeSize = BigInt(prime).toString(2).length;
-                document.getElementById('prime-size').textContent = primeSize + ' bits';
-                document.getElementById('system-stats').style.display = 'grid';
+                generateBtn.classList.add('loading');
                 
-                // Update mapping visualization
-                updateMappingDisplay(mappingInfo);
+                showStatus('progress', 'Generating large prime...', 'encrypt-status');
                 
-                showStatus('success', 'System initialized with 256 unique byte mappings', 'init-status');
+                const result = await cipher.generateLargePrime(bitLength, (progress) => {
+                    document.getElementById('prime-progress').style.width = progress + '%';
+                });
+                
+                cipher.setPrime(result.prime);
+                document.getElementById('prime').value = result.prime.toString();
+                
+                validateParameters();
+                showStatus('success', `Generated ${bitLength}-bit prime in ${result.time.toFixed(2)}ms (${result.attempts} attempts)`, 'encrypt-status');
                 
             } catch (error) {
-                showStatus('error', 'Initialization failed: ' + error.message, 'init-status');
+                showStatus('error', 'Error: ' + error.message, 'encrypt-status');
+            } finally {
+                document.getElementById('generate-prime').classList.remove('loading');
+                document.getElementById('prime-progress').style.width = '0%';
             }
         }
         
-        function updateMappingDisplay(mappingInfo = null) {
-            const display = document.getElementById('mapping-display');
-            const status = document.getElementById('mapping-status');
-            
-            if (!mappingInfo) {
-                display.innerHTML = '';
-                status.textContent = 'System not initialized';
-                status.className = 'status error';
-                document.getElementById('unique-values').textContent = '0';
-                document.getElementById('value-range').textContent = '0 - 0';
-                return;
+        async function findGenerator() {
+            try {
+                if (!cipher.p) {
+                    showStatus('error', 'Generate a prime first', 'encrypt-status');
+                    return;
+                }
+                
+                const findBtn = document.getElementById('find-generator');
+                findBtn.classList.add('loading');
+                
+                showStatus('progress', 'Finding generator...', 'encrypt-status');
+                
+                const startTime = performance.now();
+                const generator = await cipher.findGenerator((progress) => {
+                    document.getElementById('generator-progress').style.width = progress + '%';
+                });
+                const endTime = performance.now();
+                
+                cipher.setGenerator(generator);
+                document.getElementById('generator').value = generator.toString();
+                
+                validateParameters();
+                showStatus('success', `Found generator in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status');
+            } catch (error) {
+                showStatus('error', 'Error: ' + error.message, 'encrypt-status');
+            } finally {
+                document.getElementById('find-generator').classList.remove('loading');
+                document.getElementById('generator-progress').style.width = '0%';
             }
-            
-            display.innerHTML = '';
-            
-            // Show first 20 mappings as sample
-            const sampleMappings = mappingInfo.mappings.slice(0, 20);
-            
-            sampleMappings.forEach(([byte, value]) => {
-                const row = document.createElement('div');
-                row.className = 'mapping-item';
-                row.innerHTML = `
-                    <span>Byte ${byte.toString().padStart(3, '0')} → ${value}</span>
-                    <span>${value} → Byte ${byte.toString().padStart(3, '0')}</span>
-                `;
-                display.appendChild(row);
-            });
-            
-            if (mappingInfo.mappings.length > 20) {
-                const more = document.createElement('div');
-                more.className = 'mapping-item';
-                more.style.textAlign = 'center';
-                more.textContent = `... and ${mappingInfo.mappings.length - 20} more mappings`;
-                display.appendChild(more);
-            }
-            
-            document.getElementById('unique-values').textContent = mappingInfo.unique;
-            document.getElementById('value-range').textContent = 
-                `${mappingInfo.range.min} - ${mappingInfo.range.max}`;
-            
-            status.textContent = `Active: 256 byte mappings (${mappingInfo.unique} unique values)`;
-            status.className = 'status success';
         }
         
-        function encryptData() {
+        function encrypt() {
             try {
                 const plaintext = document.getElementById('plaintext').value;
+                
+                if (!cipher.isReady()) {
+                    showStatus('error', 'Please enter valid prime and generator values first', 'encrypt-status');
+                    return;
+                }
+                
+                const startTime = performance.now();
                 const encrypted = cipher.encrypt(plaintext);
+                const endTime = performance.now();
+                
                 document.getElementById('ciphertext').value = encrypted;
-                document.getElementById('input-ciphertext').value = encrypted;
-                showStatus('success', 'Encryption completed successfully', 'encrypt-status');
+                updateByteRepresentations();
+                showStatus('success', `Encrypted in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status');
             } catch (error) {
-                showStatus('error', 'Encryption failed: ' + error.message, 'encrypt-status');
+                showStatus('error', 'Error: ' + error.message, 'encrypt-status');
             }
         }
         
-        function decryptData() {
+        function decrypt() {
             try {
                 const ciphertext = document.getElementById('input-ciphertext').value;
+                
+                if (!cipher.isReady()) {
+                    showStatus('error', 'Please enter valid prime and generator values first', 'decrypt-status');
+                    return;
+                }
+                
+                const startTime = performance.now();
                 const decrypted = cipher.decrypt(ciphertext);
+                const endTime = performance.now();
+                
                 document.getElementById('decrypted').value = decrypted;
-                showStatus('success', 'Decryption completed successfully', 'decrypt-status');
+                updateByteRepresentations();
+                showStatus('success', `Decrypted in ${(endTime - startTime).toFixed(2)}ms`, 'decrypt-status');
             } catch (error) {
-                showStatus('error', 'Decryption failed: ' + error.message, 'decrypt-status');
+                showStatus('error', 'Error: ' + error.message, 'decrypt-status');
             }
-        }
-        
-        function generatePrime() {
-            // Simple prime generation for demonstration
-            const primes = [32416190039n, 49979687n, 9999991n, 2147483647n, 1301081n];
-            const randomPrime = primes[Math.floor(Math.random() * primes.length)];
-            document.getElementById('prime').value = randomPrime.toString();
-            showStatus('success', 'Prime number generated', 'prime-status');
-        }
-        
-        function findGenerator() {
-            // Simple generator finder for demonstration
-            document.getElementById('generator').value = '5';
-            showStatus('success', 'Generator found', 'generator-status');
         }
         
         function showStatus(type, message, elementId) {
