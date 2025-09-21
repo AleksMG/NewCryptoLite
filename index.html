@@ -6,20 +6,20 @@
     <title>Professional Homophonic Cipher</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #34495e;
-            --success: #2ecc71;
-            --warning: #f39c12;
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --light: #e6e6e6;
+            --dark: #0d0d1a;
+            --success: #4e9f3d;
+            --error: #d8000c;
         }
         
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
         }
         
         body {
@@ -31,125 +31,139 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         h1 {
             font-size: 2.8rem;
-            margin-bottom: 10px;
-            color: var(--secondary);
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+            color: var(--light);
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
         
         .subtitle {
-            color: var(--light);
+            color: rgba(255, 255, 255, 0.7);
             font-size: 1.2rem;
-            opacity: 0.8;
             max-width: 800px;
             margin: 0 auto;
+            line-height: 1.5;
         }
         
-        .app-container {
+        .app-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         
-        @media (max-width: 900px) {
-            .app-container {
+        @media (max-width: 1024px) {
+            .app-grid {
                 grid-template-columns: 1fr;
             }
         }
         
         .panel {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         
         h2 {
             font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--secondary);
+            margin-bottom: 25px;
+            color: var(--light);
             display: flex;
             align-items: center;
+            font-weight: 600;
         }
         
-        h2 i {
-            margin-right: 10px;
+        h2 svg {
+            margin-right: 12px;
+            width: 24px;
+            height: 24px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
+            margin-bottom: 10px;
+            font-weight: 500;
             color: var(--light);
+            font-size: 0.95rem;
         }
         
         textarea, input, select {
             width: 100%;
-            padding: 14px;
+            padding: 14px 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
             color: var(--light);
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
         }
         
         textarea:focus, input:focus, select:focus {
             outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
         }
         
         textarea {
-            min-height: 150px;
+            min-height: 180px;
             resize: vertical;
-            font-family: monospace;
         }
         
         button {
-            background: var(--secondary);
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 14px 20px;
+            padding: 14px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
         }
         
         button:hover {
+            background: #1a4a8c;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
         }
         
-        button i {
-            margin-right: 8px;
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button svg {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
         }
         
         .btn-encrypt {
@@ -157,144 +171,93 @@
         }
         
         .btn-encrypt:hover {
-            background: #27ae60;
+            background: #3d7e2e;
         }
         
         .btn-decrypt {
-            background: var(--accent);
+            background: var(--error);
         }
         
         .btn-decrypt:hover {
-            background: #c0392b;
+            background: #b3000a;
         }
         
         .key-settings {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-        
-        .settings-grid {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 40px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         
         .key-display {
-            font-family: monospace;
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
             word-break: break-all;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
-            margin-top: 10px;
-            max-height: 150px;
+            margin-top: 12px;
+            max-height: 180px;
             overflow-y: auto;
             font-size: 0.9rem;
+            line-height: 1.5;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         
-        .algorithm-explanation {
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-        }
-        
-        .explanation-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        
-        @media (max-width: 768px) {
-            .explanation-content {
-                grid-template-columns: 1fr;
-            }
+        .algorithm-info {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         
         .math-expression {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 22px;
             border-radius: 8px;
-            font-family: monospace;
-            margin: 15px 0;
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
+            margin: 20px 0;
             line-height: 1.8;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
         
         .flex-row {
             display: flex;
-            gap: 15px;
+            gap: 16px;
         }
         
         .action-buttons {
             display: flex;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 16px;
+            margin-top: 24px;
         }
         
         .action-buttons button {
             flex: 1;
         }
         
-        .prime-input {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 10px;
-        }
-        
-        .icon {
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
-        
         .status {
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
             font-size: 0.9rem;
             display: none;
+            border-left: 4px solid transparent;
         }
         
         .status.success {
-            background: rgba(46, 204, 113, 0.2);
-            border-left: 4px solid var(--success);
+            background: rgba(78, 159, 61, 0.15);
+            border-left-color: var(--success);
             display: block;
         }
         
         .status.error {
-            background: rgba(231, 76, 60, 0.2);
-            border-left: 4px solid var(--accent);
+            background: rgba(216, 0, 12, 0.15);
+            border-left-color: var(--error);
             display: block;
-        }
-        
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            border-bottom: 1px dotted var(--secondary);
-            cursor: help;
-        }
-        
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 250px;
-            background-color: var(--dark);
-            color: var(--light);
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -125px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.9rem;
-            font-weight: normal;
-        }
-        
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
         }
         
         .output-group {
@@ -303,12 +266,12 @@
         
         .copy-btn {
             position: absolute;
-            right: 10px;
-            top: 10px;
+            right: 12px;
+            top: 12px;
             background: rgba(255, 255, 255, 0.1);
             border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
+            border-radius: 6px;
+            padding: 6px 12px;
             font-size: 0.8rem;
             cursor: pointer;
         }
@@ -316,344 +279,561 @@
         .copy-btn:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+        
+        .key-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        @media (max-width: 768px) {
+            .key-info {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .performance {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Homophonic Cipher</h1>
-            <p class="subtitle">A professional implementation of a mathematically secure homophonic substitution cipher with multiple ciphertext representations for each plaintext character</p>
+            <p class="subtitle">Professional implementation of a mathematically secure homophonic substitution cipher with support for large primes and true randomness</p>
         </header>
         
         <div class="key-settings">
-            <h2><span class="icon">⚙️</span> Cipher Settings</h2>
-            <div class="settings-grid">
-                <div class="form-group">
-                    <label for="alphabet">Character Set <span class="tooltip">ℹ️<span class="tooltiptext">Define all characters that will be used in encryption</span></span></label>
-                    <input type="text" id="alphabet" valueABCDEFGHIJKLMNOPQRSTUVWXYZ">
-                </div>
-                <div class="form-group">
-                    <label for="prime">Prime Modulus (p) <span class="tooltip">ℹ️<span class="tooltiptext">Large prime number for modular arithmetic</span></span></label>
-                    <div class="flex-row">
-                        <input type="number" id="prime" value="1009">
-                        <button onclick="generatePrime()">Generate</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="generator">Generator (g) <span class="tooltip">ℹ️<span class="tooltiptext">Primitive root modulo p</span></span></label>
-                    <div class="flex-row">
-                        <input type="number" id="generator" value="7">
-                        <button onclick="findGenerator()">Find</button>
-                    </div>
+            <div class="form-group">
+                <label for="alphabet">Character Set</label>
+                <input type="text" id="alphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
+            </div>
+            <div class="form-group">
+                <label for="prime-bitlength">Prime Bit Length</label>
+                <select id="prime-bitlength">
+                    <option value="64">64 bits (fast)</option>
+                    <option value="128" selected>128 bits (standard)</option>
+                    <option value="256">256 bits (secure)</option>
+                    <option value="512">512 bits (high security)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prime">Prime Modulus (p)</label>
+                <div class="flex-row">
+                    <input type="text" id="prime" placeholder="Generating prime...">
+                    <button id="generate-prime">Generate</button>
                 </div>
             </div>
             <div class="form-group">
-                <label>Character Mapping</label>
-                <div class="key-display" id="alphabet-mapping">A=1, B=2, C=3, D=4, E=5, F=6, G=7, H=8, I=9, J=10, K=11, L=12, M=13, N=14, O=15, P=16, Q=17, R=18, S=19, T=20, U=21, V=22, W=23, X=24, Y=25, Z=26</div>
+                <label for="generator">Generator (g)</label>
+                <div class="flex-row">
+                    <input type="text" id="generator" placeholder="Finding generator...">
+                    <button id="find-generator">Find</button>
+                </div>
             </div>
         </div>
         
-        <div class="app-container">
+        <div class="app-grid">
             <div class="panel">
-                <h2><span class="icon">🔒</span> Encryption</h2>
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21.707 3.707a1 1 0 00-1.414-1.414L3 19.586V16a1 1 0 10-2 0v6a1 1 0 001 1h6a1 1 0 100-2H4.414L21.707 3.707z"/>
+                    </svg>
+                    Encryption
+                </h2>
                 <div class="form-group">
                     <label for="plaintext">Plaintext</label>
                     <textarea id="plaintext" placeholder="Enter text to encrypt">PROFESSIONAL HOMOPHONIC CIPHER IMPLEMENTATION</textarea>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn-encrypt" onclick="encrypt()"><span class="icon">▶️</span> Encrypt</button>
-                    <button onclick="document.getElementById('plaintext').value = ''">Clear</button>
+                    <button class="btn-encrypt" id="encrypt-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2a1 1 0 00-1 1v1h2V3a1 1 0 00-1-1zM9 4V3a3 3 0 116 0v1h3a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V5a1 1 0 011-1h3zm-3 2v14h12V6H6zm6 9a1 1 0 100 2 1 1 0 000-2z"/>
+                        </svg>
+                        Encrypt
+                    </button>
+                    <button id="clear-encrypt">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 2a1 1 0 00-1 1v1h6V3a1 1 0 00-1-1h-4zM5 5h14a1 1 0 010 2h-1v13a3 3 0 01-3 3H9a3 3 0 01-3-3V7H5a1 1 0 110-2zm4 4h6a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1v-9a1 1 0 011-1z"/>
+                        </svg>
+                        Clear
+                    </button>
                 </div>
                 <div class="form-group">
                     <label for="ciphertext">Ciphertext (Pairs)</label>
                     <div class="output-group">
                         <textarea id="ciphertext" placeholder="Encrypted text will appear here" readonly></textarea>
-                        <button class="copy-btn" onclick="copyToClipboard('ciphertext')">Copy</button>
+                        <button class="copy-btn" id="copy-ciphertext">Copy</button>
                     </div>
                 </div>
                 <div id="encrypt-status" class="status"></div>
             </div>
             
             <div class="panel">
-                <h2><span class="icon">🔓</span> Decryption</h2>
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2a1 1 0 00-1 1v1h2V3a1 1 0 00-1-1zM9 4V3a3 3 0 116 0v1h3a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V5a1 1 0 011-1h3zm-3 2v14h12V6H6zm6 9a1 1 0 100 2 1 1 0 000-2z"/>
+                    </svg>
+                    Decryption
+                </h2>
                 <div class="form-group">
                     <label for="input-ciphertext">Ciphertext (Pairs)</label>
                     <textarea id="input-ciphertext" placeholder="Paste ciphertext pairs here"></textarea>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn-decrypt" onclick="decrypt()"><span class="icon">▶️</span> Decrypt</button>
-                    <button onclick="document.getElementById('input-ciphertext').value = ''">Clear</button>
+                    <button class="btn-decrypt" id="decrypt-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21.707 3.707a1 1 0 00-1.414-1.414L3 19.586V16a1 1 0 10-2 0v6a1 1 0 001 1h6a1 1 0 100-2H4.414L21.707 3.707z"/>
+                        </svg>
+                        Decrypt
+                    </button>
+                    <button id="clear-decrypt">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 2a1 1 0 00-1 1v1h6V3a1 1 0 00-1-1h-4zM5 5h14a1 1 0 010 2h-1v13a3 3 0 01-3 3H9a3 3 0 01-3-3V7H5a1 1 0 110-2zm4 4h6a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1v-9a1 1 0 011-1z"/>
+                        </svg>
+                        Clear
+                    </button>
                 </div>
                 <div class="form-group">
                     <label for="decrypted">Decrypted Text</label>
                     <div class="output-group">
                         <textarea id="decrypted" placeholder="Decrypted text will appear here" readonly></textarea>
-                        <button class="copy-btn" onclick="copyToClipboard('decrypted')">Copy</button>
+                        <button class="copy-btn" id="copy-decrypted">Copy</button>
                     </div>
                 </div>
                 <div id="decrypt-status" class="status"></div>
             </div>
         </div>
         
-        <div class="algorithm-explanation">
-            <h2><span class="icon">🧠</span> Algorithm Explanation</h2>
-            <div class="explanation-content">
+        <div class="algorithm-info">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 110-16 8 8 0 010 16zm1-13a1 1 0 10-2 0v5a1 1 0 102 0V7zm-1 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                </svg>
+                Algorithm Details
+            </h2>
+            <div class="key-info">
                 <div>
                     <h3>Encryption Process</h3>
-                    <p>For each character in the plaintext:</p>
-                    <ol>
-                        <li>Convert character to numerical value m (position in alphabet)</li>
-                        <li>Generate a cryptographically secure random number k</li>
-                        <li>Compute a = g<sup>k</sup> mod p</li>
-                        <li>Compute b = m × (g<sup>m</sup>)<sup>k</sup> mod p = m × g<sup>m×k</sup> mod p</li>
-                        <li>The ciphertext is the pair (a, b)</li>
-                    </ol>
                     <div class="math-expression">
-                        Ciphertext = (g<sup>k</sup> mod p, m × g<sup>m×k</sup> mod p)
+                        For each character m in plaintext:<br>
+                        1. Convert to numeric value<br>
+                        2. Generate random k where 1 < k < p-1<br>
+                        3. Compute a = g<sup>k</sup> mod p<br>
+                        4. Compute b = m × (g<sup>m</sup>)<sup>k</sup> mod p<br>
+                        5. Output pair (a, b)
                     </div>
                 </div>
                 <div>
                     <h3>Decryption Process</h3>
-                    <p>For each ciphertext pair (a, b):</p>
-                    <ol>
-                        <li>For each possible character value m in alphabet:</li>
-                        <li>Compute a<sup>m</sup> mod p</li>
-                        <li>Check if b ≡ m × a<sup>m</sup> mod p</li>
-                        <li>When match is found, convert m back to character</li>
-                    </ol>
                     <div class="math-expression">
-                        For each m in alphabet: check if b ≡ m × a<sup>m</sup> mod p
+                        For each ciphertext pair (a, b):<br>
+                        1. For each possible m in alphabet:<br>
+                        2. Compute a<sup>m</sup> mod p<br>
+                        3. Check if b ≡ m × a<sup>m</sup> mod p<br>
+                        4. When match found, convert m to character
                     </div>
-                    <p>The decryption requires trying all possible m values, which is efficient for standard alphabets.</p>
                 </div>
             </div>
             <div class="math-expression">
-                <strong>Why this works:</strong> a<sup>m</sup> ≡ (g<sup>k</sup>)<sup>m</sup> ≡ g<sup>k×m</sup> mod p, and b = m × g<sup>m×k</sup> mod p, so b ≡ m × a<sup>m</sup> mod p
+                <strong>Mathematical Foundation:</strong> The security relies on the difficulty of the discrete logarithm problem. For each plaintext character, multiple ciphertext pairs are possible due to the random exponent k, providing homophonic properties.
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            updateAlphabetMapping();
-            document.getElementById('prime').addEventListener('input', updateAlphabetMapping);
-            document.getElementById('alphabet').addEventListener('input', updateAlphabetMapping);
-        });
-        
-        // Update the alphabet mapping display
-        function updateAlphabetMapping() {
-            const alphabet = document.getElementById('alphabet').value;
-            const prime = parseInt(document.getElementById('prime').value);
-            let mapping = '';
-            
-            for (let i = 0; i < alphabet.length; i++) {
-                const char = alphabet[i];
-                const value = i + 1;
-                if (value >= prime) {
-                    showStatus('error', 'Prime must be larger than alphabet size', 'encrypt-status');
-                    break;
+        class BigNumber {
+            constructor(value) {
+                if (typeof value === 'string') {
+                    this.value = BigInt(value);
+                } else if (typeof value === 'bigint') {
+                    this.value = value;
+                } else {
+                    this.value = BigInt(value);
                 }
-                mapping += `${char}=${value}`;
-                if (i < alphabet.length - 1) mapping += ', ';
-                if (i > 0 && i % 10 === 0) mapping += '\n';
             }
             
-            document.getElementById('alphabet-mapping').textContent = mapping;
+            add(other) {
+                return new BigNumber(this.value + BigInt(other));
+            }
+            
+            subtract(other) {
+                return new BigNumber(this.value - BigInt(other));
+            }
+            
+            multiply(other) {
+                return new BigNumber(this.value * BigInt(other));
+            }
+            
+            mod(other) {
+                return new BigNumber(this.value % BigInt(other));
+            }
+            
+            modPow(exponent, modulus) {
+                let result = BigInt(1);
+                let base = this.value % BigInt(modulus);
+                let exp = BigInt(exponent);
+                
+                while (exp > 0) {
+                    if (exp % BigInt(2) === BigInt(1)) {
+                        result = (result * base) % BigInt(modulus);
+                    }
+                    base = (base * base) % BigInt(modulus);
+                    exp = exp / BigInt(2);
+                }
+                
+                return new BigNumber(result);
+            }
+            
+            toString() {
+                return this.value.toString();
+            }
+            
+            isPrime() {
+                const n = this.value;
+                if (n <= 1n) return false;
+                if (n <= 3n) return true;
+                if (n % 2n === 0n || n % 3n === 0n) return false;
+                
+                let i = 5n;
+                while (i * i <= n) {
+                    if (n % i === 0n || n % (i + 2n) === 0n) return false;
+                    i += 6n;
+                }
+                return true;
+            }
+        }
+
+        class HomophonicCipher {
+            constructor() {
+                this.p = null;
+                this.g = null;
+                this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            }
+            
+            setPrime(p) {
+                this.p = new BigNumber(p);
+            }
+            
+            setGenerator(g) {
+                this.g = new BigNumber(g);
+            }
+            
+            setAlphabet(alphabet) {
+                this.alphabet = alphabet;
+            }
+            
+            isReady() {
+                return this.p !== null && this.g !== null;
+            }
+            
+            getCryptoRandom() {
+                const array = new Uint32Array(1);
+                window.crypto.getRandomValues(array);
+                return array[0] / (0xFFFFFFFF + 1);
+            }
+            
+            generateRandomBigInt(min, max) {
+                const range = max - min;
+                const bits = range.toString(2).length;
+                let result;
+                
+                do {
+                    const array = new Uint32Array(Math.ceil(bits / 32));
+                    window.crypto.getRandomValues(array);
+                    result = BigInt(0);
+                    
+                    for (let i = 0; i < array.length; i++) {
+                        result = (result << 32n) + BigInt(array[i]);
+                    }
+                    
+                    result = result % range + min;
+                } while (result < min || result >= max);
+                
+                return result;
+            }
+            
+            encrypt(plaintext) {
+                if (!this.isReady()) {
+                    throw new Error("Cipher not initialized with prime and generator");
+                }
+                
+                const pVal = this.p.value;
+                const gVal = this.g.value;
+                let ciphertext = "";
+                
+                for (let i = 0; i < plaintext.length; i++) {
+                    const char = plaintext[i].toUpperCase();
+                    const index = this.alphabet.indexOf(char);
+                    
+                    if (index === -1) {
+                        ciphertext += char + " ";
+                        continue;
+                    }
+                    
+                    const m = index + 1;
+                    
+                    const k = this.generateRandomBigInt(2n, pVal - 1n);
+                    
+                    const a = this.g.modPow(k, this.p);
+                    
+                    const gmk = this.g.modPow(BigInt(m) * k, this.p);
+                    const b = new BigNumber(BigInt(m) * gmk.value % pVal);
+                    
+                    ciphertext += `(${a},${b}) `;
+                }
+                
+                return ciphertext.trim();
+            }
+            
+            decrypt(ciphertext) {
+                if (!this.isReady()) {
+                    throw new Error("Cipher not initialized with prime and generator");
+                }
+                
+                const pVal = this.p.value;
+                const pairs = ciphertext.match(/\(\d+,\d+\)/g) || [];
+                let decrypted = "";
+                
+                for (const pair of pairs) {
+                    const match = pair.match(/\((\d+),(\d+)\)/);
+                    if (!match) {
+                        decrypted += "?";
+                        continue;
+                    }
+                    
+                    const a = new BigNumber(match[1]);
+                    const b = new BigNumber(match[2]);
+                    
+                    let found = false;
+                    for (let m = 1; m <= this.alphabet.length; m++) {
+                        const am = a.modPow(m, this.p);
+                        const check = new BigNumber(BigInt(m) * am.value % pVal);
+                        
+                        if (b.value === check.value) {
+                            decrypted += this.alphabet[m - 1];
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        decrypted += "?";
+                    }
+                }
+                
+                return decrypted;
+            }
+            
+            async generateLargePrime(bitLength) {
+                const bits = parseInt(bitLength);
+                const min = BigInt(2) ** BigInt(bits - 1);
+                const max = BigInt(2) ** BigInt(bits) - BigInt(1);
+                
+                let prime;
+                let attempts = 0;
+                const startTime = performance.now();
+                
+                do {
+                    prime = this.generateRandomBigInt(min, max);
+                    attempts++;
+                    
+                    if (attempts % 100 === 0) {
+                        await new Promise(resolve => setTimeout(resolve, 0));
+                    }
+                } while (!new BigNumber(prime).isPrime() && attempts < 10000);
+                
+                const endTime = performance.now();
+                
+                if (attempts >= 10000) {
+                    throw new Error("Failed to generate prime after 10000 attempts");
+                }
+                
+                return {
+                    prime: new BigNumber(prime),
+                    time: endTime - startTime,
+                    attempts: attempts
+                };
+            }
+            
+            findGenerator() {
+                if (!this.p) {
+                    throw new Error("Prime must be set first");
+                }
+                
+                const pVal = this.p.value;
+                const phi = pVal - 1n;
+                
+                const primeFactors = this.factorize(phi);
+                
+                for (let g = 2n; g < pVal; g++) {
+                    let isGenerator = true;
+                    
+                    for (const factor of primeFactors) {
+                        const exponent = phi / factor;
+                        if (new BigNumber(g).modPow(exponent, this.p).value === 1n) {
+                            isGenerator = false;
+                            break;
+                        }
+                    }
+                    
+                    if (isGenerator) {
+                        return new BigNumber(g);
+                    }
+                }
+                
+                throw new Error("Generator not found");
+            }
+            
+            factorize(n) {
+                const factors = new Set();
+                let remaining = n;
+                
+                let factor = 2n;
+                while (factor * factor <= remaining) {
+                    if (remaining % factor === 0n) {
+                        factors.add(factor);
+                        remaining /= factor;
+                    } else {
+                        factor += 1n;
+                    }
+                }
+                
+                if (remaining > 1n) {
+                    factors.add(remaining);
+                }
+                
+                return Array.from(factors);
+            }
+        }
+
+        const cipher = new HomophonicCipher();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('generate-prime').addEventListener('click', generatePrime);
+            document.getElementById('find-generator').addEventListener('click', findGenerator);
+            document.getElementById('encrypt-btn').addEventListener('click', encrypt);
+            document.getElementById('decrypt-btn').addEventListener('click', decrypt);
+            document.getElementById('clear-encrypt').addEventListener('click', () => {
+                document.getElementById('plaintext').value = '';
+                document.getElementById('ciphertext').value = '';
+            });
+            document.getElementById('clear-decrypt').addEventListener('click', () => {
+                document.getElementById('input-ciphertext').value = '';
+                document.getElementById('decrypted').value = '';
+            });
+            document.getElementById('copy-ciphertext').addEventListener('click', () => {
+                copyToClipboard('ciphertext');
+            });
+            document.getElementById('copy-decrypted').addEventListener('click', () => {
+                copyToClipboard('decrypted');
+            });
+            document.getElementById('alphabet').addEventListener('input', updateAlphabet);
+            
+            generatePrime();
+        });
+        
+        function updateAlphabet() {
+            cipher.setAlphabet(document.getElementById('alphabet').value);
         }
         
-        // Show status message
-        function showStatus(type, message, elementId) {
+        async function generatePrime() {
+            try {
+                const bitLength = document.getElementById('prime-bitlength').value;
+                showStatus('Generating large prime...', 'encrypt-status');
+                
+                const result = await cipher.generateLargePrime(bitLength);
+                cipher.setPrime(result.prime);
+                
+                document.getElementById('prime').value = result.prime.toString();
+                showStatus(`Generated ${bitLength}-bit prime in ${result.time.toFixed(2)}ms (${result.attempts} attempts)`, 'encrypt-status', 'success');
+                
+                findGenerator();
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'encrypt-status', 'error');
+            }
+        }
+        
+        function findGenerator() {
+            try {
+                if (!cipher.p) {
+                    showStatus('Generate a prime first', 'encrypt-status', 'error');
+                    return;
+                }
+                
+                showStatus('Finding generator...', 'encrypt-status');
+                
+                const startTime = performance.now();
+                const generator = cipher.findGenerator();
+                const endTime = performance.now();
+                
+                cipher.setGenerator(generator);
+                document.getElementById('generator').value = generator.toString();
+                
+                showStatus(`Found generator in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status', 'success');
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'encrypt-status', 'error');
+            }
+        }
+        
+        function encrypt() {
+            try {
+                const plaintext = document.getElementById('plaintext').value;
+                cipher.setAlphabet(document.getElementById('alphabet').value);
+                
+                if (!cipher.isReady()) {
+                    showStatus('Initialize prime and generator first', 'encrypt-status', 'error');
+                    return;
+                }
+                
+                const startTime = performance.now();
+                const encrypted = cipher.encrypt(plaintext);
+                const endTime = performance.now();
+                
+                document.getElementById('ciphertext').value = encrypted;
+                showStatus(`Encrypted in ${(endTime - startTime).toFixed(2)}ms`, 'encrypt-status', 'success');
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'encrypt-status', 'error');
+            }
+        }
+        
+        function decrypt() {
+            try {
+                const ciphertext = document.getElementById('input-ciphertext').value;
+                cipher.setAlphabet(document.getElementById('alphabet').value);
+                
+                if (!cipher.isReady()) {
+                    showStatus('Initialize prime and generator first', 'decrypt-status', 'error');
+                    return;
+                }
+                
+                const startTime = performance.now();
+                const decrypted = cipher.decrypt(ciphertext);
+                const endTime = performance.now();
+                
+                document.getElementById('decrypted').value = decrypted;
+                showStatus(`Decrypted in ${(endTime - startTime).toFixed(2)}ms`, 'decrypt-status', 'success');
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'decrypt-status', 'error');
+            }
+        }
+        
+        function showStatus(message, elementId, type = '') {
             const element = document.getElementById(elementId);
             element.textContent = message;
-            element.className = 'status ' + type;
-            
-            // Clear status after 5 seconds
-            setTimeout(() => {
-                element.className = 'status';
-                element.textContent = '';
-            }, 5000);
+            element.className = 'status' + (type ? ' ' + type : '');
         }
         
-        // Copy text to clipboard
         function copyToClipboard(elementId) {
             const textarea = document.getElementById(elementId);
             textarea.select();
             document.execCommand('copy');
-            showStatus('success', 'Copied to clipboard', elementId + '-status');
-        }
-        
-        // Generate a large prime number
-        function generatePrime() {
-            // In a real application, this would generate a much larger prime
-            // For demonstration, we'll use a precomputed list of primes
-            const primes = [101, 211, 307, 401, 503, 601, 701, 809, 907, 1009, 
-                            1103, 1201, 1301, 1409, 1511, 1601, 1709, 1801, 1901, 2003];
-            const randomPrime = primes[Math.floor(Math.random() * primes.length)];
-            document.getElementById('prime').value = randomPrime;
-            updateAlphabetMapping();
-            showStatus('success', `Generated prime: ${randomPrime}`, 'encrypt-status');
-        }
-        
-        // Find a generator for the current prime
-        function findGenerator() {
-            const p = parseInt(document.getElementById('prime').value);
-            if (!p || p < 2) {
-                showStatus('error', 'Please enter a valid prime number', 'encrypt-status');
-                return;
-            }
             
-            // Simple algorithm to find a generator
-            // In real applications, more sophisticated methods would be used
-            for (let g = 2; g < p; g++) {
-                if (isGenerator(g, p)) {
-                    document.getElementById('generator').value = g;
-                    showStatus('success', `Found generator: ${g}`, 'encrypt-status');
-                    return;
-                }
-            }
-            
-            showStatus('error', 'No generator found for this prime', 'encrypt-status');
-        }
-        
-        // Check if g is a generator modulo p
-        function isGenerator(g, p) {
-            // This is a simplified check - not efficient for very large primes
-            const seen = new Set();
-            let current = 1;
-            
-            for (let i = 1; i < p; i++) {
-                current = (current * g) % p;
-                if (seen.has(current)) return false;
-                seen.add(current);
-            }
-            
-            return true;
-        }
-        
-        // Modular exponentiation: (base^exponent) % modulus
-        function modExp(base, exponent, modulus) {
-            if (modulus === 1) return 0;
-            
-            let result = 1;
-            base = base % modulus;
-            
-            while (exponent > 0) {
-                if (exponent % 2 === 1) {
-                    result = (result * base) % modulus;
-                }
-                exponent = Math.floor(exponent / 2);
-                base = (base * base) % modulus;
-            }
-            
-            return result;
-        }
-        
-        // Get cryptographically secure random values
-        function getCryptoRandom() {
-            const array = new Uint32Array(1);
-            window.crypto.getRandomValues(array);
-            return array[0] / (0xFFFFFFFF + 1);
-        }
-        
-        // Encrypt function
-        function encrypt() {
-            const plaintext = document.getElementById('plaintext').value.toUpperCase();
-            const alphabet = document.getElementById('alphabet').value.toUpperCase();
-            const p = parseInt(document.getElementById('prime').value);
-            const g = parseInt(document.getElementById('generator').value);
-            
-            if (!p || !g) {
-                showStatus('error', 'Please enter valid prime and generator values', 'encrypt-status');
-                return;
-            }
-            
-            if (p <= alphabet.length) {
-                showStatus('error', 'Prime must be larger than alphabet size', 'encrypt-status');
-                return;
-            }
-            
-            let ciphertext = '';
-            
-            for (let i = 0; i < plaintext.length; i++) {
-                const char = plaintext[i];
-                const index = alphabet.indexOf(char);
-                
-                if (index === -1) {
-                    // Character not in alphabet, leave as is
-                    ciphertext += char + ' ';
-                    continue;
-                }
-                
-                // Character value (1-indexed)
-                const m = index + 1;
-                
-                // Generate cryptographically secure random k for each character (1 < k < p-1)
-                const k = Math.floor(getCryptoRandom() * (p - 2)) + 2;
-                
-                // Compute a = g^k mod p
-                const a = modExp(g, k, p);
-                
-                // Compute b = m * (g^m)^k mod p = m * g^(m*k) mod p
-                const gmk = modExp(g, m * k, p);
-                const b = (m * gmk) % p;
-                
-                // Append the pair (a, b) to the ciphertext
-                ciphertext += `(${a},${b}) `;
-            }
-            
-            document.getElementById('ciphertext').value = ciphertext.trim();
-            showStatus('success', 'Encryption completed successfully', 'encrypt-status');
-        }
-        
-        // Decrypt function
-        function decrypt() {
-            const ciphertext = document.getElementById('input-ciphertext').value;
-            const alphabet = document.getElementById('alphabet').value.toUpperCase();
-            const p = parseInt(document.getElementById('prime').value);
-            
-            if (!p) {
-                showStatus('error', 'Please enter a valid prime value', 'decrypt-status');
-                return;
-            }
-            
-            let decrypted = '';
-            
-            // Split ciphertext into pairs
-            const pairs = ciphertext.match(/\(\d+,\d+\)/g) || [];
-            
-            for (const pair of pairs) {
-                // Extract a and b values from the pair
-                const match = pair.match(/\((\d+),(\d+)\)/);
-                if (!match) {
-                    decrypted += '?';
-                    continue;
-                }
-                
-                const a = parseInt(match[1]);
-                const b = parseInt(match[2]);
-                
-                // Try each possible character value to find the correct one
-                let found = false;
-                for (let m = 1; m <= alphabet.length; m++) {
-                    // Compute a^m mod p
-                    const am = modExp(a, m, p);
-                    
-                    // Check if b ≡ m * a^m mod p
-                    if (b === (m * am) % p) {
-                        decrypted += alphabet[m - 1];
-                        found = true;
-                        break;
-                    }
-                }
-                
-                if (!found) {
-                    decrypted += '?';
-                }
-            }
-            
-            document.getElementById('decrypted').value = decrypted;
-            showStatus('success', 'Decryption completed successfully', 'decrypt-status');
+            const statusElement = elementId === 'ciphertext' ? 'encrypt-status' : 'decrypt-status';
+            showStatus('Copied to clipboard', statusElement, 'success');
         }
     </script>
 </body>
