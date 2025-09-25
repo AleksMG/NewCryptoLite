@@ -3,338 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Quantum Homophonic Cipher</title>
+    <title>Quantum Homophonic Cipher Pro</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #7c3aed;
-            --accent: #06d6a0;
-            --error: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-            --background: #0f172a;
-            --surface: #1e293b;
-            --surface-alt: #334155;
-            --text: #f1f5f9;
-            --text-dim: #94a3b8;
-            --border: #475569;
+            --primary: #1a365d; --secondary: #2d3748; --accent: #3182ce;
+            --error: #e53e3e; --success: #38a169; --warning: #dd6b20;
+            --background: #0f172a; --surface: #1e293b; --text: #f7fafc;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: var(--background); color: var(--text); 
+            font-family: 'Courier New', monospace; padding: 20px;
         }
-
-        body {
-            background: var(--background);
-            color: var(--text);
-            font-family: 'Fira Code', monospace;
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: var(--surface);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .control-panel {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .config-panel {
-            background: var(--surface);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .main-panel {
-            background: var(--surface);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: var(--text-dim);
-            font-size: 0.9rem;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 10px;
-            background: var(--surface-alt);
-            border: 1px solid var(--border);
-            border-radius: 5px;
-            color: var(--text);
-            font-family: 'Fira Code', monospace;
-        }
-
-        textarea.input-field {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Fira Code', monospace;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .output-area {
-            background: var(--surface-alt);
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-            min-height: 100px;
-            border: 1px solid var(--border);
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .analysis-panel {
-            background: var(--surface);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            margin-top: 20px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .stat-card {
-            background: var(--surface-alt);
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .mapping-visual {
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .mapping-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9rem;
-        }
-
-        .frequency-chart {
-            display: flex;
-            align-items: end;
-            height: 100px;
-            gap: 2px;
-            margin-top: 10px;
-        }
-
-        .frequency-bar {
-            flex: 1;
-            background: var(--accent);
-            min-height: 1px;
-        }
+        .container { max-width: 1800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; background: var(--surface); }
+        .grid { display: grid; grid-template-columns: 400px 1fr 400px; gap: 20px; }
+        .panel { background: var(--surface); padding: 20px; border-radius: 10px; }
+        .input-group { margin-bottom: 15px; }
+        .input-label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-field { width: 100%; padding: 10px; background: #2d3748; border: 1px solid #4a5568; color: var(--text); }
+        textarea.input-field { min-height: 120px; resize: vertical; font-family: inherit; }
+        .btn { padding: 10px 15px; background: var(--accent); border: none; color: white; cursor: pointer; margin: 5px; }
+        .output { background: #2d3748; padding: 15px; margin-top: 10px; min-height: 100px; border: 1px solid #4a5568; }
+        .analysis { margin-top: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
+        .stat { background: #2d3748; padding: 10px; text-align: center; }
+        .mapping { max-height: 300px; overflow-y: auto; margin-top: 10px; }
+        .mapping-item { display: flex; justify-content: space-between; padding: 5px; border-bottom: 1px solid #4a5568; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Professional Quantum Homophonic Cipher</h1>
-            <p>Полная реализация гомофонного шифра с CBC режимом и афинными преобразованиями</p>
+            <h1>QUANTUM HOMOPHONIC CIPHER PROFESSIONAL</h1>
+            <p>Полная недетерминированная гомофонная система с профессиональным анализом</p>
         </div>
 
-        <div class="control-panel">
-            <div class="config-panel">
-                <h3>Конфигурация шифра</h3>
+        <div class="grid">
+            <!-- Левая панель - Конфигурация -->
+            <div class="panel">
+                <h3>КОНФИГУРАЦИЯ СИСТЕМЫ</h3>
                 
                 <div class="input-group">
-                    <label class="input-label">Ключ шифрования:</label>
-                    <input type="text" class="input-field" id="cryptoKey" value="quantum-key-256">
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="cbcMode" checked>
-                    <label for="cbcMode">CBC режим (цепочка блоков)</label>
-                </div>
-
-                <div class="checkbox-group">
-                    <input type="checkbox" id="affineMode" checked>
-                    <label for="affineMode">Афинные преобразования</label>
+                    <label class="input-label">КЛЮЧ ШИФРОВАНИЯ:</label>
+                    <input type="text" class="input-field" id="cryptoKey" value="quantum-secure-key-2024">
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">Параметр A (афинный):</label>
-                    <input type="number" class="input-field" id="affineA" value="5" min="1" max="25">
+                    <label class="input-label">АЛФАВИТ ИСТОЧНИКА (A-Z):</label>
+                    <input type="text" class="input-field" id="sourceAlphabet" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ">
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">Параметр B (афинный):</label>
-                    <input type="number" class="input-field" id="affineB" value="7" min="0" max="25">
+                    <label class="input-label">АЛФАВИТ ГОМОФОНОВ:</label>
+                    <textarea class="input-field" id="homophoneAlphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ§¶•ªº¡¿€£¥¢ƒ±×÷=<>∞≈~¬∧∨⊕⊗</textarea>
                 </div>
 
-                <div class="input-group">
-                    <label class="input-label">Алфавит гомофонов:</label>
-                    <textarea class="input-field" id="homophoneAlphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ</textarea>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="initializeSystem()">🚀 ИНИЦИАЛИЗИРОВАТЬ</button>
+                    <button class="btn" onclick="fullAnalysis()">📊 ПОЛНЫЙ АНАЛИЗ</button>
                 </div>
 
-                <button class="btn" onclick="initializeCipher()">Инициализировать шифр</button>
-                <button class="btn" onclick="analyzeSystem()">Анализ системы</button>
+                <div class="analysis">
+                    <h4>СТАТУС СИСТЕМЫ:</h4>
+                    <div class="output" id="systemStatus">Ожидание инициализации...</div>
+                </div>
             </div>
 
-            <div class="main-panel">
-                <h3>Обработка текста</h3>
+            <!-- Центральная панель - Обработка -->
+            <div class="panel">
+                <h3>ОБРАБОТКА ТЕКСТА</h3>
                 
                 <div class="input-group">
-                    <label class="input-label">Исходный текст:</label>
-                    <textarea class="input-field" id="plainText">QUANTUM HOMOPHONIC CIPHER DEMONSTRATION</textarea>
+                    <label class="input-label">ИСХОДНЫЙ ТЕКСТ:</label>
+                    <textarea class="input-field" id="plainText">QUANTUM HOMOPHONIC CIPHER DEMONSTRATION TEXT FOR SECURE COMMUNICATION</textarea>
                 </div>
 
-                <button class="btn" onclick="encryptText()">Зашифровать</button>
-                <button class="btn" onclick="decryptText()">Расшифровать</button>
-
-                <div class="input-group">
-                    <label class="input-label">Результат:</label>
-                    <div class="output-area" id="outputResult"></div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="encryptText()">🔒 ЗАШИФРОВАТЬ</button>
+                    <button class="btn" onclick="decryptText()">🔓 РАСШИФРОВАТЬ</button>
+                    <button class="btn" onclick="testRoundTrip()">🔄 ТЕСТ ЦИКЛА</button>
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">Зашифрованный текст для расшифровки:</label>
-                    <textarea class="input-field" id="cipherText"></textarea>
+                    <label class="input-label">ЗАШИФРОВАННЫЙ ТЕКСТ:</label>
+                    <div class="output" id="cipherOutput"></div>
                 </div>
-            </div>
-        </div>
 
-        <div class="analysis-panel">
-            <h3>Анализ и визуализация</h3>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="entropyValue">0.00</div>
-                    <div>Энтропия (бит/символ)</div>
+                <div class="input-group">
+                    <label class="input-label">ТЕКСТ ДЛЯ РАСШИФРОВКИ:</label>
+                    <textarea class="input-field" id="cipherInput"></textarea>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="homophoneCount">0</div>
-                    <div>Уникальных гомофонов</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="bigramCoverage">0%</div>
-                    <div>Покрытие биграмм</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="securityLevel">0%</div>
-                    <div>Уровень безопасности</div>
+
+                <div class="input-group">
+                    <label class="input-label">РАСШИФРОВАННЫЙ ТЕКСТ:</label>
+                    <div class="output" id="decryptedOutput"></div>
                 </div>
             </div>
 
-            <div class="mapping-visual" id="mappingVisual">
-                <div>Маппинг биграмм на гомофоны будет отображен здесь</div>
-            </div>
+            <!-- Правая панель - Анализ -->
+            <div class="panel">
+                <h3>АНАЛИЗ И ВИЗУАЛИЗАЦИЯ</h3>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div style="font-size: 24px; color: #3182ce;" id="entropyValue">0.00</div>
+                        <div>Энтропия</div>
+                    </div>
+                    <div class="stat">
+                        <div style="font-size: 24px; color: #38a169;" id="homophoneCount">0</div>
+                        <div>Гомофоны</div>
+                    </div>
+                    <div class="stat">
+                        <div style="font-size: 24px; color: #dd6b20;" id="bigramCount">0</div>
+                        <div>Биграммы</div>
+                    </div>
+                    <div class="stat">
+                        <div style="font-size: 24px; color: #e53e3e;" id="securityLevel">0%</div>
+                        <div>Безопасность</div>
+                    </div>
+                </div>
 
-            <div class="input-group">
-                <label class="input-label">Частотный анализ:</label>
-                <div class="frequency-chart" id="frequencyChart"></div>
+                <div class="input-group">
+                    <label class="input-label">ЧАСТОТНЫЙ АНАЛИЗ:</label>
+                    <div class="output" id="frequencyAnalysis"></div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">МАППИНГ БИГРАММ (первые 50):</label>
+                    <div class="mapping" id="mappingVisualization"></div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">ДИАГНОСТИКА СИСТЕМЫ:</label>
+                    <div class="output" id="systemDiagnostics"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        class ProfessionalHomophonicCipher {
+        class QuantumHomophonicCipherPro {
             constructor() {
-                this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                this.sourceAlphabet = '';
                 this.homophoneAlphabet = '';
                 this.sBox = new Map();
                 this.reverseSBox = new Map();
                 this.duplicates = new Set();
+                this.nonDeterministicCache = new Map();
                 this.config = {
                     cbcMode: true,
                     affineMode: true,
-                    affineA: 5,
-                    affineB: 7,
+                    affineA: 7,
+                    affineB: 3,
                     iv: 'AA'
                 };
             }
 
-            initialize(homophoneChars, key) {
-                // Валидация и подготовка алфавита
-                const uniqueChars = [...new Set(homophoneChars)].filter(c => c.trim() !== '');
-                if (uniqueChars.length < 2) throw new Error('Алфавит слишком мал');
+            initialize(sourceAlphabet, homophoneAlphabet, key) {
+                // Валидация и подготовка алфавитов
+                this.sourceAlphabet = [...new Set(sourceAlphabet.toUpperCase())].join('');
+                this.homophoneAlphabet = [...new Set(homophoneAlphabet)].join('');
                 
-                this.homophoneAlphabet = uniqueChars.join('');
+                if (this.sourceAlphabet.length < 2) throw new Error('Исходный алфавит слишком мал');
+                if (this.homophoneAlphabet.length < 2) throw new Error('Алфавит гомофонов слишком мал');
+
                 this.generateSBox(key);
+                return this.getSystemStats();
             }
 
             generateSBox(key) {
                 this.sBox.clear();
                 this.reverseSBox.clear();
                 this.duplicates.clear();
+                this.nonDeterministicCache.clear();
 
                 const bigrams = this.generateAllBigrams();
                 const homophones = this.generateAllHomophones();
                 
-                // Ключе-зависимое перемешивание
-                const shuffledHomophones = this.keyBasedShuffle(homophones, key);
+                // Недетерминированное перемешивание на основе ключа и времени
+                const shuffledHomophones = this.nonDeterministicShuffle(homophones, key);
                 
-                // Распределение гомофонов по биграммам
-                this.distributeHomophones(bigrams, shuffledHomophones);
+                // Распределение с учетом недетерминированности
+                this.distributeHomophonesNonDeterministic(bigrams, shuffledHomophones, key);
                 this.buildReverseMapping();
             }
 
             generateAllBigrams() {
                 const bigrams = [];
-                for (let i = 0; i < this.alphabet.length; i++) {
-                    for (let j = 0; j < this.alphabet.length; j++) {
-                        bigrams.push(this.alphabet[i] + this.alphabet[j]);
+                for (let i = 0; i < this.sourceAlphabet.length; i++) {
+                    for (let j = 0; j < this.sourceAlphabet.length; j++) {
+                        bigrams.push(this.sourceAlphabet[i] + this.sourceAlphabet[j]);
                     }
                 }
                 return bigrams;
@@ -342,53 +201,68 @@
 
             generateAllHomophones() {
                 const homophones = [];
-                const chars = this.homophoneAlphabet;
-                for (let i = 0; i < chars.length; i++) {
-                    for (let j = 0; j < chars.length; j++) {
-                        homophones.push(chars[i] + chars[j]);
+                for (let i = 0; i < this.homophoneAlphabet.length; i++) {
+                    for (let j = 0; j < this.homophoneAlphabet.length; j++) {
+                        homophones.push(this.homophoneAlphabet[i] + this.homophoneAlphabet[j]);
                     }
                 }
                 return homophones;
             }
 
-            keyBasedShuffle(array, key) {
-                // Детерминистичное перемешивание на основе ключа
-                const seed = this.stringToSeed(key);
+            nonDeterministicShuffle(array, key) {
+                // Недетерминированное перемешивание с использованием времени и случайности
+                const seed = this.createNonDeterministicSeed(key);
                 const result = [...array];
                 
                 for (let i = result.length - 1; i > 0; i--) {
-                    const j = this.pseudoRandom(seed + i) % (i + 1);
+                    const j = this.nonDeterministicRandom(seed, i) % (i + 1);
                     [result[i], result[j]] = [result[j], result[i]];
                 }
                 
                 return result;
             }
 
-            stringToSeed(str) {
+            createNonDeterministicSeed(key) {
+                // Комбинация ключа, времени и математической константы для недетерминированности
+                const timeFactor = Date.now() % 1000000;
+                const randomFactor = Math.random() * 1000000;
+                return this.hashString(key + timeFactor + randomFactor);
+            }
+
+            hashString(str) {
                 let hash = 0;
                 for (let i = 0; i < str.length; i++) {
                     hash = ((hash << 5) - hash) + str.charCodeAt(i);
                     hash |= 0;
                 }
-                return hash;
+                return Math.abs(hash);
             }
 
-            pseudoRandom(seed) {
-                let x = Math.sin(seed++) * 10000;
+            nonDeterministicRandom(seed, index) {
+                // Недетерминированный ГПСЧ
+                const x = Math.sin(seed + index + Math.random() * 1000) * 10000;
                 return Math.floor((x - Math.floor(x)) * 0xFFFFFFFF);
             }
 
-            distributeHomophones(bigrams, homophones) {
+            distributeHomophonesNonDeterministic(bigrams, homophones, key) {
                 const totalHomophones = homophones.length;
                 const totalBigrams = bigrams.length;
-                const baseCount = Math.floor(totalHomophones / totalBigrams);
-                const extra = totalHomophones % totalBigrams;
-
+                
+                // Недетерминированное распределение с варьирующимся количеством гомофонов на биграмму
                 let index = 0;
+                const distributionSeed = this.createNonDeterministicSeed(key + 'distribution');
+                
                 for (let i = 0; i < totalBigrams; i++) {
-                    const count = i < extra ? baseCount + 1 : baseCount;
-                    this.sBox.set(bigrams[i], homophones.slice(index, index + count));
-                    index += count;
+                    // Недетерминированное количество гомофонов для каждой биграммы
+                    const minHomophones = 1;
+                    const maxHomophones = Math.floor(totalHomophones / totalBigrams) * 3;
+                    const count = minHomophones + this.nonDeterministicRandom(distributionSeed, i) % (maxHomophones - minHomophones + 1);
+                    
+                    const available = Math.min(count, totalHomophones - index);
+                    if (available > 0) {
+                        this.sBox.set(bigrams[i], homophones.slice(index, index + available));
+                        index += available;
+                    }
                 }
             }
 
@@ -403,7 +277,7 @@
                     }
                 }
                 
-                // Удаляем дубликаты из обратного маппинга
+                // Удаляем дубликаты для обеспечения однозначности расшифровки
                 for (const duplicate of this.duplicates) {
                     this.reverseSBox.delete(duplicate);
                 }
@@ -421,23 +295,23 @@
                     let bigram = processed.substr(i, 2);
                     if (bigram.length === 1) bigram += 'X';
 
-                    // Применяем преобразования
-                    let targetBigram = bigram;
-                    
+                    // Применяем афинные преобразования
+                    let transformedBigram = bigram;
                     if (this.config.affineMode) {
-                        targetBigram = this.applyAffine(targetBigram);
-                    }
-                    
-                    if (this.config.cbcMode) {
-                        targetBigram = this.applyCBC(targetBigram, previousBlock, position);
+                        transformedBigram = this.applyAffineTransformation(bigram);
                     }
 
-                    // Шифруем гомофонами
-                    if (this.sBox.has(targetBigram)) {
-                        const homophones = this.sBox.get(targetBigram);
-                        const randomIndex = this.pseudoRandom(position) % homophones.length;
+                    // Применяем CBC режим
+                    if (this.config.cbcMode) {
+                        transformedBigram = this.applyCBCMode(transformedBigram, previousBlock, position);
+                    }
+
+                    // Недетерминированный выбор гомофона
+                    if (this.sBox.has(transformedBigram)) {
+                        const homophones = this.sBox.get(transformedBigram);
+                        const randomIndex = this.nonDeterministicRandom(position + i, Date.now()) % homophones.length;
                         ciphertext += homophones[randomIndex];
-                        previousBlock = targetBigram;
+                        previousBlock = transformedBigram;
                     }
                     
                     position++;
@@ -447,7 +321,9 @@
             }
 
             decrypt(ciphertext) {
-                if (ciphertext.length % 2 !== 0) throw new Error('Неверная длина шифротекста');
+                if (ciphertext.length % 2 !== 0) {
+                    throw new Error('Длина шифротекста должна быть четной');
+                }
 
                 let plaintext = '';
                 let previousBlock = this.config.iv;
@@ -457,22 +333,23 @@
                     const homophone = ciphertext.substr(i, 2);
                     
                     if (this.duplicates.has(homophone)) {
-                        throw new Error(`Гомофон ${homophone} является дубликатом`);
+                        throw new Error(`Гомофон ${homophone} является дубликатом и не может быть расшифрован`);
                     }
                     
                     if (!this.reverseSBox.has(homophone)) {
-                        throw new Error(`Гомофон ${homophone} не найден`);
+                        throw new Error(`Гомофон ${homophone} не найден в таблице преобразования`);
                     }
 
                     let bigram = this.reverseSBox.get(homophone);
 
-                    // Обратные преобразования
+                    // Обратное CBC преобразование
                     if (this.config.cbcMode) {
-                        bigram = this.reverseCBC(bigram, previousBlock, position);
+                        bigram = this.reverseCBCMode(bigram, previousBlock, position);
                     }
-                    
+
+                    // Обратное афинное преобразование
                     if (this.config.affineMode) {
-                        bigram = this.reverseAffine(bigram);
+                        bigram = this.reverseAffineTransformation(bigram);
                     }
 
                     plaintext += bigram;
@@ -480,7 +357,7 @@
                     position++;
                 }
 
-                // Удаляем паддинг
+                // Удаление паддинга
                 if (plaintext.endsWith('X')) {
                     plaintext = plaintext.slice(0, -1);
                 }
@@ -488,21 +365,22 @@
                 return plaintext;
             }
 
-            applyAffine(bigram) {
+            applyAffineTransformation(bigram) {
                 let result = '';
                 for (const char of bigram) {
-                    const x = this.alphabet.indexOf(char);
-                    const y = (this.config.affineA * x + this.config.affineB) % 26;
-                    result += this.alphabet[y];
+                    const x = this.sourceAlphabet.indexOf(char);
+                    const y = (this.config.affineA * x + this.config.affineB) % this.sourceAlphabet.length;
+                    result += this.sourceAlphabet[y];
                 }
                 return result;
             }
 
-            reverseAffine(bigram) {
-                // Находим обратный элемент для A mod 26
+            reverseAffineTransformation(bigram) {
+                // Находим обратный элемент для a mod m
+                const m = this.sourceAlphabet.length;
                 let aInv = 0;
-                for (let i = 0; i < 26; i++) {
-                    if ((this.config.affineA * i) % 26 === 1) {
+                for (let i = 0; i < m; i++) {
+                    if ((this.config.affineA * i) % m === 1) {
                         aInv = i;
                         break;
                     }
@@ -510,31 +388,31 @@
 
                 let result = '';
                 for (const char of bigram) {
-                    const y = this.alphabet.indexOf(char);
-                    const x = (aInv * (y - this.config.affineB + 26)) % 26;
-                    result += this.alphabet[x];
+                    const y = this.sourceAlphabet.indexOf(char);
+                    const x = (aInv * (y - this.config.affineB + m)) % m;
+                    result += this.sourceAlphabet[x];
                 }
                 return result;
             }
 
-            applyCBC(bigram, previousBlock, position) {
+            applyCBCMode(bigram, previousBlock, position) {
                 let result = '';
                 for (let i = 0; i < 2; i++) {
-                    const current = this.alphabet.indexOf(bigram[i]);
-                    const previous = this.alphabet.indexOf(previousBlock[i]);
-                    const newIndex = (current + previous + position) % 26;
-                    result += this.alphabet[newIndex];
+                    const current = this.sourceAlphabet.indexOf(bigram[i]);
+                    const previous = this.sourceAlphabet.indexOf(previousBlock[i]);
+                    const newIndex = (current + previous + position) % this.sourceAlphabet.length;
+                    result += this.sourceAlphabet[newIndex];
                 }
                 return result;
             }
 
-            reverseCBC(bigram, previousBlock, position) {
+            reverseCBCMode(bigram, previousBlock, position) {
                 let result = '';
                 for (let i = 0; i < 2; i++) {
-                    const current = this.alphabet.indexOf(bigram[i]);
-                    const previous = this.alphabet.indexOf(previousBlock[i]);
-                    const original = (current - previous - position + 78) % 26;
-                    result += this.alphabet[original];
+                    const current = this.sourceAlphabet.indexOf(bigram[i]);
+                    const previous = this.sourceAlphabet.indexOf(previousBlock[i]);
+                    const original = (current - previous - position + 3 * this.sourceAlphabet.length) % this.sourceAlphabet.length;
+                    result += this.sourceAlphabet[original];
                 }
                 return result;
             }
@@ -555,58 +433,76 @@
                 return entropy;
             }
 
-            getStatistics() {
+            getSystemStats() {
                 let minHomophones = Infinity;
                 let maxHomophones = 0;
                 let totalHomophones = 0;
-                let uncovered = 0;
+                let uncoveredBigrams = 0;
 
-                for (const homophones of this.sBox.values()) {
+                for (const [bigram, homophones] of this.sBox.entries()) {
                     const count = homophones.length;
                     if (count > 0) {
                         minHomophones = Math.min(minHomophones, count);
                         maxHomophones = Math.max(maxHomophones, count);
                         totalHomophones += count;
                     } else {
-                        uncovered++;
+                        uncoveredBigrams++;
                     }
                 }
 
-                const coverage = ((this.sBox.size - uncovered) / this.sBox.size) * 100;
-                const uniformity = 1 - (maxHomophones - minHomophones) / (maxHomophones || 1);
+                const coverage = ((this.sBox.size - uncoveredBigrams) / this.sBox.size) * 100;
+                const entropy = this.calculateEntropy(this.homophoneAlphabet);
+                const securityLevel = Math.min(100, (coverage / 100) * (entropy / 8) * 100);
 
                 return {
+                    sourceAlphabetSize: this.sourceAlphabet.length,
+                    homophoneAlphabetSize: this.homophoneAlphabet.length,
                     totalBigrams: this.sBox.size,
                     totalHomophones: totalHomophones,
-                    minPerBigram: minHomophones,
-                    maxPerBigram: maxHomophones,
-                    coverage: coverage,
-                    uniformity: uniformity,
-                    duplicates: this.duplicates.size
+                    minHomophonesPerBigram: minHomophones,
+                    maxHomophonesPerBigram: maxHomophones,
+                    coveragePercentage: coverage,
+                    entropy: entropy,
+                    securityLevel: securityLevel,
+                    duplicateHomophones: this.duplicates.size,
+                    uniqueMappings: this.reverseSBox.size
                 };
+            }
+
+            frequencyAnalysis(text) {
+                const freq = {};
+                for (const char of text.toUpperCase()) {
+                    if (this.sourceAlphabet.includes(char)) {
+                        freq[char] = (freq[char] || 0) + 1;
+                    }
+                }
+                return freq;
             }
         }
 
-        // Глобальные переменные
-        let cipher = new ProfessionalHomophonicCipher();
+        // Глобальный экземпляр шифра
+        const cipher = new QuantumHomophonicCipherPro();
 
-        function initializeCipher() {
+        function initializeSystem() {
             try {
                 const key = document.getElementById('cryptoKey').value;
-                const homophones = document.getElementById('homophoneAlphabet').value;
-                const affineA = parseInt(document.getElementById('affineA').value);
-                const affineB = parseInt(document.getElementById('affineB').value);
-                
-                cipher.config.cbcMode = document.getElementById('cbcMode').checked;
-                cipher.config.affineMode = document.getElementById('affineMode').checked;
-                cipher.config.affineA = affineA;
-                cipher.config.affineB = affineB;
+                const sourceAlphabet = document.getElementById('sourceAlphabet').value;
+                const homophoneAlphabet = document.getElementById('homophoneAlphabet').value;
 
-                cipher.initialize(homophones, key);
-                document.getElementById('outputResult').textContent = 'Шифр успешно инициализирован';
-                updateVisualization();
+                const stats = cipher.initialize(sourceAlphabet, homophoneAlphabet, key);
+                
+                document.getElementById('systemStatus').textContent = 
+                    `✅ Система инициализирована\n` +
+                    `Алфавит: ${stats.sourceAlphabetSize} символов\n` +
+                    `Гомофоны: ${stats.homophoneAlphabetSize} символов\n` +
+                    `Биграммы: ${stats.totalBigrams}\n` +
+                    `Покрытие: ${stats.coveragePercentage.toFixed(1)}%`;
+
+                updateStatistics(stats);
+                updateMappingVisualization();
+
             } catch (error) {
-                document.getElementById('outputResult').textContent = 'Ошибка: ' + error.message;
+                document.getElementById('systemStatus').textContent = `❌ Ошибка: ${error.message}`;
             }
         }
 
@@ -614,82 +510,108 @@
             try {
                 const plaintext = document.getElementById('plainText').value;
                 const ciphertext = cipher.encrypt(plaintext);
-                document.getElementById('outputResult').textContent = ciphertext;
-                document.getElementById('cipherText').value = ciphertext;
+                
+                document.getElementById('cipherOutput').textContent = ciphertext;
+                document.getElementById('cipherInput').value = ciphertext;
+                
+                // Автоматический анализ после шифрования
+                analyzeCiphertext(ciphertext);
+                
             } catch (error) {
-                document.getElementById('outputResult').textContent = 'Ошибка шифрования: ' + error.message;
+                document.getElementById('cipherOutput').textContent = `❌ Ошибка шифрования: ${error.message}`;
             }
         }
 
         function decryptText() {
             try {
-                const ciphertext = document.getElementById('cipherText').value;
+                const ciphertext = document.getElementById('cipherInput').value;
                 const plaintext = cipher.decrypt(ciphertext);
-                document.getElementById('outputResult').textContent = plaintext;
+                document.getElementById('decryptedOutput').textContent = plaintext;
+                
             } catch (error) {
-                document.getElementById('outputResult').textContent = 'Ошибка расшифровки: ' + error.message;
+                document.getElementById('decryptedOutput').textContent = `❌ Ошибка расшифровки: ${error.message}`;
             }
         }
 
-        function analyzeSystem() {
-            const stats = cipher.getStatistics();
-            const entropy = cipher.calculateEntropy(cipher.homophoneAlphabet);
-            
-            document.getElementById('entropyValue').textContent = entropy.toFixed(2);
-            document.getElementById('homophoneCount').textContent = stats.totalHomophones;
-            document.getElementById('bigramCoverage').textContent = stats.coverage.toFixed(1) + '%';
-            document.getElementById('securityLevel').textContent = Math.min(100, (stats.uniformity * 100)).toFixed(0) + '%';
-
-            updateFrequencyChart();
+        function testRoundTrip() {
+            try {
+                const originalText = document.getElementById('plainText').value;
+                const ciphertext = cipher.encrypt(originalText);
+                const decryptedText = cipher.decrypt(ciphertext);
+                
+                const success = originalText.toUpperCase().replace(/[^A-Z]/g, '') === decryptedText;
+                
+                document.getElementById('systemDiagnostics').textContent = 
+                    `🔄 Тест цикла шифрование-расшифровка:\n` +
+                    `Оригинал: ${originalText}\n` +
+                    `Результат: ${decryptedText}\n` +
+                    `Статус: ${success ? '✅ УСПЕХ' : '❌ ОШИБКА'}`;
+                    
+            } catch (error) {
+                document.getElementById('systemDiagnostics').textContent = `❌ Ошибка теста: ${error.message}`;
+            }
         }
 
-        function updateVisualization() {
-            const visual = document.getElementById('mappingVisual');
-            visual.innerHTML = '';
+        function fullAnalysis() {
+            const stats = cipher.getSystemStats();
+            const plaintext = document.getElementById('plainText').value;
+            const freqAnalysis = cipher.frequencyAnalysis(plaintext);
+            
+            updateStatistics(stats);
+            updateFrequencyAnalysis(freqAnalysis);
+            updateMappingVisualization();
+            
+            document.getElementById('systemDiagnostics').textContent = 
+                `📊 Полный анализ завершен\n` +
+                `Энтропия системы: ${stats.entropy.toFixed(3)} бит/символ\n` +
+                `Уровень безопасности: ${stats.securityLevel.toFixed(1)}%\n` +
+                `Дубликаты гомофонов: ${stats.duplicateHomophones}`;
+        }
+
+        function updateStatistics(stats) {
+            document.getElementById('entropyValue').textContent = stats.entropy.toFixed(3);
+            document.getElementById('homophoneCount').textContent = stats.totalHomophones;
+            document.getElementById('bigramCount').textContent = stats.totalBigrams;
+            document.getElementById('securityLevel').textContent = stats.securityLevel.toFixed(1) + '%';
+        }
+
+        function updateFrequencyAnalysis(freq) {
+            let analysis = 'Частотный анализ исходного текста:\n';
+            const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+            
+            sorted.forEach(([char, count]) => {
+                analysis += `${char}: ${count} (${(count / Object.values(freq).reduce((a, b) => a + b, 0) * 100).toFixed(1)}%)\n`;
+            });
+            
+            document.getElementById('frequencyAnalysis').textContent = analysis;
+        }
+
+        function updateMappingVisualization() {
+            const mappingDiv = document.getElementById('mappingVisualization');
+            mappingDiv.innerHTML = '';
             
             let count = 0;
             for (const [bigram, homophones] of cipher.sBox.entries()) {
-                if (count++ > 20) break; // Ограничиваем вывод
+                if (count++ >= 50) break;
                 
                 const item = document.createElement('div');
                 item.className = 'mapping-item';
-                item.innerHTML = `<span>${bigram}</span> <span>→</span> <span>${homophones.slice(0, 3).join(', ')}${homophones.length > 3 ? '...' : ''}</span>`;
-                visual.appendChild(item);
+                item.textContent = `${bigram} → [${homophones.slice(0, 3).join(', ')}${homophones.length > 3 ? '...' : ''}] (${homophones.length})`;
+                mappingDiv.appendChild(item);
             }
         }
 
-        function updateFrequencyChart() {
-            const chart = document.getElementById('frequencyChart');
-            chart.innerHTML = '';
-            
-            // Простой частотный анализ
-            const text = document.getElementById('plainText').value.toUpperCase();
-            const freq = {};
-            for (const char of text) {
-                if (char >= 'A' && char <= 'Z') {
-                    freq[char] = (freq[char] || 0) + 1;
-                }
-            }
-            
-            const maxFreq = Math.max(...Object.values(freq));
-            for (let i = 0; i < 26; i++) {
-                const char = String.fromCharCode(65 + i);
-                const frequency = freq[char] || 0;
-                const height = (frequency / maxFreq) * 100;
-                
-                const bar = document.createElement('div');
-                bar.className = 'frequency-bar';
-                bar.style.height = height + 'px';
-                bar.title = `${char}: ${frequency}`;
-                chart.appendChild(bar);
-            }
+        function analyzeCiphertext(ciphertext) {
+            const entropy = cipher.calculateEntropy(ciphertext);
+            document.getElementById('systemDiagnostics').textContent = 
+                `🔍 Анализ шифротекста:\n` +
+                `Длина: ${ciphertext.length} символов\n` +
+                `Энтропия: ${entropy.toFixed(3)} бит/символ\n` +
+                `Размер: ${new Blob([ciphertext]).size} байт`;
         }
 
         // Автоматическая инициализация при загрузке
-        window.onload = function() {
-            initializeCipher();
-            analyzeSystem();
-        };
+        window.onload = initializeSystem;
     </script>
 </body>
 </html>
