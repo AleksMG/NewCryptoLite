@@ -3,98 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homophonic Cipher Pro - Enterprise Grade Cryptography</title>
+    <title>Quantum Homophonic Cipher | Professional Edition</title>
     <style>
         :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --light: #e6e6e6;
-            --dark: #0d0d1a;
-            --success: #4e9f3d;
-            --error: #d8000c;
-            --warning: #f39c12;
-            --compression: #9b59b6;
-            --crypto: #e74c3c;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --accent: #06d6a0;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-alt: #334155;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --border: #475569;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
-            color: var(--light);
+            background: var(--background);
+            color: var(--text);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
-            line-height: 1.6;
         }
-        
+
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-        
-        header {
+
+        /* Header Styles */
+        .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
         }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            color: #3498db;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 16px;
         }
-        
-        .subtitle {
-            color: rgba(255, 255, 255, 0.8);
+
+        .header p {
             font-size: 1.2rem;
-            max-width: 800px;
+            color: var(--text-dim);
+            max-width: 600px;
             margin: 0 auto;
         }
-        
-        .control-panel {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+
+        /* Main Grid */
+        .main-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            margin-bottom: 24px;
         }
-        
-        .toggle-group {
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Styles */
+        .panel {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--accent);
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            gap: 12px;
         }
-        
+
+        .panel-title::before {
+            content: "▶";
+            font-size: 0.8em;
+            color: var(--secondary);
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px;
+            background: var(--surface-alt);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea.input-field {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 24px 0;
+        }
+
+        /* Output Styles */
+        .output-container {
+            margin-top: 24px;
+        }
+
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-dim);
+        }
+
+        .output-content {
+            background: var(--surface-alt);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-family: 'Fira Code', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            min-height: 80px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Character Editor */
+        .character-editor {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .alphabet-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 16px;
+            background: var(--surface-alt);
+            border-radius: 12px;
+        }
+
+        .alphabet-char {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .alphabet-char:hover {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .alphabet-char.selected {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: var(--background);
+        }
+
+        .editor-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: var(--surface-alt);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status Messages */
+        .status {
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
         .toggle-switch {
             position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
+            width: 50px;
+            height: 26px;
         }
-        
+
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -102,1080 +348,673 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 30px;
+            background: var(--surface-alt);
+            transition: var(--transition);
+            border-radius: 34px;
         }
-        
+
         .slider:before {
             position: absolute;
             content: "";
-            height: 22px;
-            width: 22px;
+            height: 18px;
+            width: 18px;
             left: 4px;
             bottom: 4px;
-            background-color: white;
-            transition: .4s;
+            background: var(--text);
+            transition: var(--transition);
             border-radius: 50%;
         }
-        
+
         input:checked + .slider {
-            background-color: var(--success);
+            background: var(--primary);
         }
-        
+
         input:checked + .slider:before {
-            transform: translateX(30px);
+            transform: translateX(24px);
         }
-        
-        .comparison-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        @media (max-width: 1200px) {
-            .comparison-panel {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .panel {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #3498db;
-            display: flex;
-            align-items: center;
-        }
-        
-        h2 .icon {
-            margin-right: 10px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--light);
-        }
-        
-        textarea, input, select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--light);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        textarea:focus, input:focus, select:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-        }
-        
-        textarea {
-            min-height: 150px;
-            resize: vertical;
-            font-family: monospace;
-        }
-        
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        button .icon {
-            margin-right: 8px;
-        }
-        
-        .btn-encrypt {
-            background: var(--success);
-        }
-        
-        .btn-decrypt {
-            background: var(--error);
-        }
-        
-        .btn-compression {
-            background: var(--compression);
-        }
-        
-        .btn-crypto {
-            background: var(--crypto);
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .action-buttons button {
-            flex: 1;
-        }
-        
-        .status {
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-        
-        .status.success {
-            background: rgba(46, 204, 113, 0.2);
-            border-left: 4px solid var(--success);
-        }
-        
-        .status.error {
-            background: rgba(231, 76, 60, 0.2);
-            border-left: 4px solid var(--error);
-        }
-        
-        .status.info {
-            background: rgba(52, 152, 219, 0.2);
-            border-left: 4px solid #3498db;
-        }
-        
-        .status.warning {
-            background: rgba(243, 156, 18, 0.2);
-            border-left: 4px solid var(--warning);
-        }
-        
-        .status.compression {
-            background: rgba(155, 89, 182, 0.2);
-            border-left: 4px solid var(--compression);
-        }
-        
-        .output-group {
-            position: relative;
-        }
-        
-        .copy-btn {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-        
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .results-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .result-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-        }
-        
-        .result-card.compressed {
-            border-left-color: var(--compression);
-        }
-        
-        .result-card h4 {
-            margin-bottom: 10px;
-            color: #3498db;
-        }
-        
-        .result-card.compressed h4 {
-            color: var(--compression);
-        }
-        
-        .result-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .stat {
-            text-align: center;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 5px;
-        }
-        
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-        
-        .byte-view {
-            font-family: monospace;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 0.8rem;
-            max-height: 100px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-        
+
+        /* Progress Bar */
         .progress-bar {
             width: 100%;
             height: 6px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--surface-alt);
             border-radius: 3px;
-            margin-top: 10px;
             overflow: hidden;
+            margin: 16px 0;
         }
-        
-        .progress-bar-inner {
+
+        .progress-fill {
             height: 100%;
-            background: #3498db;
-            border-radius: 3px;
-            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
             transition: width 0.3s ease;
         }
-        
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-        
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            border-bottom: 1px dotted #3498db;
-            cursor: help;
-        }
-        
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 250px;
-            background-color: #2c3e50;
-            color: var(--light);
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -125px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.9rem;
-        }
-        
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 24px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .panel {
+                padding: 24px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Homophonic Cipher Professional</h1>
-            <p class="subtitle">Enterprise-grade cryptographic system with advanced compression and real-time comparison</p>
+        <header class="header">
+            <h1>QUANTUM HOMOPHONIC CIPHER</h1>
+            <p>Advanced cryptographic system with customizable character sets and real-time entropy analysis</p>
         </header>
-        
-        <div class="control-panel">
-            <div class="toggle-group">
-                <div class="toggle-switch">
-                    <input type="checkbox" id="compression-toggle" checked>
-                    <span class="slider"></span>
-                </div>
-                <label for="compression-toggle" style="font-weight: bold;">Advanced Compression</label>
-                <span class="tooltip">ℹ️
-                    <span class="tooltiptext">Enable high-efficiency compression using arithmetic coding</span>
-                </span>
-            </div>
-            
-            <div class="toggle-group">
-                <div class="toggle-switch">
-                    <input type="checkbox" id="session-keys-toggle" checked>
-                    <span class="slider"></span>
-                </div>
-                <label for="session-keys-toggle" style="font-weight: bold;">Session Keys</label>
-                <span class="tooltip">ℹ️
-                    <span class="tooltiptext">Generate unique session keys for enhanced security</span>
-                </span>
-            </div>
-            
-            <div class="toggle-group">
-                <div class="toggle-switch">
-                    <input type="checkbox" id="validation-toggle" checked>
-                    <span class="slider"></span>
-                </div>
-                <label for="validation-toggle" style="font-weight: bold;">Input Validation</label>
-                <span class="tooltip">ℹ️
-                    <span class="tooltiptext">Enable comprehensive input validation and error checking</span>
-                </span>
-            </div>
-        </div>
-        
-        <div class="comparison-panel">
-            <div class="panel">
-                <h2><span class="icon">🔒</span> Standard Encryption</h2>
-                <div class="form-group">
-                    <label for="plaintext">Input Data</label>
-                    <textarea id="plaintext" placeholder="Enter text to encrypt">Homophonic Cipher Professional Implementation</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Crypto Parameters</label>
-                    <div class="results-grid">
-                        <div class="result-card">
-                            <h4>Prime Modulus (p)</h4>
-                            <input type="text" id="prime" value="9999999999" style="font-family: monospace;">
-                        </div>
-                        <div class="result-card">
-                            <h4>Generator (g)</h4>
-                            <input type="text" id="generator" value="11" style="font-family: monospace;">
-                        </div>
+
+        <div class="main-grid">
+            <div class="crypto-panels">
+                <div class="panel">
+                    <h2 class="panel-title">Cryptographic Configuration</h2>
+                    
+                    <div class="input-group">
+                        <label class="input-label">
+                            <span>Encryption Key</span>
+                        </label>
+                        <input type="password" class="input-field" id="crypto-key" 
+                               value="quantum-secure-key-2024" placeholder="Enter strong encryption key">
+                    </div>
+
+                    <div class="toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="cbc-mode" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span>CBC Mode (Block Chaining)</span>
+                    </div>
+
+                    <div class="toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="affine-mode" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span>Affine Transformation</span>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn" id="generate-btn">
+                            <span>Generate S-Box</span>
+                        </button>
+                        <button class="btn" id="encrypt-btn">
+                            <span>Encrypt Text</span>
+                        </button>
+                        <button class="btn" id="decrypt-btn">
+                            <span>Decrypt Text</span>
+                        </button>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+
+                    <div id="status" class="status success">
+                        System ready - Configure your character set and generate S-Box
                     </div>
                 </div>
-                
-                <div class="action-buttons">
-                    <button class="btn-encrypt" id="encrypt-standard">
-                        <span class="icon">▶️</span> Encrypt Standard
-                    </button>
-                    <button class="btn-crypto" id="generate-params">
-                        <span class="icon">⚙️</span> Generate Parameters
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label>Standard Output (A,B Pairs)</label>
-                    <div class="output-group">
-                        <textarea id="output-standard" readonly></textarea>
-                        <button class="copy-btn" data-target="output-standard">Copy</button>
+
+                <div class="panel">
+                    <h2 class="panel-title">Text Processing</h2>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Plaintext (A-Z only)</label>
+                        <textarea class="input-field" id="plaintext" placeholder="Enter text to encrypt">QUANTUMCRYPTOGRAPHY</textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Ciphertext Output</label>
+                        <div class="output-content" id="ciphertext-output">Encrypted text will appear here...</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Ciphertext Input</label>
+                        <textarea class="input-field" id="ciphertext" placeholder="Paste ciphertext to decrypt"></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Decrypted Text</label>
+                        <div class="output-content" id="decrypted-output">Decrypted text will appear here...</div>
                     </div>
                 </div>
-                
-                <div id="status-standard" class="status info">Ready for standard encryption</div>
             </div>
-            
-            <div class="panel">
-                <h2><span class="icon">📦</span> Compressed Encryption</h2>
-                <div class="form-group">
-                    <label for="mapping-key">Mapping Key</label>
-                    <input type="text" id="mapping-key" value="PROFESSIONAL2024" placeholder="Enter mapping key">
+
+            <div class="character-editor">
+                <div class="editor-header">
+                    <h2 class="panel-title">Character Set Editor</h2>
                 </div>
-                
-                <div class="form-group">
-                    <label>Compression Settings</label>
-                    <div class="results-grid">
-                        <div class="result-card compressed">
-                            <h4>Session Key</h4>
-                            <div id="session-key" style="font-family: monospace; word-break: break-all;">Not generated</div>
-                        </div>
-                        <div class="result-card compressed">
-                            <h4>Compression Level</h4>
-                            <select id="compression-level">
-                                <option value="1">Fast (2x)</option>
-                                <option value="2" selected>Balanced (3x)</option>
-                                <option value="3">Maximum (4x)</option>
-                            </select>
-                        </div>
-                    </div>
+
+                <div class="input-group">
+                    <label class="input-label">Custom Character Set</label>
+                    <textarea class="input-field" id="custom-chars" placeholder="Enter custom characters (duplicates will be removed)">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ</textarea>
                 </div>
-                
-                <div class="action-buttons">
-                    <button class="btn-compression" id="encrypt-compressed">
-                        <span class="icon">▶️</span> Encrypt Compressed
+
+                <div class="editor-controls">
+                    <button class="btn" id="update-chars">
+                        <span>Update Characters</span>
                     </button>
-                    <button class="btn-crypto" id="generate-session">
-                        <span class="icon">🔑</span> New Session
+                    <button class="btn" id="reset-chars">
+                        <span>Reset to Default</span>
                     </button>
                 </div>
-                
-                <div class="form-group">
-                    <label>Compressed Output</label>
-                    <div class="output-group">
-                        <textarea id="output-compressed" readonly></textarea>
-                        <button class="copy-btn" data-target="output-compressed">Copy</button>
+
+                <div class="alphabet-display" id="alphabet-display">
+                    <!-- Characters will be rendered here -->
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="char-count">0</div>
+                        <div class="stat-label">Characters</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="homophone-count">0</div>
+                        <div class="stat-label">Homophones</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="entropy-value">0.00</div>
+                        <div class="stat-label">Entropy/Char</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bigram-ratio">0.00</div>
+                        <div class="stat-label">Homophones/Bigram</div>
                     </div>
                 </div>
-                
-                <div id="status-compressed" class="status info">Compression engine ready</div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <h2><span class="icon">📊</span> Performance Comparison</h2>
-            <div class="results-grid">
-                <div class="result-card">
-                    <h4>Standard Encryption</h4>
-                    <div class="result-stats">
-                        <div class="stat">
-                            <div class="stat-value" id="standard-size">0</div>
-                            <div class="stat-label">Size (chars)</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="standard-time">0ms</div>
-                            <div class="stat-label">Time</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="standard-ratio">1.0x</div>
-                            <div class="stat-label">Ratio</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="result-card compressed">
-                    <h4>Compressed Encryption</h4>
-                    <div class="result-stats">
-                        <div class="stat">
-                            <div class="stat-value" id="compressed-size">0</div>
-                            <div class="stat-label">Size (chars)</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="compressed-time">0ms</div>
-                            <div class="stat-label">Time</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="compressed-ratio">1.0x</div>
-                            <div class="stat-label">Ratio</div>
-                        </div>
-                    </div>
+
+                <div class="input-group">
+                    <label class="input-label">Character Set Validation</label>
+                    <div class="output-content" id="validation-output">No issues detected</div>
                 </div>
             </div>
-            
-            <div class="action-buttons">
-                <button class="btn-decrypt" id="decrypt-both">
-                    <span class="icon">🔓</span> Decrypt Both Formats
-                </button>
-                <button id="clear-all">
-                    <span class="icon">🗑️</span> Clear All
-                </button>
-            </div>
-            
-            <div class="form-group">
-                <label>Decryption Results</label>
-                <div class="output-group">
-                    <textarea id="output-decrypted" placeholder="Decrypted results will appear here" readonly></textarea>
-                    <button class="copy-btn" data-target="output-decrypted">Copy</button>
-                </div>
-            </div>
-            
-            <div id="status-comparison" class="status info">Perform encryption to see comparison results</div>
         </div>
     </div>
 
     <script>
-        // ==================== ENTERPRISE-Grade IMPLEMENTATION ====================
-        
-        class ModularArithmetic {
-            static modExp(base, exponent, modulus) {
-                if (modulus === 1n) return 0n;
-                let result = 1n;
-                base = base % modulus;
-                let exp = exponent;
+        class QuantumHomophonicCipher {
+            constructor() {
+                this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                this.customChars = new Set();
+                this.sBox = null;
+                this.reverseSBox = null;
+                this.currentKey = null;
+                this.config = {
+                    cbcMode: true,
+                    affineMode: true,
+                    affineA: 5,
+                    affineB: 7
+                };
                 
-                while (exp > 0n) {
-                    if (exp % 2n === 1n) {
-                        result = (result * base) % modulus;
+                this.initializeDefaultChars();
+            }
+
+            initializeDefaultChars() {
+                const defaultChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ';
+                this.updateCustomChars(defaultChars);
+            }
+
+            updateCustomChars(charString) {
+                // Remove duplicates and store as sorted array
+                const uniqueChars = [...new Set(charString)].sort();
+                this.customChars = new Set(uniqueChars);
+                this.updateCharacterStats();
+                return uniqueChars;
+            }
+
+            validateCharacterSet() {
+                const issues = [];
+                
+                if (this.customChars.size < 2) {
+                    issues.push('Minimum 2 characters required');
+                }
+                
+                if (this.customChars.size > 1000) {
+                    issues.push('Large character sets may impact performance');
+                }
+
+                // Check for visually similar characters
+                const similarChars = this.findSimilarCharacters();
+                if (similarChars.length > 0) {
+                    issues.push(`Visually similar characters: ${similarChars.join(', ')}`);
+                }
+
+                return issues;
+            }
+
+            findSimilarCharacters() {
+                const similarPairs = [];
+                const chars = [...this.customChars];
+                
+                for (let i = 0; i < chars.length; i++) {
+                    for (let j = i + 1; j < chars.length; j++) {
+                        if (this.areCharactersSimilar(chars[i], chars[j])) {
+                            similarPairs.push(`${chars[i]}↔${chars[j]}`);
+                        }
                     }
-                    exp = exp >> 1n;
-                    base = (base * base) % modulus;
+                }
+                
+                return similarPairs;
+            }
+
+            areCharactersSimilar(char1, char2) {
+                // Basic similarity check (can be enhanced)
+                return char1.normalize() === char2.normalize() || 
+                       char1.toLowerCase() === char2.toLowerCase();
+            }
+
+            updateCharacterStats() {
+                const charCount = this.customChars.size;
+                const homophoneCount = charCount * charCount;
+                const maxEntropy = Math.log2(charCount);
+                const bigramsCount = 26 * 26; // A-Z bigrams
+                const homophonesPerBigram = homophoneCount / bigramsCount;
+
+                return {
+                    charCount,
+                    homophoneCount,
+                    maxEntropy: maxEntropy,
+                    homophonesPerBigram
+                };
+            }
+
+            async generateSBox(key, progressCallback = null) {
+                if (!key) throw new Error('Encryption key required');
+                if (this.customChars.size < 2) throw new Error('Character set too small');
+
+                const chars = [...this.customChars];
+                const allBigrams = this.generateAllBigrams();
+                const allHomophones = this.generateAllHomophones(chars);
+
+                if (progressCallback) progressCallback(20, 'Shuffling homophones...');
+
+                // Cryptographically secure shuffling
+                const shuffledHomophones = await this.cryptoShuffle(allHomophones, key);
+                if (progressCallback) progressCallback(60, 'Distributing homophones...');
+
+                // Calculate optimal distribution
+                const totalHomophones = shuffledHomophones.length;
+                const totalBigrams = allBigrams.length;
+                const baseCount = Math.floor(totalHomophones / totalBigrams);
+                const extraCount = totalHomophones % totalBigrams;
+
+                // Create S-Box with optimal distribution
+                this.sBox = {};
+                let homophoneIndex = 0;
+
+                for (let i = 0; i < totalBigrams; i++) {
+                    const count = i < extraCount ? baseCount + 1 : baseCount;
+                    this.sBox[allBigrams[i]] = shuffledHomophones.slice(
+                        homophoneIndex, 
+                        homophoneIndex + count
+                    );
+                    homophoneIndex += count;
+                }
+
+                this.reverseSBox = this.createReverseSBox();
+                this.currentKey = key;
+
+                if (progressCallback) progressCallback(100, 'S-Box generated successfully');
+                return true;
+            }
+
+            generateAllBigrams() {
+                const bigrams = [];
+                for (let i = 0; i < this.alphabet.length; i++) {
+                    for (let j = 0; j < this.alphabet.length; j++) {
+                        bigrams.push(this.alphabet[i] + this.alphabet[j]);
+                    }
+                }
+                return bigrams;
+            }
+
+            generateAllHomophones(chars) {
+                const homophones = [];
+                for (let i = 0; i < chars.length; i++) {
+                    for (let j = 0; j < chars.length; j++) {
+                        homophones.push(chars[i] + chars[j]);
+                    }
+                }
+                return homophones;
+            }
+
+            async cryptoShuffle(array, key) {
+                const encoder = new TextEncoder();
+                const keyData = encoder.encode(key);
+                
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw', keyData, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']
+                );
+
+                // HMAC-based DRBG for shuffling
+                let state = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode('shuffle-seed'));
+                const result = [...array];
+
+                for (let i = result.length - 1; i > 0; i--) {
+                    // Update state for each iteration
+                    state = await crypto.subtle.sign('HMAC', cryptoKey, state);
+                    const randomValues = new Uint32Array(state.slice(0, 4));
+                    const j = randomValues[0] % (i + 1);
+                    
+                    [result[i], result[j]] = [result[j], result[i]];
+                }
+
+                return result;
+            }
+
+            createReverseSBox() {
+                const reverse = new Map();
+                const duplicates = new Set();
+
+                for (const [bigram, homophones] of Object.entries(this.sBox)) {
+                    for (const homophone of homophones) {
+                        if (reverse.has(homophone)) {
+                            duplicates.add(homophone);
+                            reverse.delete(homophone);
+                        } else if (!duplicates.has(homophone)) {
+                            reverse.set(homophone, bigram);
+                        }
+                    }
+                }
+
+                console.log(`Duplicate homophones detected: ${duplicates.size}`);
+                return reverse;
+            }
+
+            async encrypt(plaintext) {
+                if (!this.sBox) throw new Error('S-Box not generated');
+                
+                const processedText = plaintext.toUpperCase().replace(/[^A-Z]/g, '');
+                if (!processedText) throw new Error('No valid text to encrypt');
+
+                let ciphertext = '';
+                let previousBlock = 'AA';
+                let position = 0;
+
+                for (let i = 0; i < processedText.length; i += 2) {
+                    let bigram = processedText.substr(i, 2);
+                    if (bigram.length === 1) bigram += 'X'; // Padding
+
+                    // Apply transformations
+                    let targetBigram = this.applyTransformations(bigram, previousBlock, position);
+                    
+                    // Get random homophone
+                    if (this.sBox[targetBigram]) {
+                        const homophones = this.sBox[targetBigram];
+                        const randomIndex = this.cryptoRandom() % homophones.length;
+                        ciphertext += homophones[randomIndex];
+                        previousBlock = targetBigram;
+                    }
+                    
+                    position++;
+                }
+
+                return ciphertext;
+            }
+
+            applyTransformations(bigram, previousBlock, position) {
+                let result = bigram;
+
+                if (this.config.cbcMode) {
+                    result = this.applyCBCMode(result, previousBlock, position);
+                }
+
+                if (this.config.affineMode) {
+                    result = this.applyAffineTransformation(result);
+                }
+
+                return result;
+            }
+
+            applyCBCMode(bigram, previousBlock, position) {
+                let result = '';
+                for (let i = 0; i < 2; i++) {
+                    const currentIdx = this.alphabet.indexOf(bigram[i]);
+                    const prevIdx = this.alphabet.indexOf(previousBlock[i]);
+                    const newIdx = (currentIdx + prevIdx + position) % 26;
+                    result += this.alphabet[newIdx];
                 }
                 return result;
             }
-            
-            static isPrime(n, k = 20) {
-                if (n <= 1n) return false;
-                if (n <= 3n) return true;
-                if (n % 2n === 0n) return false;
-                
-                let d = n - 1n;
-                let s = 0n;
-                while (d % 2n === 0n) {
-                    d /= 2n;
-                    s++;
-                }
-                
-                for (let i = 0; i < k; i++) {
-                    const a = 2n + BigInt(Math.floor(Math.random() * Number(n - 4n)));
-                    let x = this.modExp(a, d, n);
-                    
-                    if (x === 1n || x === n - 1n) continue;
-                    
-                    let composite = true;
-                    for (let j = 0; j < Number(s) - 1; j++) {
-                        x = this.modExp(x, 2n, n);
-                        if (x === n - 1n) {
-                            composite = false;
-                            break;
-                        }
-                    }
-                    if (composite) return false;
-                }
-                return true;
-            }
-            
-            static generatePrime(bits) {
-                const min = 2n ** BigInt(bits - 1);
-                const max = 2n ** BigInt(bits) - 1n;
-                
-                while (true) {
-                    const candidate = min + BigInt(Math.floor(Math.random() * Number(max - min)));
-                    if (this.isPrime(candidate)) {
-                        return candidate;
-                    }
-                }
-            }
-        }
 
-        class Base91Encoder {
-            static alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~\"";
-            
-            static encode(data) {
-                if (typeof data === 'string') {
-                    const encoder = new TextEncoder();
-                    data = Array.from(encoder.encode(data));
+            applyAffineTransformation(bigram) {
+                let result = '';
+                for (const char of bigram) {
+                    const x = this.alphabet.indexOf(char);
+                    const y = (this.config.affineA * x + this.config.affineB) % 26;
+                    result += this.alphabet[y];
                 }
-                
-                let b = 0, n = 0, output = '';
-                
-                for (let i = 0; i < data.length; i++) {
-                    b |= data[i] << n;
-                    n += 8;
-                    
-                    if (n > 13) {
-                        let v = b & 8191;
-                        if (v > 88) {
-                            b >>= 13;
-                            n -= 13;
-                        } else {
-                            v = b & 16383;
-                            b >>= 14;
-                            n -= 14;
-                        }
-                        output += this.alphabet[v % 91] + this.alphabet[Math.floor(v / 91)];
-                    }
-                }
-                
-                if (n > 0) {
-                    output += this.alphabet[b % 91];
-                    if (n > 7 || b > 90) {
-                        output += this.alphabet[Math.floor(b / 91)];
-                    }
-                }
-                
-                return output;
+                return result;
             }
-            
-            static decode(str) {
-                let b = 0, n = 0, v = -1, output = [];
-                
-                for (let i = 0; i < str.length; i++) {
-                    const p = this.alphabet.indexOf(str[i]);
-                    if (p < 0) continue;
-                    
-                    if (v < 0) {
-                        v = p;
-                    } else {
-                        v += p * 91;
-                        b |= v << n;
-                        n += (v & 8191) > 88 ? 13 : 14;
-                        
-                        do {
-                            output.push(b & 0xff);
-                            b >>= 8;
-                            n -= 8;
-                        } while (n > 7);
-                        v = -1;
-                    }
-                }
-                
-                if (v > -1) output.push((b | (v << n)) & 0xff);
-                return new Uint8Array(output);
-            }
-        }
 
-        class CompressionEngine {
-            constructor(level = 2) {
-                this.level = level;
-            }
-            
-            compressPairs(pairs, p) {
-                if (pairs.length === 0) return '';
-                
-                const pStr = p.toString();
-                let compressed = '';
-                
-                if (this.level === 1) {
-                    // Fast compression: simple concatenation
-                    for (const [a, b] of pairs) {
-                        const combined = (BigInt(a) * p + BigInt(b)).toString();
-                        compressed += Base91Encoder.encode(combined) + '|';
-                    }
-                } else if (this.level === 2) {
-                    // Balanced: delta encoding
-                    let lastA = 0n, lastB = 0n;
-                    const deltas = [];
-                    
-                    for (const [a, b] of pairs) {
-                        const aBig = BigInt(a), bBig = BigInt(b);
-                        deltas.push([aBig - lastA, bBig - lastB]);
-                        lastA = aBig;
-                        lastB = bBig;
-                    }
-                    
-                    const deltaStr = deltas.map(d => d.join(',')).join(';');
-                    compressed = 'D' + Base91Encoder.encode(deltaStr);
-                } else {
-                    // Maximum: arithmetic coding simulation
-                    const values = pairs.flat();
-                    const freq = new Map();
-                    values.forEach(v => freq.set(v, (freq.get(v) || 0) + 1));
-                    
-                    const sorted = [...freq.entries()].sort((a, b) => b[1] - a[1]);
-                    const dict = new Map(sorted.map(([v], i) => [v, i]));
-                    
-                    const encoded = values.map(v => dict.get(v)).join(',');
-                    compressed = 'A' + Base91Encoder.encode(encoded) + '|' + 
-                                Base91Encoder.encode(JSON.stringify([...dict.keys()]));
-                }
-                
-                return compressed;
-            }
-            
-            decompressPairs(compressed, p) {
-                if (!compressed) return [];
-                
-                if (compressed.startsWith('D')) {
-                    // Delta decoding
-                    const decoded = Base91Encoder.decode(compressed.slice(1));
-                    const deltaStr = new TextDecoder().decode(decoded);
-                    const deltas = deltaStr.split(';').map(pair => {
-                        const [da, db] = pair.split(',').map(BigInt);
-                        return [da, db];
-                    });
-                    
-                    const pairs = [];
-                    let lastA = 0n, lastB = 0n;
-                    
-                    for (const [da, db] of deltas) {
-                        lastA += da;
-                        lastB += db;
-                        pairs.push([lastA, lastB]);
-                    }
-                    
-                    return pairs;
-                } else if (compressed.startsWith('A')) {
-                    // Arithmetic decoding
-                    const parts = compressed.split('|');
-                    const valuesEncoded = Base91Encoder.decode(parts[0].slice(1));
-                    const dictEncoded = Base91Encoder.decode(parts[1]);
-                    
-                    const valuesStr = new TextDecoder().decode(valuesEncoded);
-                    const dictStr = new TextDecoder().decode(dictEncoded);
-                    
-                    const values = valuesStr.split(',').map(Number);
-                    const dict = JSON.parse(dictStr);
-                    
-                    const pairs = [];
-                    for (let i = 0; i < values.length; i += 2) {
-                        pairs.push([BigInt(dict[values[i]]), BigInt(dict[values[i + 1]])]);
-                    }
-                    
-                    return pairs;
-                } else {
-                    // Simple decoding
-                    return compressed.split('|').filter(Boolean).map(pair => {
-                        const decoded = Base91Encoder.decode(pair);
-                        const combined = BigInt(new TextDecoder().decode(decoded));
-                        const b = combined % p;
-                        const a = (combined - b) / p;
-                        return [a, b];
-                    });
-                }
-            }
-        }
-
-        class HomophonicCipher {
-            constructor() {
-                this.p = 9999999999n;
-                this.g = 11n;
-                this.mapping = this.generateMapping("DEFAULT");
-                this.sessionKey = null;
-            }
-            
-            generateMapping(key) {
-                const mapping = Array.from({length: 256}, (_, i) => i);
-                if (!key) return mapping;
-                
-                let seed = 0;
-                for (let i = 0; i < key.length; i++) {
-                    seed = (seed + key.charCodeAt(i)) % 256;
-                }
-                
-                for (let i = 0; i < 256; i++) {
-                    const j = (seed + i * key.length) % 256;
-                    [mapping[i], mapping[j]] = [mapping[j], mapping[i]];
-                }
-                
-                return mapping;
-            }
-            
-            setSessionKey(key) {
-                this.sessionKey = key;
-                this.mapping = this.generateMapping(key);
-            }
-            
-            encrypt(data, useCompression = false, compressionLevel = 2) {
-                const bytes = typeof data === 'string' ? 
-                    Array.from(new TextEncoder().encode(data)) : data;
-                
-                const pairs = [];
-                const gVal = this.g;
-                const pVal = this.p;
-                
-                for (const byte of bytes) {
-                    const mappedByte = this.mapping[byte];
-                    const m = BigInt(mappedByte);
-                    const k = this.generateRandomK(pVal);
-                    
-                    const a = ModularArithmetic.modExp(gVal, k, pVal);
-                    const exponent = m * k;
-                    const b = (m * ModularArithmetic.modExp(gVal, exponent, pVal)) % pVal;
-                    
-                    pairs.push([a, b]);
-                }
-                
-                if (useCompression) {
-                    const compressor = new CompressionEngine(compressionLevel);
-                    return compressor.compressPairs(pairs, pVal);
-                } else {
-                    return pairs.map(pair => `(${pair[0]},${pair[1]})`).join(' ');
-                }
-            }
-            
-            decrypt(ciphertext, wasCompressed = false, compressionLevel = 2) {
-                let pairs = [];
-                const pVal = this.p;
-                
-                if (wasCompressed) {
-                    const compressor = new CompressionEngine(compressionLevel);
-                    pairs = compressor.decompressPairs(ciphertext, pVal);
-                } else {
-                    const pairRegex = /\((\d+),(\d+)\)/g;
-                    let match;
-                    while ((match = pairRegex.exec(ciphertext)) !== null) {
-                        pairs.push([BigInt(match[1]), BigInt(match[2])]);
-                    }
-                }
-                
-                const bytes = [];
-                const reverseMapping = this.createReverseMapping();
-                
-                for (const [a, b] of pairs) {
-                    let found = false;
-                    for (let m = 0; m < 256; m++) {
-                        const mBig = BigInt(m);
-                        const check = (mBig * ModularArithmetic.modExp(a, mBig, pVal)) % pVal;
-                        if (b === check) {
-                            bytes.push(reverseMapping[m]);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) bytes.push(0);
-                }
-                
-                return new Uint8Array(bytes);
-            }
-            
-            createReverseMapping() {
-                const reverse = new Array(256);
-                for (let i = 0; i < 256; i++) {
-                    reverse[this.mapping[i]] = i;
-                }
-                return reverse;
-            }
-            
-            generateRandomK(p) {
-                const min = 2n;
-                const max = p - 2n;
-                const range = max - min;
-                
-                const bytes = Math.ceil(range.toString(2).length / 8);
-                const array = new Uint8Array(bytes);
+            cryptoRandom() {
+                const array = new Uint32Array(1);
                 crypto.getRandomValues(array);
-                
-                let result = 0n;
-                for (let i = 0; i < bytes; i++) {
-                    result = (result << 8n) + BigInt(array[i]);
-                }
-                
-                return (result % range) + min;
+                return array[0];
             }
-            
-            validateParameters() {
-                if (this.p <= 255n) {
-                    throw new Error("Prime must be greater than 255");
+
+            calculateEntropy(text) {
+                if (!text) return 0;
+                
+                const frequencies = {};
+                for (const char of text) {
+                    frequencies[char] = (frequencies[char] || 0) + 1;
                 }
-                if (this.g >= this.p) {
-                    throw new Error("Generator must be less than prime");
+
+                let entropy = 0;
+                const len = text.length;
+                
+                for (const char in frequencies) {
+                    const freq = frequencies[char] / len;
+                    entropy -= freq * Math.log2(freq);
                 }
-                return ModularArithmetic.modExp(this.g, this.p - 1n, this.p) === 1n;
+
+                return entropy;
             }
         }
 
-        // ==================== APPLICATION CONTROLLER ====================
-        class ApplicationController {
+        // UI Controller
+        class CipherUI {
             constructor() {
-                this.cipher = new HomophonicCipher();
-                this.initializeEventListeners();
-                this.updateUI();
+                this.cipher = new QuantumHomophonicCipher();
+                this.initializeElements();
+                this.setupEventListeners();
+                this.updateDisplay();
             }
-            
-            initializeEventListeners() {
-                // Encryption buttons
-                document.getElementById('encrypt-standard').addEventListener('click', () => this.encryptStandard());
-                document.getElementById('encrypt-compressed').addEventListener('click', () => this.encryptCompressed());
-                document.getElementById('decrypt-both').addEventListener('click', () => this.decryptBoth());
+
+            initializeElements() {
+                this.elements = {
+                    // Inputs
+                    cryptoKey: document.getElementById('crypto-key'),
+                    plaintext: document.getElementById('plaintext'),
+                    ciphertext: document.getElementById('ciphertext'),
+                    customChars: document.getElementById('custom-chars'),
+                    
+                    // Outputs
+                    ciphertextOutput: document.getElementById('ciphertext-output'),
+                    decryptedOutput: document.getElementById('decrypted-output'),
+                    validationOutput: document.getElementById('validation-output'),
+                    alphabetDisplay: document.getElementById('alphabet-display'),
+                    
+                    // Stats
+                    charCount: document.getElementById('char-count'),
+                    homophoneCount: document.getElementById('homophone-count'),
+                    entropyValue: document.getElementById('entropy-value'),
+                    bigramRatio: document.getElementById('bigram-ratio'),
+                    
+                    // Controls
+                    generateBtn: document.getElementById('generate-btn'),
+                    encryptBtn: document.getElementById('encrypt-btn'),
+                    decryptBtn: document.getElementById('decrypt-btn'),
+                    updateCharsBtn: document.getElementById('update-chars'),
+                    resetCharsBtn: document.getElementById('reset-chars'),
+                    
+                    // Progress
+                    progressFill: document.getElementById('progress-fill'),
+                    status: document.getElementById('status')
+                };
+            }
+
+            setupEventListeners() {
+                this.elements.generateBtn.addEventListener('click', () => this.generateSBox());
+                this.elements.encryptBtn.addEventListener('click', () => this.encrypt());
+                this.elements.decryptBtn.addEventListener('click', () => this.decrypt());
+                this.elements.updateCharsBtn.addEventListener('click', () => this.updateCharacters());
+                this.elements.resetCharsBtn.addEventListener('click', () => this.resetCharacters());
                 
-                // Generation buttons
-                document.getElementById('generate-params').addEventListener('click', () => this.generateParameters());
-                document.getElementById('generate-session').addEventListener('click', () => this.generateSession());
-                document.getElementById('clear-all').addEventListener('click', () => this.clearAll());
-                
-                // Copy buttons
-                document.querySelectorAll('.copy-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const target = e.target.getAttribute('data-target');
-                        this.copyToClipboard(target);
-                    });
+                this.elements.customChars.addEventListener('input', () => this.previewCharacters());
+                this.elements.ciphertext.addEventListener('input', () => this.updateCiphertextStats());
+            }
+
+            async generateSBox() {
+                try {
+                    this.setLoading('generate', true);
+                    this.updateProgress(0, 'Initializing...');
+
+                    await this.cipher.generateSBox(
+                        this.elements.cryptoKey.value,
+                        (progress, message) => {
+                            this.updateProgress(progress, message);
+                        }
+                    );
+
+                    this.showStatus('S-Box generated successfully', 'success');
+                    this.updateStats();
+
+                } catch (error) {
+                    this.showStatus(`Error: ${error.message}`, 'error');
+                } finally {
+                    this.setLoading('generate', false);
+                }
+            }
+
+            async encrypt() {
+                try {
+                    const plaintext = this.elements.plaintext.value;
+                    if (!plaintext) throw new Error('Enter text to encrypt');
+
+                    this.setLoading('encrypt', true);
+                    const ciphertext = await this.cipher.encrypt(plaintext);
+                    
+                    this.elements.ciphertextOutput.textContent = ciphertext;
+                    this.elements.ciphertext.value = ciphertext;
+                    this.showStatus('Text encrypted successfully', 'success');
+                    this.updateCiphertextStats();
+
+                } catch (error) {
+                    this.showStatus(`Encryption error: ${error.message}`, 'error');
+                } finally {
+                    this.setLoading('encrypt', false);
+                }
+            }
+
+            updateCharacters() {
+                try {
+                    const charString = this.elements.customChars.value;
+                    const uniqueChars = this.cipher.updateCustomChars(charString);
+                    
+                    this.elements.customChars.value = uniqueChars.join('');
+                    this.updateDisplay();
+                    this.showStatus('Character set updated', 'success');
+
+                } catch (error) {
+                    this.showStatus(`Error: ${error.message}`, 'error');
+                }
+            }
+
+            resetCharacters() {
+                this.cipher.initializeDefaultChars();
+                this.elements.customChars.value = [...this.cipher.customChars].join('');
+                this.updateDisplay();
+                this.showStatus('Character set reset to default', 'success');
+            }
+
+            previewCharacters() {
+                const charString = this.elements.customChars.value;
+                const uniqueChars = [...new Set(charString)];
+                this.renderAlphabetDisplay(uniqueChars);
+            }
+
+            renderAlphabetDisplay(chars) {
+                const display = this.elements.alphabetDisplay;
+                display.innerHTML = '';
+
+                chars.forEach(char => {
+                    const charElement = document.createElement('div');
+                    charElement.className = 'alphabet-char';
+                    charElement.textContent = char;
+                    charElement.title = `Char: ${char}\nUnicode: U+${char.charCodeAt(0).toString(16).toUpperCase()}`;
+                    display.appendChild(charElement);
                 });
-                
-                // Real-time updates
-                document.getElementById('plaintext').addEventListener('input', () => this.updateUI());
-                document.getElementById('mapping-key').addEventListener('input', () => this.updateMapping());
-                document.getElementById('compression-level').addEventListener('change', () => this.updateUI());
-                
-                // Toggles
-                document.getElementById('compression-toggle').addEventListener('change', () => this.updateUI());
-                document.getElementById('session-keys-toggle').addEventListener('change', () => this.updateUI());
             }
-            
-            async encryptStandard() {
-                try {
-                    this.showStatus('standard', 'info', 'Encrypting...');
-                    const plaintext = document.getElementById('plaintext').value;
-                    const startTime = performance.now();
-                    
-                    const ciphertext = this.cipher.encrypt(plaintext, false);
-                    const endTime = performance.now();
-                    
-                    document.getElementById('output-standard').value = ciphertext;
-                    this.updateStats('standard', ciphertext.length, endTime - startTime);
-                    this.showStatus('standard', 'success', 
-                        `Encrypted ${plaintext.length} chars in ${(endTime - startTime).toFixed(1)}ms`);
-                    
-                } catch (error) {
-                    this.showStatus('standard', 'error', `Encryption failed: ${error.message}`);
+
+            updateDisplay() {
+                const stats = this.cipher.updateCharacterStats();
+                const validationIssues = this.cipher.validateCharacterSet();
+
+                // Update stats
+                this.elements.charCount.textContent = stats.charCount;
+                this.elements.homophoneCount.textContent = stats.homophoneCount.toLocaleString();
+                this.elements.entropyValue.textContent = stats.maxEntropy.toFixed(2);
+                this.elements.bigramRatio.textContent = stats.homophonesPerBigram.toFixed(1);
+
+                // Update validation
+                if (validationIssues.length > 0) {
+                    this.elements.validationOutput.textContent = validationIssues.join('\n');
+                    this.elements.validationOutput.style.color = 'var(--warning)';
+                } else {
+                    this.elements.validationOutput.textContent = 'No issues detected';
+                    this.elements.validationOutput.style.color = 'var(--success)';
+                }
+
+                // Render alphabet
+                this.renderAlphabetDisplay([...this.cipher.customChars]);
+            }
+
+            updateCiphertextStats() {
+                const ciphertext = this.elements.ciphertext.value;
+                const entropy = this.cipher.calculateEntropy(ciphertext);
+                this.elements.entropyValue.textContent = entropy.toFixed(3);
+            }
+
+            updateProgress(percent, message) {
+                this.elements.progressFill.style.width = `${percent}%`;
+                if (message) {
+                    this.showStatus(message, 'info');
                 }
             }
-            
-            async encryptCompressed() {
-                try {
-                    this.showStatus('compressed', 'info', 'Encrypting with compression...');
-                    const plaintext = document.getElementById('plaintext').value;
-                    const level = parseInt(document.getElementById('compression-level').value);
-                    const startTime = performance.now();
-                    
-                    const ciphertext = this.cipher.encrypt(plaintext, true, level);
-                    const endTime = performance.now();
-                    
-                    document.getElementById('output-compressed').value = ciphertext;
-                    this.updateStats('compressed', ciphertext.length, endTime - startTime);
-                    this.showStatus('compressed', 'success', 
-                        `Compressed encryption completed in ${(endTime - startTime).toFixed(1)}ms`);
-                    
-                } catch (error) {
-                    this.showStatus('compressed', 'error', `Compressed encryption failed: ${error.message}`);
-                }
+
+            showStatus(message, type = 'info') {
+                const status = this.elements.status;
+                status.textContent = message;
+                status.className = `status ${type}`;
             }
-            
-            async decryptBoth() {
-                try {
-                    this.showStatus('comparison', 'info', 'Decrypting both formats...');
-                    const standardText = document.getElementById('output-standard').value;
-                    const compressedText = document.getElementById('output-compressed').value;
-                    const level = parseInt(document.getElementById('compression-level').value);
-                    
-                    let results = [];
-                    
-                    if (standardText) {
-                        const decrypted = this.cipher.decrypt(standardText, false);
-                        results.push(`STANDARD: ${new TextDecoder().decode(decrypted)}`);
-                    }
-                    
-                    if (compressedText) {
-                        const decrypted = this.cipher.decrypt(compressedText, true, level);
-                        results.push(`COMPRESSED: ${new TextDecoder().decode(decrypted)}`);
-                    }
-                    
-                    document.getElementById('output-decrypted').value = results.join('\n\n');
-                    this.showStatus('comparison', 'success', 
-                        `Decrypted ${results.length} format(s) successfully`);
-                    
-                } catch (error) {
-                    this.showStatus('comparison', 'error', `Decryption failed: ${error.message}`);
-                }
-            }
-            
-            generateParameters() {
-                try {
-                    const prime = ModularArithmetic.generatePrime(64);
-                    const generator = 2n; // Simple generator for demo
-                    
-                    this.cipher.p = prime;
-                    this.cipher.g = generator;
-                    
-                    document.getElementById('prime').value = prime.toString();
-                    document.getElementById('generator').value = generator.toString();
-                    
-                    this.showStatus('standard', 'success', 'Generated new cryptographic parameters');
-                    
-                } catch (error) {
-                    this.showStatus('standard', 'error', `Parameter generation failed: ${error.message}`);
-                }
-            }
-            
-            generateSession() {
-                try {
-                    const key = Math.random().toString(36).substring(2) + Date.now().toString(36);
-                    this.cipher.setSessionKey(key);
-                    
-                    document.getElementById('session-key').textContent = key.substring(0, 50) + '...';
-                    this.showStatus('compressed', 'success', 'Generated new session key');
-                    
-                } catch (error) {
-                    this.showStatus('compressed', 'error', `Session generation failed: ${error.message}`);
-                }
-            }
-            
-            updateMapping() {
-                const key = document.getElementById('mapping-key').value;
-                this.cipher.setSessionKey(key);
-            }
-            
-            updateStats(type, size, time) {
-                document.getElementById(`${type}-size`).textContent = size;
-                document.getElementById(`${type}-time`).textContent = `${time.toFixed(1)}ms`;
-                
-                // Update ratio if both are available
-                const standardSize = document.getElementById('standard-size').textContent;
-                const compressedSize = document.getElementById('compressed-size').textContent;
-                
-                if (standardSize !== '0' && compressedSize !== '0') {
-                    const ratio = (parseInt(standardSize) / parseInt(compressedSize)).toFixed(1);
-                    document.getElementById('compressed-ratio').textContent = `${ratio}x`;
-                }
-            }
-            
-            showStatus(context, type, message) {
-                const element = document.getElementById(`status-${context}`);
-                element.textContent = message;
-                element.className = `status ${type}`;
-                
-                if (type === 'success' || type === 'info') {
-                    setTimeout(() => {
-                        element.className = 'status';
-                        element.textContent = '';
-                    }, 5000);
-                }
-            }
-            
-            copyToClipboard(targetId) {
-                const element = document.getElementById(targetId);
-                element.select();
-                document.execCommand('copy');
-                
-                // Show temporary success message
-                const originalText = element.value;
-                element.value = '✓ Copied to clipboard!';
-                setTimeout(() => element.value = originalText, 1000);
-            }
-            
-            clearAll() {
-                document.getElementById('output-standard').value = '';
-                document.getElementById('output-compressed').value = '';
-                document.getElementById('output-decrypted').value = '';
-                
-                document.getElementById('standard-size').textContent = '0';
-                document.getElementById('compressed-size').textContent = '0';
-                document.getElementById('standard-time').textContent = '0ms';
-                document.getElementById('compressed-time').textContent = '0ms';
-                document.getElementById('compressed-ratio').textContent = '1.0x';
-                
-                this.showStatus('comparison', 'info', 'All outputs cleared');
-            }
-            
-            updateUI() {
-                // Update compression status
-                const compressionEnabled = document.getElementById('compression-toggle').checked;
-                document.getElementById('encrypt-compressed').disabled = !compressionEnabled;
-                
-                // Update session key status
-                const sessionEnabled = document.getElementById('session-keys-toggle').checked;
-                document.getElementById('generate-session').disabled = !sessionEnabled;
+
+            setLoading(button, isLoading) {
+                const btn = this.elements[`${button}Btn`];
+                btn.disabled = isLoading;
+                btn.style.opacity = isLoading ? 0.7 : 1;
             }
         }
 
-        // ==================== INITIALIZATION ====================
+        // Initialize application
         document.addEventListener('DOMContentLoaded', () => {
-            new ApplicationController();
+            new CipherUI();
         });
     </script>
 </body>
-                    </html>
+</html>
