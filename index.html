@@ -20,7 +20,6 @@
             --text-dim: #94a3b8;
             --border: #475569;
             --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -32,7 +31,7 @@
         body {
             background: var(--background);
             color: var(--text);
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
@@ -47,19 +46,15 @@
             text-align: center;
             margin-bottom: 40px;
             padding: 40px;
-            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
+            background: var(--surface);
             border-radius: 20px;
             border: 1px solid var(--border);
-            box-shadow: var(--card-shadow);
         }
 
         .header h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--accent);
             margin-bottom: 16px;
         }
 
@@ -78,21 +73,20 @@
         .panel {
             background: var(--surface);
             border-radius: 16px;
-            padding: 32px;
+            padding: 24px;
             border: 1px solid var(--border);
-            box-shadow: var(--card-shadow);
             margin-bottom: 24px;
         }
 
         .panel-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             color: var(--accent);
         }
 
         .input-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .input-label {
@@ -101,28 +95,26 @@
             font-weight: 600;
             color: var(--text-dim);
             font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .input-field {
             width: 100%;
             padding: 12px;
             background: var(--surface-alt);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text);
             font-size: 1rem;
         }
 
         textarea.input-field {
-            min-height: 100px;
+            min-height: 80px;
             resize: vertical;
             font-family: 'Courier New', monospace;
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 12px 20px;
             background: var(--primary);
             color: white;
             border: none;
@@ -146,12 +138,14 @@
             font-family: 'Courier New', monospace;
             min-height: 60px;
             margin-top: 10px;
+            word-break: break-all;
         }
 
         .status {
             padding: 12px;
             border-radius: 8px;
             margin: 15px 0;
+            font-size: 0.9rem;
         }
 
         .status.error {
@@ -166,11 +160,14 @@
             color: var(--success);
         }
 
-        .config-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .config-row {
+            display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        .config-item {
+            flex: 1;
         }
 
         .toggle {
@@ -192,21 +189,22 @@
         </header>
 
         <div class="main-layout">
+            <!-- Left Column -->
             <div class="left-column">
                 <div class="panel">
                     <h2 class="panel-title">CONFIGURATION</h2>
                     
                     <div class="input-group">
                         <label class="input-label">ENCRYPTION KEY</label>
-                        <input type="password" class="input-field" id="crypto-key" value="quantum-key-2024">
+                        <input type="text" class="input-field" id="crypto-key" value="quantum-key-2024">
                     </div>
 
-                    <div class="config-grid">
-                        <div class="input-group">
+                    <div class="config-row">
+                        <div class="config-item">
                             <label class="input-label">AFFINE PARAMETER A</label>
                             <input type="number" class="input-field" id="affine-a" value="5" min="1" max="25">
                         </div>
-                        <div class="input-group">
+                        <div class="config-item">
                             <label class="input-label">AFFINE PARAMETER B</label>
                             <input type="number" class="input-field" id="affine-b" value="7" min="0" max="25">
                         </div>
@@ -214,7 +212,7 @@
 
                     <div class="toggle">
                         <input type="checkbox" id="cbc-mode" checked>
-                        <label>CBC Mode (Block Chaining)</label>
+                        <label>CBC Mode</label>
                     </div>
 
                     <div class="toggle">
@@ -244,6 +242,7 @@
                 </div>
             </div>
 
+            <!-- Right Column -->
             <div class="right-column">
                 <div class="panel">
                     <h2 class="panel-title">DECRYPTION</h2>
@@ -272,62 +271,25 @@
                     <button class="btn" id="update-chars">UPDATE CHARACTERS</button>
                     <button class="btn" id="reset-chars">RESET TO DEFAULT</button>
                     
-                    <div id="char-status" class="status">Character set loaded</div>
+                    <div class="input-group">
+                        <label class="input-label">CHARACTER SET INFO</label>
+                        <div class="output-content" id="char-info">No character set loaded</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Utility functions
-        class CryptoUtils {
-            static gcd(a, b) {
-                if (b === 0) return a;
-                return CryptoUtils.gcd(b, a % b);
-            }
-
-            static modInverse(a, m) {
-                for (let x = 1; x < m; x++) {
-                    if ((a * x) % m === 1) return x;
-                }
-                return 1;
-            }
-
-            static isCoprime(a, b) {
-                return CryptoUtils.gcd(a, b) === 1;
-            }
-
-            static async cryptoShuffle(array, key) {
-                const encoder = new TextEncoder();
-                const keyData = encoder.encode(key);
-                
-                const cryptoKey = await crypto.subtle.importKey(
-                    'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
-                );
-
-                const result = [...array];
-                
-                for (let i = result.length - 1; i > 0; i--) {
-                    const message = encoder.encode(i.toString());
-                    const signature = await crypto.subtle.sign('HMAC', cryptoKey, message);
-                    const randomValues = new Uint32Array(signature.slice(0, 4));
-                    const j = randomValues[0] % (i + 1);
-                    
-                    [result[i], result[j]] = [result[j], result[i]];
-                }
-
-                return result;
-            }
-        }
-
-        // Main Cipher Class
+        // Real Professional Implementation
         class QuantumHomophonicCipher {
             constructor() {
-                this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                this.customChars = new Set();
+                this.ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                this.customChars = [];
                 this.sBox = null;
                 this.reverseSBox = null;
                 this.currentKey = null;
+                
                 this.config = {
                     cbcMode: true,
                     affineMode: true,
@@ -339,94 +301,130 @@
             }
 
             initializeDefaultChars() {
-                const defaultChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
-                this.updateCustomChars(defaultChars);
+                this.updateCustomChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()');
             }
 
             updateCustomChars(charString) {
+                // Remove duplicates and empty characters
                 const uniqueChars = [...new Set(charString)].filter(c => c.trim() !== '');
-                this.customChars = new Set(uniqueChars);
-                return uniqueChars;
+                this.customChars = uniqueChars;
+                return this.getCharSetInfo();
             }
 
-            validateConfiguration() {
-                const errors = [];
+            getCharSetInfo() {
+                return {
+                    count: this.customChars.length,
+                    homophones: this.customChars.length * this.customChars.length,
+                    isValid: this.customChars.length >= 2
+                };
+            }
 
-                // Check affine parameters
+            validateConfig() {
+                const errors = [];
+                
                 if (this.config.affineMode) {
-                    if (!CryptoUtils.isCoprime(this.config.affineA, 26)) {
-                        errors.push(`Parameter A (${this.config.affineA}) must be coprime with 26`);
+                    // Check if affine A is coprime with 26
+                    if (!this.isCoprime(this.config.affineA, 26)) {
+                        errors.push(`Affine parameter A (${this.config.affineA}) must be coprime with 26`);
                     }
                 }
-
-                // Check character set
-                if (this.customChars.size < 2) {
-                    errors.push('Character set must contain at least 2 unique characters');
+                
+                if (this.customChars.length < 2) {
+                    errors.push('Character set must contain at least 2 characters');
                 }
-
+                
                 return errors;
             }
 
+            isCoprime(a, b) {
+                const gcd = (x, y) => y === 0 ? x : gcd(y, x % y);
+                return gcd(a, b) === 1;
+            }
+
+            modInverse(a, m) {
+                for (let x = 1; x < m; x++) {
+                    if ((a * x) % m === 1) return x;
+                }
+                return 1;
+            }
+
             async generateSBox(key) {
-                const errors = this.validateConfiguration();
+                const errors = this.validateConfig();
                 if (errors.length > 0) {
                     throw new Error(errors.join(', '));
                 }
 
-                if (!key || key.length === 0) {
+                if (!key || key.trim() === '') {
                     throw new Error('Encryption key is required');
                 }
 
-                const chars = [...this.customChars];
-                const allBigrams = this.generateAllBigrams();
-                const allHomophones = this.generateAllHomophones(chars);
+                this.currentKey = key;
+                
+                // Generate all possible bigrams (AA, AB, AC, ..., ZY, ZZ)
+                const allBigrams = [];
+                for (let i = 0; i < this.ALPHABET.length; i++) {
+                    for (let j = 0; j < this.ALPHABET.length; j++) {
+                        allBigrams.push(this.ALPHABET[i] + this.ALPHABET[j]);
+                    }
+                }
 
-                // Shuffle homophones
-                const shuffledHomophones = await CryptoUtils.cryptoShuffle(allHomophones, key);
+                // Generate all possible homophones from custom character set
+                const allHomophones = [];
+                for (let i = 0; i < this.customChars.length; i++) {
+                    for (let j = 0; j < this.customChars.length; j++) {
+                        allHomophones.push(this.customChars[i] + this.customChars[j]);
+                    }
+                }
 
-                // Calculate distribution
+                // Shuffle homophones using key-based deterministic randomness
+                const shuffledHomophones = await this.deterministicShuffle(allHomophones, key);
+
+                // Distribute homophones evenly among bigrams
+                this.sBox = {};
                 const totalHomophones = shuffledHomophones.length;
                 const totalBigrams = allBigrams.length;
+                
                 const baseCount = Math.floor(totalHomophones / totalBigrams);
                 const extraCount = totalHomophones % totalBigrams;
-
-                // Create S-Box
-                this.sBox = {};
+                
                 let homophoneIndex = 0;
-
+                
                 for (let i = 0; i < totalBigrams; i++) {
+                    const bigram = allBigrams[i];
                     const count = i < extraCount ? baseCount + 1 : baseCount;
-                    this.sBox[allBigrams[i]] = shuffledHomophones.slice(
-                        homophoneIndex, 
-                        homophoneIndex + count
-                    );
+                    
+                    this.sBox[bigram] = shuffledHomophones.slice(homophoneIndex, homophoneIndex + count);
                     homophoneIndex += count;
                 }
 
+                // Create reverse mapping
                 this.createReverseSBox();
-                this.currentKey = key;
 
                 return true;
             }
 
-            generateAllBigrams() {
-                const bigrams = [];
-                for (let i = 0; i < this.alphabet.length; i++) {
-                    for (let j = 0; j < this.alphabet.length; j++) {
-                        bigrams.push(this.alphabet[i] + this.alphabet[j]);
-                    }
+            async deterministicShuffle(array, key) {
+                // Simple deterministic shuffle based on key
+                const encoder = new TextEncoder();
+                const keyBytes = encoder.encode(key);
+                
+                const result = [...array];
+                const n = result.length;
+                
+                // Use first 4 bytes of key hash as seed
+                const keyHash = await crypto.subtle.digest('SHA-256', keyBytes);
+                const seedArray = new Uint32Array(keyHash.slice(0, 16));
+                let seed = seedArray[0];
+                
+                for (let i = n - 1; i > 0; i--) {
+                    // Simple PRNG using the seed
+                    seed = (seed * 1664525 + 1013904223) >>> 0;
+                    const j = seed % (i + 1);
+                    
+                    [result[i], result[j]] = [result[j], result[i]];
                 }
-                return bigrams;
-            }
-
-            generateAllHomophones(chars) {
-                const homophones = [];
-                for (let i = 0; i < chars.length; i++) {
-                    for (let j = 0; j < chars.length; j++) {
-                        homophones.push(chars[i] + chars[j]);
-                    }
-                }
-                return homophones;
+                
+                return result;
             }
 
             createReverseSBox() {
@@ -437,38 +435,49 @@
                     for (const homophone of homophones) {
                         if (this.reverseSBox.has(homophone)) {
                             duplicates.add(homophone);
-                            this.reverseSBox.delete(homophone);
                         } else {
                             this.reverseSBox.set(homophone, bigram);
                         }
                     }
                 }
 
-                console.log(`Found ${duplicates.size} duplicate homophones`);
+                if (duplicates.size > 0) {
+                    console.warn(`Found ${duplicates.size} duplicate homophones`);
+                }
             }
 
             encrypt(plaintext) {
-                if (!this.sBox) throw new Error('S-Box not generated');
+                if (!this.sBox) throw new Error('S-Box not generated. Please generate S-Box first.');
                 
-                const processedText = plaintext.toUpperCase().replace(/[^A-Z]/g, '');
-                if (!processedText) throw new Error('No valid text to encrypt');
+                // Clean and validate input
+                const cleanText = plaintext.toUpperCase().replace(/[^A-Z]/g, '');
+                if (!cleanText) throw new Error('No valid characters found in plaintext');
 
                 let ciphertext = '';
-                let previousBlock = 'AA';
+                let previousBlock = 'AA'; // Initialization vector for CBC
                 
-                for (let i = 0; i < processedText.length; i += 2) {
-                    let bigram = processedText.substr(i, 2);
-                    if (bigram.length === 1) bigram += 'X';
-
-                    let targetBigram = this.applyTransformations(bigram, previousBlock, i);
+                // Process text in bigrams (2 characters at a time)
+                for (let i = 0; i < cleanText.length; i += 2) {
+                    let bigram = cleanText.substr(i, 2);
                     
-                    if (this.sBox[targetBigram] && this.sBox[targetBigram].length > 0) {
-                        const homophones = this.sBox[targetBigram];
+                    // Pad with 'X' if odd length
+                    if (bigram.length === 1) {
+                        bigram += 'X';
+                    }
+
+                    // Apply transformations
+                    let transformedBigram = this.applyTransformations(bigram, previousBlock, i);
+                    
+                    // Get random homophone for this bigram
+                    if (this.sBox[transformedBigram] && this.sBox[transformedBigram].length > 0) {
+                        const homophones = this.sBox[transformedBigram];
                         const randomIndex = Math.floor(Math.random() * homophones.length);
-                        ciphertext += homophones[randomIndex];
-                        previousBlock = targetBigram;
+                        const selectedHomophone = homophones[randomIndex];
+                        
+                        ciphertext += selectedHomophone;
+                        previousBlock = transformedBigram;
                     } else {
-                        throw new Error(`No homophones found for bigram: ${targetBigram}`);
+                        throw new Error(`No homophones available for bigram: ${transformedBigram}`);
                     }
                 }
 
@@ -476,23 +485,31 @@
             }
 
             decrypt(ciphertext) {
-                if (!this.reverseSBox) throw new Error('S-Box not generated');
+                if (!this.reverseSBox) throw new Error('S-Box not generated. Please generate S-Box first.');
                 if (!ciphertext) throw new Error('No ciphertext provided');
-                if (ciphertext.length % 2 !== 0) throw new Error('Ciphertext length must be even');
+                
+                // Validate ciphertext length (must be even)
+                if (ciphertext.length % 2 !== 0) {
+                    throw new Error('Ciphertext length must be even');
+                }
 
                 let plaintext = '';
-                let previousBlock = 'AA';
+                let previousBlock = 'AA'; // Initialization vector for CBC
                 
+                // Process ciphertext in pairs (each homophone is 2 characters)
                 for (let i = 0; i < ciphertext.length; i += 2) {
                     const homophone = ciphertext.substr(i, 2);
                     
                     if (this.reverseSBox.has(homophone)) {
                         let bigram = this.reverseSBox.get(homophone);
+                        
+                        // Reverse transformations
                         bigram = this.reverseTransformations(bigram, previousBlock, i);
+                        
                         plaintext += bigram;
                         previousBlock = this.reverseSBox.get(homophone);
                     } else {
-                        plaintext += '??';
+                        plaintext += '??'; // Unknown homophone
                     }
                 }
 
@@ -502,10 +519,12 @@
             applyTransformations(bigram, previousBlock, position) {
                 let result = bigram;
 
+                // Apply CBC mode if enabled
                 if (this.config.cbcMode) {
                     result = this.applyCBC(result, previousBlock, position);
                 }
 
+                // Apply affine transformation if enabled
                 if (this.config.affineMode) {
                     result = this.applyAffine(result);
                 }
@@ -516,10 +535,12 @@
             reverseTransformations(bigram, previousBlock, position) {
                 let result = bigram;
 
+                // Reverse affine transformation first (opposite order of application)
                 if (this.config.affineMode) {
                     result = this.reverseAffine(result);
                 }
 
+                // Reverse CBC mode
                 if (this.config.cbcMode) {
                     result = this.reverseCBC(result, previousBlock, position);
                 }
@@ -530,10 +551,15 @@
             applyCBC(bigram, previousBlock, position) {
                 let result = '';
                 for (let i = 0; i < 2; i++) {
-                    const currentIdx = this.alphabet.indexOf(bigram[i]);
-                    const prevIdx = this.alphabet.indexOf(previousBlock[i]);
-                    const newIdx = (currentIdx + prevIdx + position) % 26;
-                    result += this.alphabet[newIdx];
+                    const currentChar = bigram[i];
+                    const prevChar = previousBlock[i];
+                    
+                    const currentIndex = this.ALPHABET.indexOf(currentChar);
+                    const prevIndex = this.ALPHABET.indexOf(prevChar);
+                    
+                    // CBC operation: current + previous + position
+                    const newIndex = (currentIndex + prevIndex + position) % 26;
+                    result += this.ALPHABET[newIndex];
                 }
                 return result;
             }
@@ -541,11 +567,17 @@
             reverseCBC(bigram, previousBlock, position) {
                 let result = '';
                 for (let i = 0; i < 2; i++) {
-                    const currentIdx = this.alphabet.indexOf(bigram[i]);
-                    const prevIdx = this.alphabet.indexOf(previousBlock[i]);
-                    let newIdx = (currentIdx - prevIdx - position) % 26;
-                    if (newIdx < 0) newIdx += 26;
-                    result += this.alphabet[newIdx];
+                    const currentChar = bigram[i];
+                    const prevChar = previousBlock[i];
+                    
+                    const currentIndex = this.ALPHABET.indexOf(currentChar);
+                    const prevIndex = this.ALPHABET.indexOf(prevChar);
+                    
+                    // Reverse CBC operation: current - previous - position
+                    let newIndex = (currentIndex - prevIndex - position) % 26;
+                    if (newIndex < 0) newIndex += 26;
+                    
+                    result += this.ALPHABET[newIndex];
                 }
                 return result;
             }
@@ -553,37 +585,43 @@
             applyAffine(bigram) {
                 let result = '';
                 for (const char of bigram) {
-                    const x = this.alphabet.indexOf(char);
+                    const x = this.ALPHABET.indexOf(char);
                     const y = (this.config.affineA * x + this.config.affineB) % 26;
-                    result += this.alphabet[y];
+                    result += this.ALPHABET[y];
                 }
                 return result;
             }
 
             reverseAffine(bigram) {
-                const aInv = CryptoUtils.modInverse(this.config.affineA, 26);
+                const aInv = this.modInverse(this.config.affineA, 26);
                 let result = '';
+                
                 for (const char of bigram) {
-                    const y = this.alphabet.indexOf(char);
+                    const y = this.ALPHABET.indexOf(char);
                     let x = (aInv * (y - this.config.affineB)) % 26;
                     if (x < 0) x += 26;
-                    result += this.alphabet[x];
+                    result += this.ALPHABET[x];
                 }
                 return result;
             }
         }
 
-        // UI Controller
+        // UI Controller - Simple and Professional
         class CipherUI {
             constructor() {
                 this.cipher = new QuantumHomophonicCipher();
-                this.initializeElements();
-                this.setupEventListeners();
-                this.updateConfig();
+                this.initialize();
             }
 
-            initializeElements() {
+            initialize() {
+                this.bindElements();
+                this.setupEventListeners();
+                this.updateCharInfo();
+            }
+
+            bindElements() {
                 this.elements = {
+                    // Inputs
                     cryptoKey: document.getElementById('crypto-key'),
                     affineA: document.getElementById('affine-a'),
                     affineB: document.getElementById('affine-b'),
@@ -592,15 +630,21 @@
                     plaintext: document.getElementById('plaintext'),
                     ciphertext: document.getElementById('ciphertext'),
                     customChars: document.getElementById('custom-chars'),
+                    
+                    // Outputs
                     ciphertextOutput: document.getElementById('ciphertext-output'),
                     decryptedOutput: document.getElementById('decrypted-output'),
+                    charInfo: document.getElementById('char-info'),
+                    
+                    // Buttons
                     generateBtn: document.getElementById('generate-btn'),
                     encryptBtn: document.getElementById('encrypt-btn'),
                     decryptBtn: document.getElementById('decrypt-btn'),
                     updateCharsBtn: document.getElementById('update-chars'),
                     resetCharsBtn: document.getElementById('reset-chars'),
-                    configStatus: document.getElementById('config-status'),
-                    charStatus: document.getElementById('char-status')
+                    
+                    // Status
+                    configStatus: document.getElementById('config-status')
                 };
             }
 
@@ -608,47 +652,52 @@
                 this.elements.generateBtn.addEventListener('click', () => this.generateSBox());
                 this.elements.encryptBtn.addEventListener('click', () => this.encrypt());
                 this.elements.decryptBtn.addEventListener('click', () => this.decrypt());
-                this.elements.updateCharsBtn.addEventListener('click', () => this.updateCharacters());
-                this.elements.resetCharsBtn.addEventListener('click', () => this.resetCharacters());
+                this.elements.updateCharsBtn.addEventListener('click', () => this.updateChars());
+                this.elements.resetCharsBtn.addEventListener('click', () => this.resetChars());
 
-                // Update config on change
-                this.elements.affineA.addEventListener('change', () => this.updateConfig());
-                this.elements.affineB.addEventListener('change', () => this.updateConfig());
-                this.elements.cbcMode.addEventListener('change', () => this.updateConfig());
-                this.elements.affineMode.addEventListener('change', () => this.updateConfig());
-                this.elements.cryptoKey.addEventListener('input', () => this.updateConfig());
+                // Real-time config validation
+                this.elements.affineA.addEventListener('input', () => this.validateConfig());
+                this.elements.affineB.addEventListener('input', () => this.validateConfig());
+                this.elements.cryptoKey.addEventListener('input', () => this.validateConfig());
+                this.elements.customChars.addEventListener('input', () => this.updateCharInfo());
             }
 
-            updateConfig() {
+            validateConfig() {
                 this.cipher.config.affineA = parseInt(this.elements.affineA.value) || 5;
                 this.cipher.config.affineB = parseInt(this.elements.affineB.value) || 7;
                 this.cipher.config.cbcMode = this.elements.cbcMode.checked;
                 this.cipher.config.affineMode = this.elements.affineMode.checked;
 
-                // Validate configuration
-                const errors = this.cipher.validateConfiguration();
+                const errors = this.cipher.validateConfig();
+                
                 if (errors.length > 0) {
-                    this.showStatus(this.elements.configStatus, errors.join(', '), 'error');
+                    this.showStatus(errors.join('; '), 'error');
                     this.elements.generateBtn.disabled = true;
                 } else {
-                    this.showStatus(this.elements.configStatus, 'Configuration valid', 'success');
+                    this.showStatus('Configuration valid', 'success');
                     this.elements.generateBtn.disabled = false;
                 }
             }
 
+            updateCharInfo() {
+                const info = this.cipher.getCharSetInfo();
+                this.elements.charInfo.textContent = 
+                    `Characters: ${info.count} | Homophones: ${info.homophones} | ${info.isValid ? 'Valid' : 'Invalid'}`;
+            }
+
             async generateSBox() {
                 try {
+                    this.showStatus('Generating S-Box...', 'success');
                     this.elements.generateBtn.disabled = true;
-                    this.showStatus(this.elements.configStatus, 'Generating S-Box...', 'success');
 
                     await this.cipher.generateSBox(this.elements.cryptoKey.value);
 
                     this.elements.encryptBtn.disabled = false;
                     this.elements.decryptBtn.disabled = false;
-                    this.showStatus(this.elements.configStatus, 'S-Box generated successfully!', 'success');
+                    this.showStatus('S-Box generated successfully!', 'success');
 
                 } catch (error) {
-                    this.showStatus(this.elements.configStatus, `Error: ${error.message}`, 'error');
+                    this.showStatus(`Error: ${error.message}`, 'error');
                 } finally {
                     this.elements.generateBtn.disabled = false;
                 }
@@ -656,58 +705,51 @@
 
             async encrypt() {
                 try {
-                    const plaintext = this.elements.plaintext.value;
-                    const ciphertext = this.cipher.encrypt(plaintext);
-                    
-                    this.elements.ciphertextOutput.textContent = ciphertext;
-                    this.elements.ciphertext.value = ciphertext;
-                    this.showStatus(this.elements.configStatus, 'Text encrypted successfully!', 'success');
-
+                    const result = this.cipher.encrypt(this.elements.plaintext.value);
+                    this.elements.ciphertextOutput.textContent = result;
+                    this.elements.ciphertext.value = result;
+                    this.showStatus('Text encrypted successfully!', 'success');
                 } catch (error) {
-                    this.showStatus(this.elements.configStatus, `Encryption error: ${error.message}`, 'error');
+                    this.showStatus(`Encryption error: ${error.message}`, 'error');
                 }
             }
 
             async decrypt() {
                 try {
-                    const ciphertext = this.elements.ciphertext.value;
-                    const plaintext = this.cipher.decrypt(ciphertext);
-                    
-                    this.elements.decryptedOutput.textContent = plaintext;
-                    this.showStatus(this.elements.configStatus, 'Text decrypted successfully!', 'success');
-
+                    const result = this.cipher.decrypt(this.elements.ciphertext.value);
+                    this.elements.decryptedOutput.textContent = result;
+                    this.showStatus('Text decrypted successfully!', 'success');
                 } catch (error) {
-                    this.showStatus(this.elements.configStatus, `Decryption error: ${error.message}`, 'error');
+                    this.showStatus(`Decryption error: ${error.message}`, 'error');
                 }
             }
 
-            updateCharacters() {
+            updateChars() {
                 try {
-                    const charString = this.elements.customChars.value;
-                    this.cipher.updateCustomChars(charString);
-                    
-                    this.showStatus(this.elements.charStatus, 'Character set updated successfully!', 'success');
-                    this.updateConfig();
-
+                    this.cipher.updateCustomChars(this.elements.customChars.value);
+                    this.updateCharInfo();
+                    this.validateConfig();
+                    this.showStatus('Character set updated', 'success');
                 } catch (error) {
-                    this.showStatus(this.elements.charStatus, `Error: ${error.message}`, 'error');
+                    this.showStatus(`Error: ${error.message}`, 'error');
                 }
             }
 
-            resetCharacters() {
+            resetChars() {
                 this.cipher.initializeDefaultChars();
-                this.elements.customChars.value = [...this.cipher.customChars].join('');
-                this.showStatus(this.elements.charStatus, 'Character set reset to default', 'success');
-                this.updateConfig();
+                this.elements.customChars.value = this.cipher.customChars.join('');
+                this.updateCharInfo();
+                this.validateConfig();
+                this.showStatus('Character set reset to default', 'success');
             }
 
-            showStatus(element, message, type) {
-                element.textContent = message;
-                element.className = `status ${type}`;
+            showStatus(message, type) {
+                this.elements.configStatus.textContent = message;
+                this.elements.configStatus.className = `status ${type}`;
             }
         }
 
-        // Initialize application
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
             new CipherUI();
         });
