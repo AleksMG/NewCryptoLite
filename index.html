@@ -71,16 +71,16 @@
             margin: 0 auto;
         }
 
-        /* Main Grid */
-        .main-grid {
+        /* Main Layout */
+        .main-layout {
             display: grid;
-            grid-template-columns: 1fr 400px;
+            grid-template-columns: 1fr 1fr;
             gap: 24px;
             margin-bottom: 24px;
         }
 
         @media (max-width: 1200px) {
-            .main-grid {
+            .main-layout {
                 grid-template-columns: 1fr;
             }
         }
@@ -92,6 +92,7 @@
             padding: 32px;
             border: 1px solid var(--border);
             box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
         }
 
         .panel-title {
@@ -177,6 +178,12 @@
             transform: translateY(0);
         }
 
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-group {
             display: flex;
             gap: 12px;
@@ -216,16 +223,15 @@
             border: 1px solid var(--border);
         }
 
-        .editor-header {
+        .editor-controls {
             display: flex;
-            justify-content: between;
-            align-items: center;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         .alphabet-display {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
             gap: 8px;
             margin-bottom: 20px;
             max-height: 200px;
@@ -254,16 +260,9 @@
             transform: scale(1.1);
         }
 
-        .alphabet-char.selected {
-            border-color: var(--accent);
-            background: var(--accent);
-            color: var(--background);
-        }
-
-        .editor-controls {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
+        .alphabet-char.duplicate {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
         }
 
         .stats-grid {
@@ -319,6 +318,12 @@
             background: rgba(245, 158, 11, 0.1);
             border: 1px solid var(--warning);
             color: var(--warning);
+        }
+
+        .status.info {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
         }
 
         /* Toggle Switch */
@@ -389,6 +394,25 @@
             transition: width 0.3s ease;
         }
 
+        /* Configuration Panel */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .config-label {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header {
@@ -410,6 +434,10 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -417,20 +445,30 @@
     <div class="container">
         <header class="header">
             <h1>QUANTUM HOMOPHONIC CIPHER</h1>
-            <p>Advanced cryptographic system with customizable character sets and real-time entropy analysis</p>
+            <p>Advanced cryptographic system with customizable character sets and real-time analysis</p>
         </header>
 
-        <div class="main-grid">
-            <div class="crypto-panels">
+        <div class="main-layout">
+            <!-- Left Column: Configuration and Encryption -->
+            <div class="left-column">
                 <div class="panel">
-                    <h2 class="panel-title">Cryptographic Configuration</h2>
+                    <h2 class="panel-title">Configuration</h2>
                     
                     <div class="input-group">
-                        <label class="input-label">
-                            <span>Encryption Key</span>
-                        </label>
+                        <label class="input-label">Encryption Key</label>
                         <input type="password" class="input-field" id="crypto-key" 
                                value="quantum-secure-key-2024" placeholder="Enter strong encryption key">
+                    </div>
+
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label class="config-label">Affine Parameter A</label>
+                            <input type="number" class="input-field" id="affine-a" value="5" min="1" max="25">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">Affine Parameter B</label>
+                            <input type="number" class="input-field" id="affine-b" value="7" min="0" max="25">
+                        </div>
                     </div>
 
                     <div class="toggle">
@@ -453,93 +491,104 @@
                         <button class="btn" id="generate-btn">
                             <span>Generate S-Box</span>
                         </button>
-                        <button class="btn" id="encrypt-btn">
-                            <span>Encrypt Text</span>
-                        </button>
-                        <button class="btn" id="decrypt-btn">
-                            <span>Decrypt Text</span>
-                        </button>
                     </div>
 
                     <div class="progress-bar">
                         <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
                     </div>
 
-                    <div id="status" class="status success">
-                        System ready - Configure your character set and generate S-Box
+                    <div id="status" class="status info">
+                        System ready. Configure your settings and generate the S-Box to begin.
                     </div>
                 </div>
 
                 <div class="panel">
-                    <h2 class="panel-title">Text Processing</h2>
+                    <h2 class="panel-title">Encryption</h2>
                     
                     <div class="input-group">
                         <label class="input-label">Plaintext (A-Z only)</label>
                         <textarea class="input-field" id="plaintext" placeholder="Enter text to encrypt">QUANTUMCRYPTOGRAPHY</textarea>
                     </div>
 
-                    <div class="input-group">
-                        <label class="input-label">Ciphertext Output</label>
-                        <div class="output-content" id="ciphertext-output">Encrypted text will appear here...</div>
+                    <div class="btn-group">
+                        <button class="btn" id="encrypt-btn" disabled>
+                            <span>Encrypt Text</span>
+                        </button>
                     </div>
 
+                    <div class="output-container">
+                        <label class="output-label">Ciphertext Output</label>
+                        <div class="output-content" id="ciphertext-output">Encrypted text will appear here...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Decryption and Character Editor -->
+            <div class="right-column">
+                <div class="panel">
+                    <h2 class="panel-title">Decryption</h2>
+                    
                     <div class="input-group">
                         <label class="input-label">Ciphertext Input</label>
                         <textarea class="input-field" id="ciphertext" placeholder="Paste ciphertext to decrypt"></textarea>
                     </div>
 
-                    <div class="input-group">
-                        <label class="input-label">Decrypted Text</label>
+                    <div class="btn-group">
+                        <button class="btn" id="decrypt-btn" disabled>
+                            <span>Decrypt Text</span>
+                        </button>
+                    </div>
+
+                    <div class="output-container">
+                        <label class="output-label">Decrypted Text</label>
                         <div class="output-content" id="decrypted-output">Decrypted text will appear here...</div>
                     </div>
                 </div>
-            </div>
 
-            <div class="character-editor">
-                <div class="editor-header">
-                    <h2 class="panel-title">Character Set Editor</h2>
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Custom Character Set</label>
-                    <textarea class="input-field" id="custom-chars" placeholder="Enter custom characters (duplicates will be removed)">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ</textarea>
-                </div>
-
-                <div class="editor-controls">
-                    <button class="btn" id="update-chars">
-                        <span>Update Characters</span>
-                    </button>
-                    <button class="btn" id="reset-chars">
-                        <span>Reset to Default</span>
-                    </button>
-                </div>
-
-                <div class="alphabet-display" id="alphabet-display">
-                    <!-- Characters will be rendered here -->
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="char-count">0</div>
-                        <div class="stat-label">Characters</div>
+                <div class="panel">
+                    <h2 class="panel-title">Character Set Configuration</h2>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Custom Character Set</label>
+                        <textarea class="input-field" id="custom-chars" placeholder="Enter custom characters (duplicates will be removed)">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()</textarea>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="homophone-count">0</div>
-                        <div class="stat-label">Homophones</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="entropy-value">0.00</div>
-                        <div class="stat-label">Entropy/Char</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="bigram-ratio">0.00</div>
-                        <div class="stat-label">Homophones/Bigram</div>
-                    </div>
-                </div>
 
-                <div class="input-group">
-                    <label class="input-label">Character Set Validation</label>
-                    <div class="output-content" id="validation-output">No issues detected</div>
+                    <div class="editor-controls">
+                        <button class="btn" id="update-chars">
+                            <span>Update Character Set</span>
+                        </button>
+                        <button class="btn" id="reset-chars">
+                            <span>Reset to Default</span>
+                        </button>
+                    </div>
+
+                    <div class="alphabet-display" id="alphabet-display">
+                        <!-- Characters will be rendered here -->
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="char-count">0</div>
+                            <div class="stat-label">Characters</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="homophone-count">0</div>
+                            <div class="stat-label">Homophones</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="entropy-value">0.00</div>
+                            <div class="stat-label">Entropy/Char</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="bigram-ratio">0.00</div>
+                            <div class="stat-label">Homophones/Bigram</div>
+                        </div>
+                    </div>
+
+                    <div class="output-container">
+                        <label class="output-label">Character Set Validation</label>
+                        <div class="output-content" id="validation-output">No issues detected</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -564,7 +613,7 @@
             }
 
             initializeDefaultChars() {
-                const defaultChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ';
+                const defaultChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
                 this.updateCustomChars(defaultChars);
             }
 
@@ -578,6 +627,12 @@
 
             validateCharacterSet() {
                 const issues = [];
+                const chars = [...this.customChars];
+                
+                // Check for duplicates (shouldn't happen with Set, but just in case)
+                if (chars.length !== this.customChars.size) {
+                    issues.push('Duplicate characters detected');
+                }
                 
                 if (this.customChars.size < 2) {
                     issues.push('Minimum 2 characters required');
@@ -612,7 +667,7 @@
             }
 
             areCharactersSimilar(char1, char2) {
-                // Basic similarity check (can be enhanced)
+                // Basic similarity check
                 return char1.normalize() === char2.normalize() || 
                        char1.toLowerCase() === char2.toLowerCase();
             }
@@ -766,6 +821,40 @@
                 return ciphertext;
             }
 
+            async decrypt(ciphertext) {
+                if (!this.reverseSBox) throw new Error('S-Box not generated');
+                if (!ciphertext) throw new Error('No ciphertext to decrypt');
+                
+                // Check if ciphertext length is even
+                if (ciphertext.length % 2 !== 0) {
+                    throw new Error('Ciphertext length must be even');
+                }
+
+                let plaintext = '';
+                let previousBlock = 'AA';
+                let position = 0;
+
+                for (let i = 0; i < ciphertext.length; i += 2) {
+                    const homophone = ciphertext.substr(i, 2);
+                    
+                    if (this.reverseSBox.has(homophone)) {
+                        let bigram = this.reverseSBox.get(homophone);
+                        
+                        // Reverse transformations
+                        bigram = this.reverseTransformations(bigram, previousBlock, position);
+                        
+                        plaintext += bigram;
+                        previousBlock = this.reverseSBox.get(homophone);
+                    } else {
+                        plaintext += '??'; // Unknown homophone
+                    }
+                    
+                    position++;
+                }
+
+                return plaintext;
+            }
+
             applyTransformations(bigram, previousBlock, position) {
                 let result = bigram;
 
@@ -775,6 +864,20 @@
 
                 if (this.config.affineMode) {
                     result = this.applyAffineTransformation(result);
+                }
+
+                return result;
+            }
+
+            reverseTransformations(bigram, previousBlock, position) {
+                let result = bigram;
+
+                if (this.config.affineMode) {
+                    result = this.reverseAffineTransformation(result);
+                }
+
+                if (this.config.cbcMode) {
+                    result = this.reverseCBCMode(result, previousBlock, position);
                 }
 
                 return result;
@@ -791,12 +894,44 @@
                 return result;
             }
 
+            reverseCBCMode(bigram, previousBlock, position) {
+                let result = '';
+                for (let i = 0; i < 2; i++) {
+                    const currentIdx = this.alphabet.indexOf(bigram[i]);
+                    const prevIdx = this.alphabet.indexOf(previousBlock[i]);
+                    let newIdx = (currentIdx - prevIdx - position) % 26;
+                    if (newIdx < 0) newIdx += 26;
+                    result += this.alphabet[newIdx];
+                }
+                return result;
+            }
+
             applyAffineTransformation(bigram) {
                 let result = '';
                 for (const char of bigram) {
                     const x = this.alphabet.indexOf(char);
                     const y = (this.config.affineA * x + this.config.affineB) % 26;
                     result += this.alphabet[y];
+                }
+                return result;
+            }
+
+            reverseAffineTransformation(bigram) {
+                // Find modular inverse of a mod 26
+                let aInv = 0;
+                for (let i = 0; i < 26; i++) {
+                    if ((this.config.affineA * i) % 26 === 1) {
+                        aInv = i;
+                        break;
+                    }
+                }
+
+                let result = '';
+                for (const char of bigram) {
+                    const y = this.alphabet.indexOf(char);
+                    let x = (aInv * (y - this.config.affineB)) % 26;
+                    if (x < 0) x += 26;
+                    result += this.alphabet[x];
                 }
                 return result;
             }
@@ -843,6 +978,10 @@
                     plaintext: document.getElementById('plaintext'),
                     ciphertext: document.getElementById('ciphertext'),
                     customChars: document.getElementById('custom-chars'),
+                    affineA: document.getElementById('affine-a'),
+                    affineB: document.getElementById('affine-b'),
+                    cbcMode: document.getElementById('cbc-mode'),
+                    affineMode: document.getElementById('affine-mode'),
                     
                     // Outputs
                     ciphertextOutput: document.getElementById('ciphertext-output'),
@@ -878,6 +1017,19 @@
                 
                 this.elements.customChars.addEventListener('input', () => this.previewCharacters());
                 this.elements.ciphertext.addEventListener('input', () => this.updateCiphertextStats());
+                
+                // Update config when settings change
+                this.elements.affineA.addEventListener('change', () => this.updateConfig());
+                this.elements.affineB.addEventListener('change', () => this.updateConfig());
+                this.elements.cbcMode.addEventListener('change', () => this.updateConfig());
+                this.elements.affineMode.addEventListener('change', () => this.updateConfig());
+            }
+
+            updateConfig() {
+                this.cipher.config.affineA = parseInt(this.elements.affineA.value);
+                this.cipher.config.affineB = parseInt(this.elements.affineB.value);
+                this.cipher.config.cbcMode = this.elements.cbcMode.checked;
+                this.cipher.config.affineMode = this.elements.affineMode.checked;
             }
 
             async generateSBox() {
@@ -892,6 +1044,8 @@
                         }
                     );
 
+                    this.elements.encryptBtn.disabled = false;
+                    this.elements.decryptBtn.disabled = false;
                     this.showStatus('S-Box generated successfully', 'success');
                     this.updateStats();
 
@@ -908,6 +1062,8 @@
                     if (!plaintext) throw new Error('Enter text to encrypt');
 
                     this.setLoading('encrypt', true);
+                    this.updateConfig();
+                    
                     const ciphertext = await this.cipher.encrypt(plaintext);
                     
                     this.elements.ciphertextOutput.textContent = ciphertext;
@@ -919,6 +1075,26 @@
                     this.showStatus(`Encryption error: ${error.message}`, 'error');
                 } finally {
                     this.setLoading('encrypt', false);
+                }
+            }
+
+            async decrypt() {
+                try {
+                    const ciphertext = this.elements.ciphertext.value;
+                    if (!ciphertext) throw new Error('Enter ciphertext to decrypt');
+
+                    this.setLoading('decrypt', true);
+                    this.updateConfig();
+                    
+                    const plaintext = await this.cipher.decrypt(ciphertext);
+                    
+                    this.elements.decryptedOutput.textContent = plaintext;
+                    this.showStatus('Text decrypted successfully', 'success');
+
+                } catch (error) {
+                    this.showStatus(`Decryption error: ${error.message}`, 'error');
+                } finally {
+                    this.setLoading('decrypt', false);
                 }
             }
 
@@ -953,9 +1129,18 @@
                 const display = this.elements.alphabetDisplay;
                 display.innerHTML = '';
 
+                // Find duplicates
+                const charCount = {};
+                chars.forEach(char => {
+                    charCount[char] = (charCount[char] || 0) + 1;
+                });
+
                 chars.forEach(char => {
                     const charElement = document.createElement('div');
                     charElement.className = 'alphabet-char';
+                    if (charCount[char] > 1) {
+                        charElement.classList.add('duplicate');
+                    }
                     charElement.textContent = char;
                     charElement.title = `Char: ${char}\nUnicode: U+${char.charCodeAt(0).toString(16).toUpperCase()}`;
                     display.appendChild(charElement);
