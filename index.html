@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +43,6 @@
             margin: 0 auto;
         }
 
-        /* Header Styles */
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -64,14 +63,6 @@
             margin-bottom: 16px;
         }
 
-        .header p {
-            font-size: 1.2rem;
-            color: var(--text-dim);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Main Grid */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 400px;
@@ -85,7 +76,6 @@
             }
         }
 
-        /* Panel Styles */
         .panel {
             background: var(--surface);
             border-radius: 16px;
@@ -104,13 +94,6 @@
             gap: 12px;
         }
 
-        .panel-title::before {
-            content: "▶";
-            font-size: 0.8em;
-            color: var(--secondary);
-        }
-
-        /* Input Groups */
         .input-group {
             margin-bottom: 24px;
         }
@@ -150,7 +133,6 @@
             font-family: 'Fira Code', 'Cascadia Code', monospace;
         }
 
-        /* Button Styles */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -184,7 +166,6 @@
             margin: 24px 0;
         }
 
-        /* Output Styles */
         .output-container {
             margin-top: 24px;
         }
@@ -208,19 +189,11 @@
             overflow-y: auto;
         }
 
-        /* Character Editor */
         .character-editor {
             background: var(--surface);
             border-radius: 16px;
             padding: 24px;
             border: 1px solid var(--border);
-        }
-
-        .editor-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 20px;
         }
 
         .alphabet-display {
@@ -247,6 +220,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            position: relative;
         }
 
         .alphabet-char:hover {
@@ -260,10 +234,20 @@
             color: var(--background);
         }
 
-        .editor-controls {
+        .alphabet-char.duplicate::after {
+            content: "⚠";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--error);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
             display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
         }
 
         .stats-grid {
@@ -293,7 +277,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Status Messages */
         .status {
             padding: 16px;
             border-radius: 12px;
@@ -321,59 +304,6 @@
             color: var(--warning);
         }
 
-        /* Toggle Switch */
-        .toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--surface-alt);
-            transition: var(--transition);
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background: var(--text);
-            transition: var(--transition);
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background: var(--primary);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(24px);
-        }
-
-        /* Progress Bar */
         .progress-bar {
             width: 100%;
             height: 6px;
@@ -389,7 +319,33 @@
             transition: width 0.3s ease;
         }
 
-        /* Responsive */
+        .visualization {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--surface-alt);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .mapping-table th, .mapping-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .mapping-table th {
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .header {
                 padding: 24px;
@@ -417,47 +373,38 @@
     <div class="container">
         <header class="header">
             <h1>QUANTUM HOMOPHONIC CIPHER</h1>
-            <p>Advanced cryptographic system with customizable character sets and real-time entropy analysis</p>
+            <p>Профессиональная система гомофонного шифрования с полной кастомизацией и визуализацией</p>
         </header>
 
         <div class="main-grid">
             <div class="crypto-panels">
                 <div class="panel">
-                    <h2 class="panel-title">Cryptographic Configuration</h2>
+                    <h2 class="panel-title">Конфигурация шифрования</h2>
                     
                     <div class="input-group">
-                        <label class="input-label">
-                            <span>Encryption Key</span>
-                        </label>
+                        <label class="input-label">Ключ шифрования</label>
                         <input type="password" class="input-field" id="crypto-key" 
-                               value="quantum-secure-key-2024" placeholder="Enter strong encryption key">
+                               value="quantum-secure-key-2024" placeholder="Введите сильный ключ шифрования">
                     </div>
 
-                    <div class="toggle">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="cbc-mode" checked>
-                            <span class="slider"></span>
-                        </label>
-                        <span>CBC Mode (Block Chaining)</span>
-                    </div>
-
-                    <div class="toggle">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="affine-mode" checked>
-                            <span class="slider"></span>
-                        </label>
-                        <span>Affine Transformation</span>
+                    <div class="input-group">
+                        <label class="input-label">Исходный алфавит (A-Z)</label>
+                        <input type="text" class="input-field" id="source-alphabet" 
+                               value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" placeholder="Базовый алфавит для биграмм">
                     </div>
 
                     <div class="btn-group">
                         <button class="btn" id="generate-btn">
-                            <span>Generate S-Box</span>
+                            <span>Сгенерировать S-Box</span>
                         </button>
                         <button class="btn" id="encrypt-btn">
-                            <span>Encrypt Text</span>
+                            <span>Зашифровать текст</span>
                         </button>
                         <button class="btn" id="decrypt-btn">
-                            <span>Decrypt Text</span>
+                            <span>Расшифровать текст</span>
+                        </button>
+                        <button class="btn" id="analyze-btn">
+                            <span>Анализ безопасности</span>
                         </button>
                     </div>
 
@@ -466,223 +413,255 @@
                     </div>
 
                     <div id="status" class="status success">
-                        System ready - Configure your character set and generate S-Box
+                        Система готова - Настройте алфавит и сгенерируйте S-Box
                     </div>
                 </div>
 
                 <div class="panel">
-                    <h2 class="panel-title">Text Processing</h2>
+                    <h2 class="panel-title">Обработка текста</h2>
                     
                     <div class="input-group">
-                        <label class="input-label">Plaintext (A-Z only)</label>
-                        <textarea class="input-field" id="plaintext" placeholder="Enter text to encrypt">QUANTUMCRYPTOGRAPHY</textarea>
+                        <label class="input-label">Исходный текст</label>
+                        <textarea class="input-field" id="plaintext" placeholder="Введите текст для шифрования">QUANTUMCRYPTOGRAPHY</textarea>
                     </div>
 
                     <div class="input-group">
-                        <label class="input-label">Ciphertext Output</label>
-                        <div class="output-content" id="ciphertext-output">Encrypted text will appear here...</div>
+                        <label class="input-label">Зашифрованный текст</label>
+                        <div class="output-content" id="ciphertext-output">Зашифрованный текст появится здесь...</div>
                     </div>
 
                     <div class="input-group">
-                        <label class="input-label">Ciphertext Input</label>
-                        <textarea class="input-field" id="ciphertext" placeholder="Paste ciphertext to decrypt"></textarea>
+                        <label class="input-label">Текст для расшифровки</label>
+                        <textarea class="input-field" id="ciphertext" placeholder="Введите зашифрованный текст"></textarea>
                     </div>
 
                     <div class="input-group">
-                        <label class="input-label">Decrypted Text</label>
-                        <div class="output-content" id="decrypted-output">Decrypted text will appear here...</div>
+                        <label class="input-label">Расшифрованный текст</label>
+                        <div class="output-content" id="decrypted-output">Расшифрованный текст появится здесь...</div>
+                    </div>
+                </div>
+
+                <div class="panel visualization">
+                    <h2 class="panel-title">Визуализация маппинга</h2>
+                    <div class="output-content">
+                        <table class="mapping-table" id="mapping-table">
+                            <thead>
+                                <tr>
+                                    <th>Биграмма</th>
+                                    <th>Гомофоны</th>
+                                    <th>Кол-во</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mapping-body">
+                                <!-- Данные маппинга будут здесь -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
             <div class="character-editor">
                 <div class="editor-header">
-                    <h2 class="panel-title">Character Set Editor</h2>
+                    <h2 class="panel-title">Редактор алфавита гомофонов</h2>
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">Custom Character Set</label>
-                    <textarea class="input-field" id="custom-chars" placeholder="Enter custom characters (duplicates will be removed)">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ</textarea>
+                    <label class="input-label">Пользовательские символы</label>
+                    <textarea class="input-field" id="custom-chars" placeholder="Введите символы (дубликаты будут удалены)">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ</textarea>
                 </div>
 
-                <div class="editor-controls">
+                <div class="btn-group">
                     <button class="btn" id="update-chars">
-                        <span>Update Characters</span>
+                        <span>Обновить алфавит</span>
                     </button>
                     <button class="btn" id="reset-chars">
-                        <span>Reset to Default</span>
+                        <span>Сбросить к стандартному</span>
+                    </button>
+                    <button class="btn" id="optimize-chars">
+                        <span>Оптимизировать распределение</span>
                     </button>
                 </div>
 
                 <div class="alphabet-display" id="alphabet-display">
-                    <!-- Characters will be rendered here -->
+                    <!-- Символы будут отображены здесь -->
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value" id="char-count">0</div>
-                        <div class="stat-label">Characters</div>
+                        <div class="stat-label">Символов</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="homophone-count">0</div>
-                        <div class="stat-label">Homophones</div>
+                        <div class="stat-label">Гомофонов</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="entropy-value">0.00</div>
-                        <div class="stat-label">Entropy/Char</div>
+                        <div class="stat-label">Энтропия/символ</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="bigram-ratio">0.00</div>
-                        <div class="stat-label">Homophones/Bigram</div>
+                        <div class="stat-value" id="coverage-ratio">0%</div>
+                        <div class="stat-label">Покрытие биграмм</div>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">Character Set Validation</label>
-                    <div class="output-content" id="validation-output">No issues detected</div>
+                    <label class="input-label">Валидация алфавита</label>
+                    <div class="output-content" id="validation-output">Проблем не обнаружено</div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Статистика безопасности</label>
+                    <div class="output-content" id="security-stats">
+                        Проанализируйте систему для получения статистики
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        class QuantumHomophonicCipher {
+        // Профессиональная реализация гомофонного шифра
+        class ProfessionalHomophonicCipher {
             constructor() {
-                this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                this.customChars = new Set();
-                this.sBox = null;
-                this.reverseSBox = null;
-                this.currentKey = null;
-                this.config = {
-                    cbcMode: true,
-                    affineMode: true,
-                    affineA: 5,
-                    affineB: 7
-                };
+                this.sourceAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                this.homophoneAlphabet = new Set();
+                this.sBox = new Map(); // Биграмма -> массив гомофонов
+                this.reverseSBox = new Map(); // Гомофон -> биграмма
+                this.encryptionKey = '';
+                this.duplicateHomophones = new Set();
                 
-                this.initializeDefaultChars();
+                this.initializeDefaultAlphabet();
             }
 
-            initializeDefaultChars() {
+            initializeDefaultAlphabet() {
                 const defaultChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ⴰⴱⴳⴷⴹⴻⴼⴽⵀⵂⵃⵄⵅⵆⵇⵈⵉⵊⵋⵌⵍⵎⵏⵐⵑⵒⵓⵔⵕⵖⵗⵘⵙⵚⵛⵜⵝⵞⵟⵠⵡⵢⵣⵤⵥⵦ';
-                this.updateCustomChars(defaultChars);
+                this.updateHomophoneAlphabet(defaultChars);
             }
 
-            updateCustomChars(charString) {
-                // Remove duplicates and store as sorted array
-                const uniqueChars = [...new Set(charString)].sort();
-                this.customChars = new Set(uniqueChars);
-                this.updateCharacterStats();
-                return uniqueChars;
+            updateHomophoneAlphabet(charString) {
+                // Удаляем дубликаты и сортируем
+                const uniqueChars = [...new Set(charString)].filter(c => c.trim() !== '');
+                this.homophoneAlphabet = new Set(uniqueChars);
+                return this.validateAlphabet();
             }
 
-            validateCharacterSet() {
+            validateAlphabet() {
                 const issues = [];
+                const chars = [...this.homophoneAlphabet];
                 
-                if (this.customChars.size < 2) {
-                    issues.push('Minimum 2 characters required');
-                }
-                
-                if (this.customChars.size > 1000) {
-                    issues.push('Large character sets may impact performance');
+                // Проверка минимального размера
+                if (chars.length < 2) {
+                    issues.push('Требуется минимум 2 символа');
                 }
 
-                // Check for visually similar characters
-                const similarChars = this.findSimilarCharacters();
+                // Поиск визуально похожих символов
+                const similarChars = this.findSimilarCharacters(chars);
                 if (similarChars.length > 0) {
-                    issues.push(`Visually similar characters: ${similarChars.join(', ')}`);
+                    issues.push(`Похожие символы: ${similarChars.join(', ')}`);
                 }
 
-                return issues;
+                // Проверка на специальные символы которые могут вызвать проблемы
+                const problematicChars = chars.filter(c => {
+                    return c === '\n' || c === '\t' || c === '\r' || c === ' ';
+                });
+                
+                if (problematicChars.length > 0) {
+                    issues.push('Обнаружены пробелы или специальные символы');
+                }
+
+                return {
+                    isValid: issues.length === 0,
+                    issues,
+                    characterCount: chars.length,
+                    homophoneCount: chars.length * chars.length
+                };
             }
 
-            findSimilarCharacters() {
-                const similarPairs = [];
-                const chars = [...this.customChars];
-                
+            findSimilarCharacters(chars) {
+                const similar = [];
                 for (let i = 0; i < chars.length; i++) {
                     for (let j = i + 1; j < chars.length; j++) {
-                        if (this.areCharactersSimilar(chars[i], chars[j])) {
-                            similarPairs.push(`${chars[i]}↔${chars[j]}`);
+                        if (this.isCharacterSimilar(chars[i], chars[j])) {
+                            similar.push(`${chars[i]}↔${chars[j]}`);
                         }
                     }
                 }
+                return similar;
+            }
+
+            isCharacterSimilar(char1, char2) {
+                // Нормализация для сравнения
+                const norm1 = char1.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const norm2 = char2.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
                 
-                return similarPairs;
+                return norm1 === norm2 || 
+                       char1.toLowerCase() === char2.toLowerCase() ||
+                       this.getVisualSimilarity(char1, char2) > 0.8;
             }
 
-            areCharactersSimilar(char1, char2) {
-                // Basic similarity check (can be enhanced)
-                return char1.normalize() === char2.normalize() || 
-                       char1.toLowerCase() === char2.toLowerCase();
-            }
-
-            updateCharacterStats() {
-                const charCount = this.customChars.size;
-                const homophoneCount = charCount * charCount;
-                const maxEntropy = Math.log2(charCount);
-                const bigramsCount = 26 * 26; // A-Z bigrams
-                const homophonesPerBigram = homophoneCount / bigramsCount;
-
-                return {
-                    charCount,
-                    homophoneCount,
-                    maxEntropy: maxEntropy,
-                    homophonesPerBigram
+            getVisualSimilarity(char1, char2) {
+                // Простая эвристика для визуального сходства
+                if (char1 === char2) return 1.0;
+                if (char1.toLowerCase() === char2.toLowerCase()) return 0.9;
+                
+                const confusables = {
+                    '0': 'O', '1': 'I', '5': 'S', '8': 'B',
+                    'O': '0', 'I': '1', 'S': '5', 'B': '8'
                 };
+                
+                return confusables[char1] === char2 || confusables[char2] === char1 ? 0.8 : 0;
             }
 
             async generateSBox(key, progressCallback = null) {
-                if (!key) throw new Error('Encryption key required');
-                if (this.customChars.size < 2) throw new Error('Character set too small');
-
-                const chars = [...this.customChars];
-                const allBigrams = this.generateAllBigrams();
-                const allHomophones = this.generateAllHomophones(chars);
-
-                if (progressCallback) progressCallback(20, 'Shuffling homophones...');
-
-                // Cryptographically secure shuffling
-                const shuffledHomophones = await this.cryptoShuffle(allHomophones, key);
-                if (progressCallback) progressCallback(60, 'Distributing homophones...');
-
-                // Calculate optimal distribution
-                const totalHomophones = shuffledHomophones.length;
-                const totalBigrams = allBigrams.length;
-                const baseCount = Math.floor(totalHomophones / totalBigrams);
-                const extraCount = totalHomophones % totalBigrams;
-
-                // Create S-Box with optimal distribution
-                this.sBox = {};
-                let homophoneIndex = 0;
-
-                for (let i = 0; i < totalBigrams; i++) {
-                    const count = i < extraCount ? baseCount + 1 : baseCount;
-                    this.sBox[allBigrams[i]] = shuffledHomophones.slice(
-                        homophoneIndex, 
-                        homophoneIndex + count
-                    );
-                    homophoneIndex += count;
+                if (!key || key.length < 8) {
+                    throw new Error('Ключ должен содержать минимум 8 символов');
                 }
 
-                this.reverseSBox = this.createReverseSBox();
-                this.currentKey = key;
+                this.encryptionKey = key;
+                const validation = this.validateAlphabet();
+                
+                if (!validation.isValid) {
+                    throw new Error(`Невалидный алфавит: ${validation.issues.join(', ')}`);
+                }
 
-                if (progressCallback) progressCallback(100, 'S-Box generated successfully');
-                return true;
+                if (progressCallback) progressCallback(10, 'Генерация биграмм...');
+
+                // Генерация всех возможных биграмм
+                const bigrams = this.generateBigrams();
+                if (progressCallback) progressCallback(20, 'Генерация гомофонов...');
+
+                // Генерация всех возможных гомофонов
+                const homophones = this.generateHomophones();
+                if (progressCallback) progressCallback(30, 'Перемешивание гомофонов...');
+
+                // Криптографически безопасное перемешивание
+                const shuffledHomophones = await this.cryptographicShuffle(homophones, key);
+                if (progressCallback) progressCallback(60, 'Распределение гомофонов...');
+
+                // Оптимальное распределение гомофонов по биграммам
+                this.distributeHomophones(bigrams, shuffledHomophones);
+                if (progressCallback) progressCallback(90, 'Создание обратного маппинга...');
+
+                // Создание обратного преобразования
+                this.createReverseMapping();
+                if (progressCallback) progressCallback(100, 'S-Box успешно сгенерирован');
+
+                return this.getSBoxStats();
             }
 
-            generateAllBigrams() {
+            generateBigrams() {
                 const bigrams = [];
-                for (let i = 0; i < this.alphabet.length; i++) {
-                    for (let j = 0; j < this.alphabet.length; j++) {
-                        bigrams.push(this.alphabet[i] + this.alphabet[j]);
+                for (let i = 0; i < this.sourceAlphabet.length; i++) {
+                    for (let j = 0; j < this.sourceAlphabet.length; j++) {
+                        bigrams.push(this.sourceAlphabet[i] + this.sourceAlphabet[j]);
                     }
                 }
                 return bigrams;
             }
 
-            generateAllHomophones(chars) {
+            generateHomophones() {
+                const chars = [...this.homophoneAlphabet];
                 const homophones = [];
                 for (let i = 0; i < chars.length; i++) {
                     for (let j = 0; j < chars.length; j++) {
@@ -692,23 +671,21 @@
                 return homophones;
             }
 
-            async cryptoShuffle(array, key) {
+            async cryptographicShuffle(array, key) {
                 const encoder = new TextEncoder();
                 const keyData = encoder.encode(key);
                 
                 const cryptoKey = await crypto.subtle.importKey(
-                    'raw', keyData, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']
+                    'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
                 );
 
-                // HMAC-based DRBG for shuffling
-                let state = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode('shuffle-seed'));
                 const result = [...array];
+                let seed = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode('shuffle'));
 
                 for (let i = result.length - 1; i > 0; i--) {
-                    // Update state for each iteration
-                    state = await crypto.subtle.sign('HMAC', cryptoKey, state);
-                    const randomValues = new Uint32Array(state.slice(0, 4));
-                    const j = randomValues[0] % (i + 1);
+                    seed = await crypto.subtle.sign('HMAC', cryptoKey, seed);
+                    const randomBuffer = new Uint32Array(seed.slice(0, 4));
+                    const j = randomBuffer[0] % (i + 1);
                     
                     [result[i], result[j]] = [result[j], result[i]];
                 }
@@ -716,130 +693,222 @@
                 return result;
             }
 
-            createReverseSBox() {
-                const reverse = new Map();
-                const duplicates = new Set();
+            distributeHomophones(bigrams, homophones) {
+                this.sBox.clear();
+                this.duplicateHomophones.clear();
 
-                for (const [bigram, homophones] of Object.entries(this.sBox)) {
+                const totalHomophones = homophones.length;
+                const totalBigrams = bigrams.length;
+                
+                // Расчет оптимального распределения
+                const baseCount = Math.floor(totalHomophones / totalBigrams);
+                const extra = totalHomophones % totalBigrams;
+
+                let homophoneIndex = 0;
+
+                for (let i = 0; i < totalBigrams; i++) {
+                    const count = i < extra ? baseCount + 1 : baseCount;
+                    const bigramHomophones = homophones.slice(homophoneIndex, homophoneIndex + count);
+                    this.sBox.set(bigrams[i], bigramHomophones);
+                    homophoneIndex += count;
+                }
+            }
+
+            createReverseMapping() {
+                this.reverseSBox.clear();
+                const duplicateCheck = new Map();
+
+                for (const [bigram, homophones] of this.sBox.entries()) {
                     for (const homophone of homophones) {
-                        if (reverse.has(homophone)) {
-                            duplicates.add(homophone);
-                            reverse.delete(homophone);
-                        } else if (!duplicates.has(homophone)) {
-                            reverse.set(homophone, bigram);
+                        if (this.reverseSBox.has(homophone)) {
+                            this.duplicateHomophones.add(homophone);
+                            // Удаляем дубликат из обратного маппинга
+                            this.reverseSBox.delete(homophone);
+                        } else {
+                            this.reverseSBox.set(homophone, bigram);
                         }
                     }
                 }
-
-                console.log(`Duplicate homophones detected: ${duplicates.size}`);
-                return reverse;
             }
 
-            async encrypt(plaintext) {
-                if (!this.sBox) throw new Error('S-Box not generated');
-                
-                const processedText = plaintext.toUpperCase().replace(/[^A-Z]/g, '');
-                if (!processedText) throw new Error('No valid text to encrypt');
+            encrypt(plaintext) {
+                if (!this.sBox || this.sBox.size === 0) {
+                    throw new Error('S-Box не сгенерирован');
+                }
+
+                // Подготовка текста
+                const processedText = plaintext.toUpperCase()
+                    .replace(/[^A-Z]/g, '')
+                    .replace(/\s+/g, '');
+
+                if (processedText.length === 0) {
+                    throw new Error('Нет валидного текста для шифрования');
+                }
 
                 let ciphertext = '';
-                let previousBlock = 'AA';
-                let position = 0;
+                const rng = this.createSeededRNG(this.encryptionKey);
 
+                // Шифрование по биграммам
                 for (let i = 0; i < processedText.length; i += 2) {
                     let bigram = processedText.substr(i, 2);
-                    if (bigram.length === 1) bigram += 'X'; // Padding
-
-                    // Apply transformations
-                    let targetBigram = this.applyTransformations(bigram, previousBlock, position);
                     
-                    // Get random homophone
-                    if (this.sBox[targetBigram]) {
-                        const homophones = this.sBox[targetBigram];
-                        const randomIndex = this.cryptoRandom() % homophones.length;
-                        ciphertext += homophones[randomIndex];
-                        previousBlock = targetBigram;
+                    // Паддинг для последней неполной биграммы
+                    if (bigram.length === 1) {
+                        bigram += 'X';
                     }
-                    
-                    position++;
+
+                    if (this.sBox.has(bigram)) {
+                        const homophones = this.sBox.get(bigram);
+                        const randomIndex = Math.floor(rng() * homophones.length);
+                        ciphertext += homophones[randomIndex];
+                    } else {
+                        throw new Error(`Биграмма ${bigram} не найдена в S-Box`);
+                    }
                 }
 
                 return ciphertext;
             }
 
-            applyTransformations(bigram, previousBlock, position) {
-                let result = bigram;
-
-                if (this.config.cbcMode) {
-                    result = this.applyCBCMode(result, previousBlock, position);
+            decrypt(ciphertext) {
+                if (!this.reverseSBox || this.reverseSBox.size === 0) {
+                    throw new Error('Обратный S-Box не сгенерирован');
                 }
 
-                if (this.config.affineMode) {
-                    result = this.applyAffineTransformation(result);
+                if (ciphertext.length % 2 !== 0) {
+                    throw new Error('Длина зашифрованного текста должна быть четной');
                 }
 
-                return result;
-            }
+                let plaintext = '';
 
-            applyCBCMode(bigram, previousBlock, position) {
-                let result = '';
-                for (let i = 0; i < 2; i++) {
-                    const currentIdx = this.alphabet.indexOf(bigram[i]);
-                    const prevIdx = this.alphabet.indexOf(previousBlock[i]);
-                    const newIdx = (currentIdx + prevIdx + position) % 26;
-                    result += this.alphabet[newIdx];
+                // Дешифровка по гомофонам
+                for (let i = 0; i < ciphertext.length; i += 2) {
+                    const homophone = ciphertext.substr(i, 2);
+                    
+                    if (this.reverseSBox.has(homophone)) {
+                        plaintext += this.reverseSBox.get(homophone);
+                    } else if (this.duplicateHomophones.has(homophone)) {
+                        throw new Error(`Гомофон ${homophone} является дубликатом и не может быть однозначно расшифрован`);
+                    } else {
+                        throw new Error(`Гомофон ${homophone} не найден в обратном S-Box`);
+                    }
                 }
-                return result;
-            }
 
-            applyAffineTransformation(bigram) {
-                let result = '';
-                for (const char of bigram) {
-                    const x = this.alphabet.indexOf(char);
-                    const y = (this.config.affineA * x + this.config.affineB) % 26;
-                    result += this.alphabet[y];
+                // Удаление паддинга
+                if (plaintext.endsWith('X')) {
+                    plaintext = plaintext.slice(0, -1);
                 }
-                return result;
+
+                return plaintext;
             }
 
-            cryptoRandom() {
-                const array = new Uint32Array(1);
-                crypto.getRandomValues(array);
-                return array[0];
+            createSeededRNG(seed) {
+                let state = this.hashString(seed);
+                return function() {
+                    state ^= state << 13;
+                    state ^= state >> 17;
+                    state ^= state << 5;
+                    return Math.abs((state >>> 0) / 0xFFFFFFFF);
+                };
             }
 
-            calculateEntropy(text) {
-                if (!text) return 0;
+            hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return hash;
+            }
+
+            getSBoxStats() {
+                let minHomophones = Infinity;
+                let maxHomophones = 0;
+                let totalHomophones = 0;
+                let uncoveredBigrams = 0;
+
+                for (const [bigram, homophones] of this.sBox.entries()) {
+                    const count = homophones.length;
+                    if (count > 0) {
+                        minHomophones = Math.min(minHomophones, count);
+                        maxHomophones = Math.max(maxHomophones, count);
+                        totalHomophones += count;
+                    } else {
+                        uncoveredBigrams++;
+                    }
+                }
+
+                const avgHomophones = totalHomophones / this.sBox.size;
+                const coverage = ((this.sBox.size - uncoveredBigrams) / this.sBox.size) * 100;
+
+                return {
+                    totalBigrams: this.sBox.size,
+                    totalHomophones,
+                    minHomophonesPerBigram: minHomophones,
+                    maxHomophonesPerBigram: maxHomophones,
+                    avgHomophonesPerBigram: avgHomophones,
+                    coveragePercentage: coverage,
+                    duplicateHomophones: this.duplicateHomophones.size,
+                    uniqueMappings: this.reverseSBox.size
+                };
+            }
+
+            analyzeSecurity() {
+                const stats = this.getSBoxStats();
+                const homophoneChars = [...this.homophoneAlphabet];
                 
-                const frequencies = {};
-                for (const char of text) {
-                    frequencies[char] = (frequencies[char] || 0) + 1;
-                }
-
-                let entropy = 0;
-                const len = text.length;
+                // Расчет энтропии
+                const entropyPerSymbol = Math.log2(homophoneChars.length);
+                const effectiveEntropy = entropyPerSymbol * 2; // Для биграмм гомофонов
                 
-                for (const char in frequencies) {
-                    const freq = frequencies[char] / len;
-                    entropy -= freq * Math.log2(freq);
-                }
+                // Стойкость к частотному анализу
+                const uniformityScore = 1 - (stats.maxHomophonesPerBigram - stats.minHomophonesPerBigram) / stats.avgHomophonesPerBigram;
+                
+                return {
+                    keyStrength: this.encryptionKey.length * 8, // Битная длина ключа
+                    alphabetSize: homophoneChars.length,
+                    entropyPerHomophone: entropyPerSymbol,
+                    effectiveEntropy: effectiveEntropy,
+                    uniformityScore: Math.max(0, uniformityScore),
+                    duplicateRisk: (stats.duplicateHomophones / stats.totalHomophones) * 100,
+                    coverageScore: stats.coveragePercentage,
+                    securityLevel: this.calculateSecurityLevel(stats, effectiveEntropy)
+                };
+            }
 
-                return entropy;
+            calculateSecurityLevel(stats, entropy) {
+                let score = 0;
+                
+                // Оценка на основе размера алфавита
+                score += Math.min(stats.alphabetSize / 10, 10);
+                
+                // Оценка на основе энтропии
+                score += Math.min(entropy / 2, 10);
+                
+                // Оценка равномерности распределения
+                score += stats.uniformityScore * 10;
+                
+                // Штраф за дубликаты
+                score -= stats.duplicateRisk / 10;
+                
+                return Math.max(0, Math.min(score, 30));
             }
         }
 
-        // UI Controller
-        class CipherUI {
+        // Профессиональный UI контроллер
+        class ProfessionalCipherUI {
             constructor() {
-                this.cipher = new QuantumHomophonicCipher();
-                this.initializeElements();
+                this.cipher = new ProfessionalHomophonicCipher();
+                this.initializeDOM();
                 this.setupEventListeners();
                 this.updateDisplay();
             }
 
-            initializeElements() {
+            initializeDOM() {
                 this.elements = {
                     // Inputs
                     cryptoKey: document.getElementById('crypto-key'),
+                    sourceAlphabet: document.getElementById('source-alphabet'),
                     plaintext: document.getElementById('plaintext'),
                     ciphertext: document.getElementById('ciphertext'),
                     customChars: document.getElementById('custom-chars'),
@@ -848,20 +917,24 @@
                     ciphertextOutput: document.getElementById('ciphertext-output'),
                     decryptedOutput: document.getElementById('decrypted-output'),
                     validationOutput: document.getElementById('validation-output'),
+                    securityStats: document.getElementById('security-stats'),
                     alphabetDisplay: document.getElementById('alphabet-display'),
+                    mappingBody: document.getElementById('mapping-body'),
                     
                     // Stats
                     charCount: document.getElementById('char-count'),
                     homophoneCount: document.getElementById('homophone-count'),
                     entropyValue: document.getElementById('entropy-value'),
-                    bigramRatio: document.getElementById('bigram-ratio'),
+                    coverageRatio: document.getElementById('coverage-ratio'),
                     
                     // Controls
                     generateBtn: document.getElementById('generate-btn'),
                     encryptBtn: document.getElementById('encrypt-btn'),
                     decryptBtn: document.getElementById('decrypt-btn'),
+                    analyzeBtn: document.getElementById('analyze-btn'),
                     updateCharsBtn: document.getElementById('update-chars'),
                     resetCharsBtn: document.getElementById('reset-chars'),
+                    optimizeCharsBtn: document.getElementById('optimize-chars'),
                     
                     // Progress
                     progressFill: document.getElementById('progress-fill'),
@@ -873,80 +946,149 @@
                 this.elements.generateBtn.addEventListener('click', () => this.generateSBox());
                 this.elements.encryptBtn.addEventListener('click', () => this.encrypt());
                 this.elements.decryptBtn.addEventListener('click', () => this.decrypt());
-                this.elements.updateCharsBtn.addEventListener('click', () => this.updateCharacters());
-                this.elements.resetCharsBtn.addEventListener('click', () => this.resetCharacters());
+                this.elements.analyzeBtn.addEventListener('click', () => this.analyzeSecurity());
+                this.elements.updateCharsBtn.addEventListener('click', () => this.updateAlphabet());
+                this.elements.resetCharsBtn.addEventListener('click', () => this.resetAlphabet());
+                this.elements.optimizeCharsBtn.addEventListener('click', () => this.optimizeAlphabet());
                 
-                this.elements.customChars.addEventListener('input', () => this.previewCharacters());
-                this.elements.ciphertext.addEventListener('input', () => this.updateCiphertextStats());
+                this.elements.customChars.addEventListener('input', () => this.previewAlphabet());
+                this.elements.sourceAlphabet.addEventListener('input', () => this.updateSourceAlphabet());
             }
 
             async generateSBox() {
                 try {
-                    this.setLoading('generate', true);
-                    this.updateProgress(0, 'Initializing...');
+                    this.setLoadingState(true);
+                    this.updateProgress(0, 'Инициализация...');
 
-                    await this.cipher.generateSBox(
-                        this.elements.cryptoKey.value,
-                        (progress, message) => {
-                            this.updateProgress(progress, message);
-                        }
-                    );
+                    const key = this.elements.cryptoKey.value;
+                    await this.cipher.generateSBox(key, (progress, message) => {
+                        this.updateProgress(progress, message);
+                    });
 
-                    this.showStatus('S-Box generated successfully', 'success');
+                    this.showStatus('S-Box успешно сгенерирован', 'success');
+                    this.updateMappingTable();
                     this.updateStats();
 
                 } catch (error) {
-                    this.showStatus(`Error: ${error.message}`, 'error');
+                    this.showStatus(`Ошибка: ${error.message}`, 'error');
                 } finally {
-                    this.setLoading('generate', false);
+                    this.setLoadingState(false);
                 }
             }
 
             async encrypt() {
                 try {
                     const plaintext = this.elements.plaintext.value;
-                    if (!plaintext) throw new Error('Enter text to encrypt');
+                    if (!plaintext.trim()) throw new Error('Введите текст для шифрования');
 
-                    this.setLoading('encrypt', true);
-                    const ciphertext = await this.cipher.encrypt(plaintext);
+                    this.setLoadingState(true, 'encrypt');
+                    const ciphertext = this.cipher.encrypt(plaintext);
                     
                     this.elements.ciphertextOutput.textContent = ciphertext;
                     this.elements.ciphertext.value = ciphertext;
-                    this.showStatus('Text encrypted successfully', 'success');
-                    this.updateCiphertextStats();
+                    this.showStatus('Текст успешно зашифрован', 'success');
 
                 } catch (error) {
-                    this.showStatus(`Encryption error: ${error.message}`, 'error');
+                    this.showStatus(`Ошибка шифрования: ${error.message}`, 'error');
                 } finally {
-                    this.setLoading('encrypt', false);
+                    this.setLoadingState(false, 'encrypt');
                 }
             }
 
-            updateCharacters() {
+            async decrypt() {
+                try {
+                    const ciphertext = this.elements.ciphertext.value;
+                    if (!ciphertext.trim()) throw new Error('Введите текст для расшифровки');
+
+                    this.setLoadingState(true, 'decrypt');
+                    const plaintext = this.cipher.decrypt(ciphertext);
+                    
+                    this.elements.decryptedOutput.textContent = plaintext;
+                    this.showStatus('Текст успешно расшифрован', 'success');
+
+                } catch (error) {
+                    this.showStatus(`Ошибка расшифровки: ${error.message}`, 'error');
+                } finally {
+                    this.setLoadingState(false, 'decrypt');
+                }
+            }
+
+            updateAlphabet() {
                 try {
                     const charString = this.elements.customChars.value;
-                    const uniqueChars = this.cipher.updateCustomChars(charString);
-                    
-                    this.elements.customChars.value = uniqueChars.join('');
+                    this.cipher.updateHomophoneAlphabet(charString);
+                    this.elements.customChars.value = [...this.cipher.homophoneAlphabet].join('');
                     this.updateDisplay();
-                    this.showStatus('Character set updated', 'success');
+                    this.showStatus('Алфавит успешно обновлен', 'success');
 
                 } catch (error) {
-                    this.showStatus(`Error: ${error.message}`, 'error');
+                    this.showStatus(`Ошибка: ${error.message}`, 'error');
                 }
             }
 
-            resetCharacters() {
-                this.cipher.initializeDefaultChars();
-                this.elements.customChars.value = [...this.cipher.customChars].join('');
+            resetAlphabet() {
+                this.cipher.initializeDefaultAlphabet();
+                this.elements.customChars.value = [...this.cipher.homophoneAlphabet].join('');
                 this.updateDisplay();
-                this.showStatus('Character set reset to default', 'success');
+                this.showStatus('Алфавит сброшен к стандартному', 'success');
             }
 
-            previewCharacters() {
-                const charString = this.elements.customChars.value;
-                const uniqueChars = [...new Set(charString)];
-                this.renderAlphabetDisplay(uniqueChars);
+            optimizeAlphabet() {
+                // Простая оптимизация - удаление проблемных символов
+                const currentChars = this.elements.customChars.value;
+                const optimized = currentChars.replace(/[\\\n\r\t\s]/g, '');
+                this.elements.customChars.value = [...new Set(optimized)].join('');
+                this.updateAlphabet();
+            }
+
+            updateSourceAlphabet() {
+                this.cipher.sourceAlphabet = this.elements.sourceAlphabet.value.toUpperCase().replace(/[^A-Z]/g, '');
+                this.elements.sourceAlphabet.value = this.cipher.sourceAlphabet;
+                this.showStatus('Исходный алфавит обновлен', 'success');
+            }
+
+            analyzeSecurity() {
+                try {
+                    const analysis = this.cipher.analyzeSecurity();
+                    let statsHTML = '';
+                    
+                    statsHTML += `Уровень безопасности: ${analysis.securityLevel.toFixed(1)}/30\n`;
+                    statsHTML += `Размер алфавита: ${analysis.alphabetSize} символов\n`;
+                    statsHTML += `Энтропия на гомофон: ${analysis.entropyPerHomophone.toFixed(2)} бит\n`;
+                    statsHTML += `Эффективная энтропия: ${analysis.effectiveEntropy.toFixed(2)} бит\n`;
+                    statsHTML += `Равномерность распределения: ${(analysis.uniformityScore * 100).toFixed(1)}%\n`;
+                    statsHTML += `Риск дубликатов: ${analysis.duplicateRisk.toFixed(2)}%\n`;
+                    statsHTML += `Покрытие биграмм: ${analysis.coverageScore.toFixed(1)}%`;
+                    
+                    this.elements.securityStats.textContent = statsHTML;
+                    this.showStatus('Анализ безопасности завершен', 'success');
+
+                } catch (error) {
+                    this.showStatus(`Ошибка анализа: ${error.message}`, 'error');
+                }
+            }
+
+            updateDisplay() {
+                const validation = this.cipher.validateAlphabet();
+                const stats = this.cipher.getSBoxStats?.() || { coveragePercentage: 0 };
+
+                // Обновление статистики
+                this.elements.charCount.textContent = validation.characterCount;
+                this.elements.homophoneCount.textContent = validation.homophoneCount.toLocaleString();
+                this.elements.entropyValue.textContent = Math.log2(validation.characterCount).toFixed(2);
+                this.elements.coverageRatio.textContent = `${stats.coveragePercentage?.toFixed(1) || 0}%`;
+
+                // Валидация
+                if (!validation.isValid) {
+                    this.elements.validationOutput.textContent = validation.issues.join('\n');
+                    this.elements.validationOutput.style.color = 'var(--warning)';
+                } else {
+                    this.elements.validationOutput.textContent = 'Проблем не обнаружено';
+                    this.elements.validationOutput.style.color = 'var(--success)';
+                }
+
+                // Отображение алфавита
+                this.renderAlphabetDisplay([...this.cipher.homophoneAlphabet]);
             }
 
             renderAlphabetDisplay(chars) {
@@ -957,38 +1099,50 @@
                     const charElement = document.createElement('div');
                     charElement.className = 'alphabet-char';
                     charElement.textContent = char;
-                    charElement.title = `Char: ${char}\nUnicode: U+${char.charCodeAt(0).toString(16).toUpperCase()}`;
+                    charElement.title = `Символ: ${char}\nUnicode: U+${char.charCodeAt(0).toString(16).toUpperCase()}`;
+                    
+                    // Проверка на дубликаты и похожие символы
+                    const similar = this.cipher.findSimilarCharacters?.(chars) || [];
+                    if (similar.some(pair => pair.includes(char))) {
+                        charElement.classList.add('duplicate');
+                    }
+                    
                     display.appendChild(charElement);
                 });
             }
 
-            updateDisplay() {
-                const stats = this.cipher.updateCharacterStats();
-                const validationIssues = this.cipher.validateCharacterSet();
+            updateMappingTable() {
+                const tbody = this.elements.mappingBody;
+                tbody.innerHTML = '';
 
-                // Update stats
-                this.elements.charCount.textContent = stats.charCount;
-                this.elements.homophoneCount.textContent = stats.homophoneCount.toLocaleString();
-                this.elements.entropyValue.textContent = stats.maxEntropy.toFixed(2);
-                this.elements.bigramRatio.textContent = stats.homophonesPerBigram.toFixed(1);
-
-                // Update validation
-                if (validationIssues.length > 0) {
-                    this.elements.validationOutput.textContent = validationIssues.join('\n');
-                    this.elements.validationOutput.style.color = 'var(--warning)';
-                } else {
-                    this.elements.validationOutput.textContent = 'No issues detected';
-                    this.elements.validationOutput.style.color = 'var(--success)';
+                if (!this.cipher.sBox || this.cipher.sBox.size === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3">S-Box не сгенерирован</td></tr>';
+                    return;
                 }
 
-                // Render alphabet
-                this.renderAlphabetDisplay([...this.cipher.customChars]);
+                let rowCount = 0;
+                for (const [bigram, homophones] of this.cipher.sBox.entries()) {
+                    if (rowCount >= 50) { // Ограничение для производительности
+                        tbody.innerHTML += `<tr><td colspan="3">... и еще ${this.cipher.sBox.size - 50} строк</td></tr>`;
+                        break;
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${bigram}</td>
+                        <td>${homophones.slice(0, 5).join(', ')}${homophones.length > 5 ? '...' : ''}</td>
+                        <td>${homophones.length}</td>
+                    `;
+                    tbody.appendChild(row);
+                    rowCount++;
+                }
             }
 
-            updateCiphertextStats() {
-                const ciphertext = this.elements.ciphertext.value;
-                const entropy = this.cipher.calculateEntropy(ciphertext);
-                this.elements.entropyValue.textContent = entropy.toFixed(3);
+            updateStats() {
+                if (this.cipher.getSBoxStats) {
+                    const stats = this.cipher.getSBoxStats();
+                    this.elements.coverageRatio.textContent = `${stats.coveragePercentage.toFixed(1)}%`;
+                }
             }
 
             updateProgress(percent, message) {
@@ -1004,16 +1158,30 @@
                 status.className = `status ${type}`;
             }
 
-            setLoading(button, isLoading) {
-                const btn = this.elements[`${button}Btn`];
-                btn.disabled = isLoading;
-                btn.style.opacity = isLoading ? 0.7 : 1;
+            setLoadingState(isLoading, operation = 'all') {
+                const buttons = operation === 'all' ? 
+                    ['generate', 'encrypt', 'decrypt', 'analyze', 'update', 'reset', 'optimize'] : 
+                    [operation];
+
+                buttons.forEach(op => {
+                    const btn = this.elements[`${op}Btn`];
+                    if (btn) {
+                        btn.disabled = isLoading;
+                        btn.style.opacity = isLoading ? 0.6 : 1;
+                    }
+                });
+            }
+
+            previewAlphabet() {
+                const charString = this.elements.customChars.value;
+                const uniqueChars = [...new Set(charString)].filter(c => c.trim() !== '');
+                this.renderAlphabetDisplay(uniqueChars);
             }
         }
 
-        // Initialize application
+        // Инициализация приложения
         document.addEventListener('DOMContentLoaded', () => {
-            new CipherUI();
+            window.cipherUI = new ProfessionalCipherUI();
         });
     </script>
 </body>
